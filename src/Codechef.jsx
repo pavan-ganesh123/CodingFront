@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from "react";
-import './Leetcode.css';
+import './Codechef.css';
 
-function Leetcode () {
+function Codechef () {
     const [problems, setProblems] = useState([]);
 
     useEffect(() => {
@@ -13,9 +13,8 @@ function Leetcode () {
             body: JSON.stringify({
                 query: `
                     query {
-                        getLeetcode{
+                        getCodechef{
                             questionName
-                            questionId
                             difficulty
                             link
                             intuition
@@ -26,22 +25,21 @@ function Leetcode () {
             }),
         })
             .then((res)=> res.json())
-            .then((data)=> setProblems(data.data.getLeetcode));
+            .then((data)=> setProblems(data.data.getCodechef));
     }, []);
     return (
     <><h1 className="title" style={{ textAlign: "center", marginBottom: "20px" }}>
-            LeetCode Problems
+            Codechef Problems
         </h1><div className="container">
                 <div className="grid">
                     {problems.map((p, index) => (
-                        <div key={index} className="leetcode_card">
+                        <div key={index} className="codechef_card">
 
                             {/* Title */}
                             <h2 className="title">{p.questionName}</h2>
 
                             {/* Meta */}
                             <div className="meta">
-                                <span className="leetcode_platform">{p.questionId}. </span>
                                 
                                     <a href={p.link} target="_blank" rel="noreferrer" className="button">
                                         View Problem
@@ -99,4 +97,4 @@ function Leetcode () {
   );
 }
 
-export default Leetcode;
+export default Codechef;

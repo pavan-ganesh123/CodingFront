@@ -29,7 +29,7 @@ function AddProblem() {
               $questionName: String!,
               $difficulty: String!,
               $platformName: String!,
-              $questionId: Int!,
+              $questionId: Int,
               $link: String!,
               $intuition: String!,
               $code: String!
