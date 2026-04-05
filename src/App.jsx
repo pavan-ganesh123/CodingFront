@@ -1,39 +1,51 @@
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Leetcode from "./Leetcode";
 import AddProblem from "./AddProblem";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
+import HomePage from "./HomePage";
 import "./App.css";
 
 function Home() {
   const navigate = useNavigate();
 
-  const buttonStyle =
-    "bg-white/10 backdrop-blur-lg text-white px-8 py-4 rounded-2xl shadow-lg border border-white/20 hover:bg-white/20 transition-all duration-300";
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-purple-900 to-gray-900">
-      <h1 className="text-4xl font-bold text-white mb-10">What's in Mind</h1>
+    <div className="page-container">
+      
+      <h1 className="main-title">What's in Mind</h1>
 
-      <div className="flex gap-6">
-        <motion.button
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.95 }}
-          className={buttonStyle}
-          onClick={() => navigate("/leetcode")}
-        >
-          LeetCode
-        </motion.button>
+      <div className="content-layout">
 
-        <motion.button
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-purple-600 text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-purple-700 transition-all duration-300"
+      {/* LEFT: Cards */}
+      <div className="cards-container">
+        {[1, 2, 3, 4].map((_, i) => (
+          <div
+            key={i}
+            className="image-card"
+            onClick={() => navigate("/leetcode")}
+          >
+            <img src="/LeetCode_Image.png" alt="LeetCode" />
+            <p>Leetcode</p>
+          </div>
+        ))}
+      </div>
+
+      {/* MIDDLE: Button */}
+      <div className="right-panel">
+        <button
           onClick={() => navigate("/addProblem")}
+          className="button button-accent"
         >
           + Add Problem
-        </motion.button>
+        </button>
       </div>
+
+      {/* RIGHT: Animation */}
+      <div className="animation-container">
+        <HomePage />
+      </div>
+
+    </div>
+
     </div>
   );
 }

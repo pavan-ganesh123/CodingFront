@@ -1,181 +1,130 @@
-/* ================= GLOBAL THEME ================= */
+/* ================= PAGE ================= */
 
-:root {
-  --bg-main: #0f0f1a;
-  --bg-gradient: linear-gradient(135deg, #0f0f1a, #1e1b4b, #312e81);
-  --bg-card: rgba(255, 255, 255, 0.05);
-
-  --border: rgba(255, 255, 255, 0.1);
-
-  --text-main: #ffffff;
-  --text-muted: #9ca3af;
-
-  --accent: #a855f7;
-  --accent-bg: rgba(168, 85, 247, 0.1);
-  --accent-border: rgba(168, 85, 247, 0.5);
-
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-/* ================= BASE ================= */
-
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  background: var(--bg-gradient);
-  color: var(--text-main);
-}
-
-/* Smooth animations globally */
-* {
+.page-container {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px;
   box-sizing: border-box;
-  transition: all 0.25s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: var(--bg-gradient);
+  position: relative;
+}
+
+/* ================= TITLE ================= */
+
+.main-title {
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  text-align: center;
 }
 
 /* ================= LAYOUT ================= */
 
-#center {
-  min-height: 100vh;
+.content-layout {
+  width: 100%;
+  max-width: 1400px;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 80px;
+}
+
+/* ================= LEFT: CARDS ================= */
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 24px;
+  width: fit-content;
+}
+
+/* ================= RIGHT PANEL ================= */
+
+.right-panel {
+  width: 250px; 
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+/* ================= IMAGE CARD ================= */
+
+.image-card {
+  width: 220px;
+  padding: 16px;
+  border-radius: 20px;
+
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+  cursor: pointer;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 25px;
+  gap: 12px;
+
+  transition: all 0.3s ease;
 }
 
-/* ================= GLASS EFFECT ================= */
+.image-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8),
+              0 0 25px rgba(168, 85, 247, 0.4);
+}
 
-.glass {
-  background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
+/* IMAGE FIX */
+.image-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* TEXT */
+.image-card p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 /* ================= BUTTON ================= */
 
 .button {
-  padding: 12px 24px;
+  padding: 14px 28px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  cursor: pointer;
-  font-weight: 500;
-}
-
-/* Hover effect */
-.button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-}
-
-/* Accent button */
-.button-accent {
-  background: var(--accent);
   border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
 }
 
-.button-accent:hover {
-  background: #9333ea;
+.button:hover {
+  transform: scale(1.05);
 }
 
-/* ================= CARD ================= */
+/* ================= ANIMATION ================= */
 
-.card {
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  width: 300px;
-}
-
-/* Hover animation */
-.card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-}
-
-/* ================= TEXT ================= */
-
-.title {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.subtitle {
-  color: var(--text-muted);
-}
-
-/* ================= COUNTER ================= */
-
-.counter {
-  font-size: 16px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  margin-bottom: 24px;
-}
-
-.counter:hover {
-  border-color: var(--accent-border);
-}
-
-.counter:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* ================= HERO (OPTIONAL 3D AREA) ================= */
-
-.hero {
-  position: relative;
+.animation-container {
+  margin-left: auto;   /* THIS now works */
   display: flex;
-  justify-content: center;
   align-items: center;
 }
 
-.hero .base {
-  width: 170px;
-  position: relative;
-  z-index: 0;
-}
 
-.hero .framework,
-.hero .vite {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.hero .framework {
-  top: 34px;
-  height: 28px;
-  transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-    scale(1.4);
-}
-
-.hero .vite {
-  top: 107px;
-  height: 26px;
-  transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-    scale(0.8);
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 1024px) {
-  #center {
-    padding: 20px;
-    gap: 18px;
-  }
-
-  .card {
-    width: 100%;
-  }
-}
