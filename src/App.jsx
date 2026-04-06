@@ -5,6 +5,8 @@ import AddProblem from "./AddProblem";
 import HomePage from "./HomePage";
 import { useRef, useEffect, useState } from "react";
 import "./App.css";
+import CSES from "./CSES";
+import Codeforces from "./Codeforces";
 
 function Home() {
   const navigate = useNavigate();
@@ -24,7 +26,16 @@ function Home() {
     image: "/Codechef.jpg",
     route: "/codechef"
   },
-  
+  {
+    name: "CSES",
+    image: "/CSES.png",
+    route: "/cses"
+  },
+  {
+    name: "Codeforces",
+    image: "/Codeforces.png",
+    route: "/codeforces"
+  },
 ];
 
   useEffect(() => {
@@ -124,6 +135,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/leetcode" element={<Leetcode />} />
         <Route path="/codechef" element={<Codechef />} />
+        <Route path="/codeforces" element={<Codeforces />} />
+        <Route path="/cses" element={<CSES />} />
         <Route path="/addProblem" element={<AddProblem />} />
       </Routes>
     </BrowserRouter>

@@ -30,9 +30,10 @@ function Codechef () {
     return (
     <><h1 className="title" style={{ textAlign: "center", marginBottom: "20px" }}>
             Codechef Problems
-        </h1><div className="container">
+        </h1><div className="codechef_container">
                 <div className="grid">
                     {problems.map((p, index) => (
+                        <div className="card-wrapper">
                         <div key={index} className="codechef_card">
 
                             {/* Title */}
@@ -90,6 +91,7 @@ function Codechef () {
                                 </pre>
                             </div>
 
+                        </div>
                         </div>
                     ))}
                 </div>

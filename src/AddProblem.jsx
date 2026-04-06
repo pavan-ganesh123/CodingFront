@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./AddProblem.css";
 
 function AddProblem() {
   const [questionName, setQuestionName] = useState("");
@@ -84,10 +85,10 @@ function AddProblem() {
   };
 
   return (
-    <div className="container">
+    <div className="adding_container">
       <h2 className="title">Add Problem</h2>
 
-      <div className="card" style={{ maxWidth: "500px" }}>
+      <div className="adding_card" style={{ maxWidth: "450px" }}>
         <input
           className="input"
           placeholder="Question Name"
@@ -144,7 +145,11 @@ function AddProblem() {
         </button>
 
         {message && (
-          <p style={{ marginTop: "10px", fontSize: "14px" }}>
+          <p
+            className={`message ${
+              message.includes("❌") ? "error" : "success"
+            }`}
+          >
             {message}
           </p>
         )}
