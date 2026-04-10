@@ -1,0 +1,141 @@
+/* ================= PAGE ================= */
+
+.adding_container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 30px 20px;
+}
+
+/* ================= TITLE ================= */
+
+.adding_container .title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+/* ================= CARD ================= */
+
+.adding_container .adding_card {
+  width: 100%;
+  max-width: 500px;   /* slightly bigger */
+  padding: 28px;
+
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  transition: all 0.3s ease;
+}
+
+.adding_container .adding_card:hover {
+  transform: translateY(-4px);
+}
+
+/* ================= INPUT ================= */
+
+.adding_container .input {
+  width: 95%;
+  padding: 12px 14px;
+  border-radius: 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+
+  color: #e2e8f0;
+  font-size: 14px;
+
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+/* Placeholder */
+.adding_container .input::placeholder {
+  color: rgba(226, 232, 240, 0.5);
+}
+
+/* Focus */
+.adding_container .input:focus {
+  border: 1px solid #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Textarea */
+.adding_container textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ================= BUTTON ================= */
+
+.adding_container .button {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 12px;
+
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+
+  color: white;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+
+  transition: all 0.25s ease;
+}
+
+.adding_container .button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.6);
+}
+
+.adding_container .button:active {
+  transform: scale(0.98);
+}
+
+/* ================= MESSAGE ================= */
+
+.adding_container .message {
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Success */
+.adding_container .message.success {
+  color: #4ade80;
+}
+
+/* Error */
+.adding_container .message.error {
+  color: #f87171;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .adding_container .adding_card {
+    max-width: 95%;
+    padding: 22px;
+  }
+
+  .adding_container .title {
+    font-size: 26px;
+  }
+}

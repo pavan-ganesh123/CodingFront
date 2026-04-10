@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from "react";
-import './Leetcode.css';
+import './CSES.css';
 
-function Leetcode () {
+function CSES () {
     const [problems, setProblems] = useState([]);
 
     useEffect(() => {
@@ -13,9 +13,8 @@ function Leetcode () {
             body: JSON.stringify({
                 query: `
                     query {
-                        getLeetcode{
+                        getCSES{
                             questionName
-                            questionId
                             difficulty
                             link
                             intuition
@@ -26,22 +25,21 @@ function Leetcode () {
             }),
         })
             .then((res)=> res.json())
-            .then((data)=> setProblems(data.data.getLeetcode));
+            .then((data)=> setProblems(data.data.getCSES));
     }, []);
     return (
     <><h1 className="title" style={{ textAlign: "center", marginBottom: "20px" }}>
-            LeetCode Problems
-        </h1><div className="leetcode_container">
+            CSES Problems
+        </h1><div className="cses_container">
                 <div className="grid">
                     {problems.map((p, index) => (
-                        <div key={index} className="leetcode_card">
+                        <div key={index} className="cses_card">
 
                             {/* Title */}
                             <h2 className="title">{p.questionName}</h2>
 
                             {/* Meta */}
                             <div className="meta">
-                                <span className="leetcode_platform">{p.questionId}. </span>
                                 
                                     <a href={p.link} target="_blank" rel="noreferrer" className="button">
                                         View Problem
@@ -99,4 +97,4 @@ function Leetcode () {
   );
 }
 
-export default Leetcode;
+export default CSES;

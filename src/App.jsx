@@ -1,20 +1,82 @@
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Leetcode from "./Leetcode";
+import Codechef from "./Codechef";
 import AddProblem from "./AddProblem";
 import HomePage from "./HomePage";
 import FindQuestion from "./FindQuestion";
 import { useRef, useEffect, useState } from "react";
 import "./App.css";
+import CSES from "./CSES";
+import Codeforces from "./Codeforces";
 
 function Home() {
   const navigate = useNavigate();
 
-  const buttonStyle =
-    "bg-white/10 backdrop-blur-lg text-white px-8 py-4 rounded-2xl shadow-lg border border-white/20 hover:bg-white/20 transition-all duration-300";
+  const containerRef = useRef(null);
+  const cardRefs = useRef([]);
+  const buttonRef = useRef(null);
+  const [lines, setLines] = useState([]);
+  const platforms = [
+  {
+    name: "Leetcode",
+    image: "/LeetCode_Image.png",
+    route: "/leetcode"
+  },
+  {
+    name: "Codechef",
+    image: "/Codechef.jpg",
+    route: "/codechef"
+  },
+  {
+    name: "CSES",
+    image: "/CSES.png",
+    route: "/cses"
+  },
+  {
+    name: "Codeforces",
+    image: "/Codeforces.png",
+    route: "/codeforces"
+  },
+];
+
+  useEffect(() => {
+    const updateLines = () => {
+      if (!buttonRef.current || !containerRef.current) return;
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const btnRect = buttonRef.current.getBoundingClientRect();
+
+      const newLines = cardRefs.current.map((card) => {
+        if (!card) return null;
+
+        const rect = card.getBoundingClientRect();
+
+        return {
+          x1: rect.right - containerRect.left,
+          y1: rect.top + rect.height / 2 - containerRect.top,
+          x2: btnRect.left - containerRect.left,
+          y2: btnRect.top + btnRect.height / 2 - containerRect.top,
+        };
+      }).filter(Boolean);
+
+      setLines(newLines);
+    };
+
+    updateLines();
+
+    // Resize + slight delay (for animations/layout shifts)
+    window.addEventListener("resize", updateLines);
+    const timeout = setTimeout(updateLines, 300);
+
+    return () => {
+      window.removeEventListener("resize", updateLines);
+      clearTimeout(timeout);
+    };
+  }, []);
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-purple-900 to-gray-900">
-      <h1 className="text-4xl font-bold text-white mb-10">What's in Mind</h1>
+    <div className="page-container" ref={containerRef}>
+      <h1 className="main-title">What's in Mind</h1>
 
       <div className="content-layout">
 
@@ -79,6 +141,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/leetcode" element={<Leetcode />} />
+        <Route path="/codechef" element={<Codechef />} />
+        <Route path="/codeforces" element={<Codeforces />} />
+        <Route path="/cses" element={<CSES />} />
         <Route path="/addProblem" element={<AddProblem />} />
         <Route path="/find" element={<FindQuestion />} />
       </Routes>
