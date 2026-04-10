@@ -3,6 +3,7 @@ import Leetcode from "./Leetcode";
 import Codechef from "./Codechef";
 import AddProblem from "./AddProblem";
 import HomePage from "./HomePage";
+import FindQuestion from "./FindQuestion";
 import { useRef, useEffect, useState } from "react";
 import "./App.css";
 import CSES from "./CSES";
@@ -109,6 +110,12 @@ function Home() {
 
         {/* MIDDLE: BUTTON */}
         <div className="right-panel">
+          <input
+            type="text"
+            placeholder="🔍 Search problems..."
+            className="search-input"
+            onFocus={() => navigate("/find")}
+          />
           <button
             ref={buttonRef}
             onClick={() => navigate("/addProblem")}
@@ -138,6 +145,7 @@ function App() {
         <Route path="/codeforces" element={<Codeforces />} />
         <Route path="/cses" element={<CSES />} />
         <Route path="/addProblem" element={<AddProblem />} />
+        <Route path="/find" element={<FindQuestion />} />
       </Routes>
     </BrowserRouter>
   );

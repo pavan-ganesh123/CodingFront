@@ -153,3 +153,23 @@
     stroke-dashoffset: 20;
   }
 }
+
+.search-input {
+  width: 220px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  margin-bottom: 15px;
+
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  backdrop-filter: blur(8px);
+
+  transition: 0.3s;
+}
+
+.search-input:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0,255,255,0.5);
+}
