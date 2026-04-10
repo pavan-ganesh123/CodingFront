@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Leetcode from "./Leetcode";
 import AddProblem from "./AddProblem";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
+import HomePage from "./HomePage";
+import FindQuestion from "./FindQuestion";
+import { useRef, useEffect, useState } from "react";
 import "./App.css";
 
 function Home() {
@@ -15,24 +16,58 @@ function Home() {
     <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-purple-900 to-gray-900">
       <h1 className="text-4xl font-bold text-white mb-10">What's in Mind</h1>
 
-      <div className="flex gap-6">
-        <motion.button
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.95 }}
-          className={buttonStyle}
-          onClick={() => navigate("/leetcode")}
-        >
-          LeetCode
-        </motion.button>
+      <div className="content-layout">
 
-        <motion.button
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-purple-600 text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-purple-700 transition-all duration-300"
-          onClick={() => navigate("/addProblem")}
-        >
-          + Add Problem
-        </motion.button>
+        {/* SVG CONNECTIONS */}
+        <svg className="connection-layer">
+          {lines.map((line, i) => (
+            <line
+              key={i}
+              x1={line.x1}
+              y1={line.y1}
+              x2={line.x2}
+              y2={line.y2}
+            />
+          ))}
+        </svg>
+
+        {/* LEFT: CARDS */}
+        <div className="cards-container">
+        {platforms.map((platform, i) => (
+          <div
+            key={i}
+            ref={(el) => (cardRefs.current[i] = el)}
+            className="image-card"
+            onClick={() => navigate(platform.route)}
+          >
+            <img src={platform.image} alt={platform.name} />
+            <p>{platform.name}</p>
+          </div>
+        ))}
+      </div>
+
+        {/* MIDDLE: BUTTON */}
+        <div className="right-panel">
+          <input
+            type="text"
+            placeholder="🔍 Search problems..."
+            className="search-input"
+            onFocus={() => navigate("/find")}
+          />
+          <button
+            ref={buttonRef}
+            onClick={() => navigate("/addProblem")}
+            className="button button-accent"
+          >
+            + Add Problem
+          </button>
+        </div>
+
+        {/* RIGHT: ANIMATION */}
+        <div className="animation-container">
+          <HomePage />
+        </div>
+
       </div>
     </div>
   );
@@ -45,6 +80,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/leetcode" element={<Leetcode />} />
         <Route path="/addProblem" element={<AddProblem />} />
+        <Route path="/find" element={<FindQuestion />} />
       </Routes>
     </BrowserRouter>
   );
