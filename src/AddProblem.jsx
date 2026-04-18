@@ -10,6 +10,11 @@ function AddProblem() {
   const [intuition, setIntuition] = useState("");
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
+  const [keyIdea, setKeyIdea] = useState("");
+  const [approach, setApproach] = useState("");
+  const [mistakes, setMistakes] = useState("");
+  const [timeComplexity, setTimeComplexity] = useState("");
+  const [spaceComplexity, setSpaceComplexity] = useState("");
 
   const handleSubmit = async () => {
     // ✅ Validation
@@ -34,6 +39,11 @@ function AddProblem() {
               $link: String!,
               $intuition: String!,
               $code: String!
+              $keyIdea: String
+              $approach: String
+              $mistakes: String
+              $timeComplexity: String
+              $spaceComplexity: String
             ) {
               addProblem(
                 questionName: $questionName,
@@ -43,6 +53,11 @@ function AddProblem() {
                 link: $link,
                 intuition: $intuition,
                 code: $code
+                keyIdea: $keyIdea
+                approach: $approach
+                mistakes: $mistakes
+                timeComplexity: $timeComplexity
+                spaceComplexity: $spaceComplexity
               ) {
                 id
               }
@@ -56,6 +71,11 @@ function AddProblem() {
             link,
             intuition,
             code,
+            keyIdea,
+            approach,
+            mistakes,
+            timeComplexity,
+            spaceComplexity,
           },
         }),
       });
@@ -77,6 +97,11 @@ function AddProblem() {
         setLink("");
         setIntuition("");
         setCode("");
+        setKeyIdea("");
+        setApproach("");
+        setMistakes("");
+        setTimeComplexity("");
+        setSpaceComplexity("");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -134,12 +159,49 @@ function AddProblem() {
 
         <textarea
           className="input"
+          placeholder="KeyIdea"
+          rows="3"
+          value={keyIdea}
+          onChange={(e) => setKeyIdea(e.target.value)}
+        />
+
+        <textarea
+          className="input"
+          placeholder="Approach"
+          rows="3"
+          value={approach}
+          onChange={(e) => setApproach(e.target.value)}
+        />
+
+        <textarea
+          className="input"
+          placeholder="Common Mistakes"
+          rows="2"
+          value={mistakes}
+          onChange={(e) => setMistakes(e.target.value)}
+        />
+        <textarea
+          className="input"
           placeholder="Code"
           rows="6"
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
 
+        <input
+          className="input"
+          placeholder="Time Complexity"
+          value={timeComplexity}
+          onChange={(e) => setTimeComplexity(e.target.value)}
+        />
+
+        <input
+          className="input"
+          placeholder="Space Complexity"
+          value={spaceComplexity}
+          onChange={(e) => setSpaceComplexity(e.target.value)}
+        />
+        
         <button className="button button-accent" onClick={handleSubmit}>
           Add Problem
         </button>
