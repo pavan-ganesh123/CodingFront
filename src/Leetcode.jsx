@@ -19,7 +19,12 @@ function Leetcode () {
                             difficulty
                             link
                             intuition
+                            keyIdea
+                            approach
+                            mistakes
                             code
+                            timeComplexity
+                            spaceComplexity
                         }
                     }
                 `,
@@ -91,7 +96,9 @@ function Leetcode () {
                                     </code>
                                 </pre>
                             </div>
-
+                            <div className="intuition_block">
+                                <div className="intuition_header">{p.timeComplexity}</div>
+                            </div>
                         </div>
                     ))}
                 </div>
