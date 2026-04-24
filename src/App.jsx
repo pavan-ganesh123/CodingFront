@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Leetcode from "./Leetcode";
 import Codechef from "./Codechef";
 import AddProblem from "./AddProblem";
 import FindQuestion from "./FindQuestion";
-import "./App.css";
+
 import CSES from "./CSES";
 import Codeforces from "./Codeforces";
 import Home from "./pages/Home";

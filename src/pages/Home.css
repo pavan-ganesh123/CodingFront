@@ -1,0 +1,178 @@
+/* ================= PAGE ================= */
+
+.page-container {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: var(--bg-gradient);
+  position: relative;
+}
+
+/* ================= TITLE ================= */
+
+.main-title {
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* ================= LAYOUT ================= */
+
+.content-layout {
+  width: 100%;
+  max-width: 1400px;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 80px;
+}
+
+/* ================= LEFT: CARDS ================= */
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
+  width: fit-content;
+}
+
+/* ================= RIGHT PANEL ================= */
+
+.right-panel {
+  width: 250px; 
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+/* ================= IMAGE CARD ================= */
+
+.image-card {
+  width: 220px;
+  padding: 16px;
+  border-radius: 20px;
+
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  transition: all 0.3s ease;
+}
+
+.image-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8),
+              0 0 25px rgba(168, 85, 247, 0.4);
+}
+
+/* IMAGE FIX */
+.image-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* TEXT */
+.image-card p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* ================= BUTTON ================= */
+
+.button {
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+
+  background: linear-gradient(135deg, #bf7bff, #7c3aed);
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+/* ================= ANIMATION ================= */
+
+.animation-container {
+  margin-left: auto;   /* THIS now works */
+  display: flex;
+  align-items: center;
+}
+
+
+.connection-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.connection-layer line {
+  stroke: #7cffb2;
+  stroke-width: 2;
+  stroke-dasharray: 6;
+  animation: flow 2s linear infinite;
+}
+
+@keyframes flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 20;
+  }
+}
+
+.search-input {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+
+  width: 220px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  backdrop-filter: blur(8px);
+
+  transition: 0.3s;
+}
+
+.search-input:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0,255,255,0.5);
+}

@@ -71,7 +71,7 @@ function FindQuestion() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>🔍 Find Questions</h2>
+      <h2 style={styles.heading}>Find Questions</h2>
 
       {/* 🔹 Search Box */}
       <input

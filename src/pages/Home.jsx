@@ -1,7 +1,7 @@
 import HomePage from '../HomePage';
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import "./Home.css";
 
 function Home() {
   const navigate = useNavigate();
@@ -70,8 +70,7 @@ function Home() {
 
   return (
     <div className="page-container" ref={containerRef}>
-      <h1 className="main-title">What's in Mind</h1>
-
+      
       <div className="content-layout">
 
         {/* SVG CONNECTIONS */}
@@ -106,7 +105,7 @@ function Home() {
         <div className="right-panel">
           <input
             type="text"
-            placeholder="🔍 Search problems..."
+            placeholder="Search.."
             className="search-input"
             onFocus={() => navigate("/find")}
           />

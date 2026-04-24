@@ -1,0 +1,105 @@
+/* Full page background */
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+.auth-container {
+  height: 100vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background: linear-gradient(135deg, #000000, #434343);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Glass Card */
+.glass-card {
+  width: 350px;
+  padding: 30px;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  color: white;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover effect */
+.glass-card:hover {
+  transform: scale(1.05);
+}
+
+/* Inputs inside Login/Signup */
+.glass-card input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+
+  border-radius: 10px;
+  border: 1px solid transparent;
+  outline: none;
+  transition: 0.3s;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.glass-card input:focus {
+  border: 1px solid var(--accent);
+  background: rgba(255, 255, 255, 0.2);
+}
+/* Placeholder color */
+.glass-card input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Buttons */
+.glass-card button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+
+  border-radius: 10px;
+  border: none;
+
+  background: linear-gradient(135deg, #7e7cb2, #8f94fb);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
+  transition: 0.3s;
+}
+
+.glass-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 99, 255, 0.6);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.brand {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  color: white;
+}
+
+.brand h2 {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6c63ff, #00c6ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand p {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
