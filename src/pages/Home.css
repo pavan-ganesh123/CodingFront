@@ -14,15 +14,6 @@
   position: relative;
 }
 
-/* ================= TITLE ================= */
-
-.main-title {
-  font-size: 42px;
-  font-weight: bold;
-  margin-bottom: 40px;
-  text-align: center;
-}
-
 /* ================= LAYOUT ================= */
 
 .content-layout {
@@ -38,22 +29,10 @@
 /* ================= LEFT: CARDS ================= */
 
 .cards-container {
-  display: flex;
-  flex-direction: column;
-
-  gap: 24px;
-  width: fit-content;
-}
-
-/* ================= RIGHT PANEL ================= */
-
-.right-panel {
-  width: 250px; 
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
+  display: grid;
+  margin-top: 120px;
+  grid-template-columns: repeat(2, 1fr); /* 2 per row */
+  gap: 40px;
 }
 
 /* ================= IMAGE CARD ================= */
@@ -102,22 +81,6 @@
   font-size: 16px;
 }
 
-/* ================= BUTTON ================= */
-
-.button {
-  padding: 14px 28px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  color: white;
-
-  background: linear-gradient(135deg, #bf7bff, #7c3aed);
-}
-
-.button:hover {
-  transform: scale(1.05);
-}
 
 /* ================= ANIMATION ================= */
 
@@ -128,40 +91,20 @@
 }
 
 
-.connection-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.connection-layer line {
-  stroke: #7cffb2;
-  stroke-width: 2;
-  stroke-dasharray: 6;
-  animation: flow 2s linear infinite;
-}
-
-@keyframes flow {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: 20;
-  }
-}
-
-.search-input {
+.top-right-container {
   position: fixed;
   top: 20px;
   right: 30px;
 
-  width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* space between search and button */
+}
+
+
+.search-input,
+.addProblem-button{
   padding: 10px 14px;
-  border-radius: 10px;
   border: none;
   outline: none;
 
@@ -172,7 +115,36 @@
   transition: 0.3s;
 }
 
+.search-input {
+  width: 220px;
+  border-radius: 10px;
+}
+
+.addProblem-button {
+  width: 40px;               /* match height → perfect square */
+  padding: 5;                /* remove extra padding */
+  font-size: 14px;           /* center the + nicely */
+  border-radius: 10px;
+}
+
 .search-input:focus {
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(0,255,255,0.5);
+}
+
+
+
+.brand {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  color: white;
+}
+
+.brand h2 {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6c63ff, #00c6ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
