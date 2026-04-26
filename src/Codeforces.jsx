@@ -30,7 +30,7 @@ function Codeforces () {
             }),
         })
             .then((res)=> res.json())
-            .then((data)=> setProblems(data.data.getCodeforces));
+            .then((data)=> setProblems(data?.data?.getLeetcode || []));
     }, []);
     return (
     <><h1 className="title" style={{ textAlign: "center", marginBottom: "20px" }}>
