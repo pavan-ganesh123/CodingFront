@@ -9,6 +9,8 @@ import Codeforces from "./Codeforces";
 import Home from "./pages/Home";
 import AuthPage from "./pages/AuthPage";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import Friends from "./pages/Friends";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/cses" element={<CSES />} />
         <Route path="/addProblem" element={<AddProblem />} />
         <Route path="/find" element={<FindQuestion />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/friends" element={<Friends />} />
       </Routes>
     </BrowserRouter>
   );

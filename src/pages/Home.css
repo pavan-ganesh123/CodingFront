@@ -91,17 +91,6 @@
 }
 
 
-.top-right-container {
-  position: fixed;
-  top: 20px;
-  right: 30px;
-
-  display: flex;
-  align-items: center;
-  gap: 12px; /* space between search and button */
-}
-
-
 .search-input,
 .addProblem-button{
   padding: 10px 14px;
@@ -132,19 +121,40 @@
   box-shadow: 0 0 10px rgba(0,255,255,0.5);
 }
 
+.navbar {
+  width: 100%;
+  max-width: 1400px;
 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-.brand {
-  position: absolute;
-  top: 30px;
-  left: 40px;
-  color: white;
+  padding: 10px 20px;
+  margin-bottom: 40px;
 }
 
-.brand h2 {
+.nav-left h2 {
   font-size: 28px;
   font-weight: 700;
   background: linear-gradient(90deg, #6c63ff, #00c6ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-icon {
+  font-size: 22px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-icon:hover {
+  transform: scale(1.1);
+  color: #00ffcc;
 }
