@@ -10,7 +10,13 @@ import Home from "./pages/Home";
 import AuthPage from "./pages/AuthPage";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
-import Friends from "./pages/Friends";
+
+import FriendsLayout from "./pages/FriendsLayout";
+import FriendsChat from "./pages/FriendsChat";
+import FriendRequests from "./pages/FriendRequests";
+import FindFriends from "./pages/FindFriends";
+import ChatWindow from "./pages/ChatWindow";
+import { Navigate } from "react-router-dom";
 
 function App() {
   return (
@@ -25,7 +31,14 @@ function App() {
         <Route path="/addProblem" element={<AddProblem />} />
         <Route path="/find" element={<FindQuestion />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/friends" element={<Friends />} />
+
+        <Route path="/friends" element={<FriendsLayout />}>
+          <Route index element={<Navigate to="chat" />} />
+          <Route path="chat" element={<FriendsChat />} />
+          <Route path="requests" element={<FriendRequests />} />
+          <Route path="find-friends" element={<FindFriends />} />
+          <Route path="chat/:friendId" element={<ChatWindow />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

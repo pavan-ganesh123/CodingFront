@@ -32,10 +32,10 @@ function Login() {
     if (data.data && data.data.login) {
       const token = data.data.login.token;
       localStorage.setItem("token", token);
-      alert("Login successful!");
+      console.log("Login successful!");
       navigate("/home");   // ✅ go to home
     } else {
-      alert("Invalid credentials");
+      console.log("Invalid credentials");
     }
   };
 

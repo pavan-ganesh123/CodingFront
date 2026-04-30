@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
 import "./Friends.css";
+import { FaUserFriends } from "react-icons/fa";
+import { IoNotifications } from "react-icons/io5";
+import { MdPersonAdd } from "react-icons/md";
 import { getUserFromToken } from "../utils/auth";
 
 function Friends() {
   const [friends, setFriends] = useState([]);
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]); 
-
+  const [activeTab, setActiveTab] = useState("friends");
   const user = getUserFromToken();
   const userId = user?.userId;
 
@@ -108,7 +111,7 @@ function Friends() {
         userId: String(userId),   // safer
         friendId: String(friendId)
       });
-      alert("Friend request sent!");
+      console.log("Friend request sent!");
       fetchData();
     } catch (err) {
       console.error(err);
@@ -120,7 +123,7 @@ function Friends() {
       await client.request(ACCEPT_REQUEST, {
         requestId: String(requestId)
       });
-      alert("Friend request accepted!");
+      console.log("Friend request accepted!");
       fetchData();
     } catch (err) {
       console.error(err);
@@ -130,49 +133,98 @@ function Friends() {
   return (
     <div className="friends-container">
 
-      <h2>Your Friends</h2>
+      {/* 🔹 Tabs */}
+      <div className="tabs">
+        <button
+          className={activeTab === "friends" ? "active" : ""}
+          onClick={() => setActiveTab("friends")}
+        >
+          <FaUserFriends className="icon" />
+          
+        </button>
 
-      {friends.length === 0 ? (
-        <p>No friends yet</p>
-      ) : (
-        friends.map(friend => (
-          <div key={friend.id} className="friend-card">
-            {friend.userName}
-          </div>
-        ))
-      )}
-      <h2>Friend Requests</h2>
-      
-      {requests.length === 0 ? ( 
-        
-        <p>No pending requests</p>
-        
-      ) : (
-        requests.map(req => (
-          <div key={req.id} className="friend-card">
-            {req.user.userName}
-            <button onClick={() => handleAccept(req.id)}>
-              Accept
-            </button>
-          </div>
-        ))
-      )}
+        <button
+          className={activeTab === "requests" ? "active" : ""}
+          onClick={() => setActiveTab("requests")}
+        >
+          <IoNotifications className="icon" />
+           {requests.length > 0 && `(${requests.length})`}
+        </button>
 
-      <h2>Add Friends</h2>
+        <button
+          className={activeTab === "add" ? "active" : ""}
+          onClick={() => setActiveTab("add")}
+        >
+          <MdPersonAdd className="icon" />
+          
+        </button>
+      </div>
 
-      {users.length === 0 ? (
-        <p>No users available</p>
-      ) : (
-        users.map(u => (
-          <div key={u.id} className="friend-card">
-            {u.userName}
-            <button onClick={() => handleAddFriend(u.id)}>
-              Add Friend
-            </button>
-          </div>
-        ))
-      )}
+      {/* 🔹 CONTENT AREA */}
+      <div className="tab-content">
 
+        {/* 👥 FRIENDS */}
+        {activeTab === "friends" && (
+          <>
+            <h2>Your Friends</h2>
+
+            {friends.length === 0 ? (
+              <p className="empty">No friends yet</p>
+            ) : (
+              friends.map(friend => (
+                <div
+                  key={friend.id}
+                  className="friend-card clickable"
+                  onClick={() => console.log("Open chat with", friend)}
+                >
+                  {friend.userName}
+                </div>
+              ))
+            )}
+          </>
+        )}
+
+        {/* 🔔 REQUESTS */}
+        {activeTab === "requests" && (
+          <>
+            <h2>Friend Requests</h2>
+
+            {requests.length === 0 ? (
+              <p className="empty">No pending requests</p>
+            ) : (
+              requests.map(req => (
+                <div key={req.id} className="friend-card">
+                  <span>{req.user.userName}</span>
+                  <button onClick={() => handleAccept(req.id)}>
+                    Accept
+                  </button>
+                </div>
+              ))
+            )}
+          </>
+        )}
+
+        {/* ➕ ADD FRIENDS */}
+        {activeTab === "add" && (
+          <>
+            <h2>Add Friends</h2>
+
+            {users.length === 0 ? (
+              <p className="empty">No users available</p>
+            ) : (
+              users.map(u => (
+                <div key={u.id} className="friend-card">
+                  <span>{u.userName}</span>
+                  <button onClick={() => handleAddFriend(u.id)}>
+                    Add Friend
+                  </button>
+                </div>
+              ))
+            )}
+          </>
+        )}
+
+      </div>
     </div>
   );
 }
