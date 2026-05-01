@@ -1,8 +1,7 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { FaUserFriends } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { MdPersonAdd } from "react-icons/md";
-import "./Friends.css";
+import "./FriendsLayout.css";
 
 function FriendsLayout() {
   const navigate = useNavigate();
@@ -15,24 +14,17 @@ function FriendsLayout() {
       <div className="sidebar">
 
         <button
-          className={location.pathname.includes("chat") ? "active" : ""}
-          onClick={() => navigate("/friends/chat")}
-        >
-          <FaUserFriends /> Chat
-        </button>
-
-        <button
           className={location.pathname.includes("requests") ? "active" : ""}
           onClick={() => navigate("/friends/requests")}
         >
-          <IoNotifications /> Requests
+          <IoNotifications />
         </button>
 
         <button
           className={location.pathname.includes("find-friends") ? "active" : ""}
           onClick={() => navigate("/friends/find-friends")}
         >
-          <MdPersonAdd /> Find Friends
+          <MdPersonAdd />
         </button>
 
       </div>

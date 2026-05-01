@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
-import "./Friends.css"; // adjust path if needed
+import "./FindFriends.css";
 import { getUserFromToken } from "../utils/auth";
 
 function FindFriends() {
@@ -55,7 +55,7 @@ function FindFriends() {
 
       const allRelations = friendsData.getAllFriends;
 
-      // 🚫 Remove already connected or requested users
+      // Remove already connected or requested users
       const excludedIds = allRelations
         .filter(f =>
           String(f.user.id) === String(userId) ||

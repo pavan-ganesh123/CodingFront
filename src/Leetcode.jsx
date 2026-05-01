@@ -1,108 +1,200 @@
-import React,{useEffect, useState} from "react";
-import './Leetcode.css';
+import React, { useEffect, useState } from "react";
+import "./Leetcode.css";
 
-function Leetcode () {
-    const [problems, setProblems] = useState([]);
+function Leetcode() {
 
-    useEffect(() => {
-        fetch("http://localhost:8080/graphql",{
-            method :"POST",
-            headers :{
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query: `
-                    query {
-                        getLeetcode{
-                            questionName
-                            questionId
-                            difficulty
-                            link
-                            intuition
-                            keyIdea
-                            approach
-                            mistakes
-                            code
-                            timeComplexity
-                            spaceComplexity
-                        }
-                    }
-                `,
-            }),
-        })
-            .then((res)=> res.json())
-            .then((data)=>{ console.log(data); setProblems(data?.data?.getLeetcode || [])});
-    }, []);
-    return (
-    <><h1 className="title" style={{ textAlign: "center", marginBottom: "20px" }}>
-            LeetCode Problems
-        </h1><div className="leetcode_container">
-                <div className="grid">
-                    {problems.map((p, index) => (
-                        <div key={index} className="leetcode_card">
+  const [problems, setProblems] = useState([]);
 
-                            {/* Title */}
-                            <h2 className="title">{p.questionName}</h2>
+  const [expanded, setExpanded] = useState(null);
 
-                            {/* Meta */}
-                            <div className="meta">
-                                <span className="leetcode_platform">{p.questionId}. </span>
-                                
-                                    <a href={p.link} target="_blank" rel="noreferrer" className="button">
-                                        View Problem
-                                    </a>
-                                
-                                <span className={`difficulty ${p.difficulty.toLowerCase()}`}>
-                                    {p.difficulty}
-                                </span>
-                            </div>
+  useEffect(() => {
 
-                            {/* Link */}
-                            
+    fetch("http://localhost:8080/graphql", {
+      method: "POST",
 
-                            {/* Intuition */}
-                            <div className="intuition_block">
-                                <div className="intuition_header">▶ Intuition</div>
-                                <div className="intuition_content">
-                                    {p.intuition?.split("\n").map((line, i) => {
-                                        const text = line.trim();
-                                        if (!text) return null;
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-                                        if (text.toLowerCase().includes("o(")) {
-                                            return (
-                                                <div key={i} className="tag complexity">
-                                                    ⚡ {text}
-                                                </div>
-                                            );
-                                        } else if (text.length < 50) {
-                                            return (
-                                                <div key={i} className="point">
-                                                    {text}
-                                                </div>
-                                            );
-                                        } else {
-                                            return <p key={i}>{text}</p>;
-                                        }
-                                    })}
-                                </div>
-                            </div>
+      body: JSON.stringify({
+        query: `
+          query {
+            getLeetcode {
+              questionName
+              questionId
+              difficulty
+              link
+              intuition
+              keyIdea
+              approach
+              mistakes
+              code
+              timeComplexity
+              spaceComplexity
+            }
+          }
+        `,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setProblems(data?.data?.getLeetcode || []);
+      });
 
-                            {/* Code */}
-                            <div className="code_block">
-                                <div className="code_header">💻 Code</div>
-                                <pre className="line-numbers">
-                                    <code className="language-cpp">
-                                    {p.code?.replace(/</g, "<").replace(/>/g, ">")}
-                                    </code>
-                                </pre>
-                            </div>
-                            <div className="intuition_block">
-                                <div className="intuition_header">{p.timeComplexity}</div>
-                            </div>
-                        </div>
-                    ))}
+  }, []);
+
+  const toggleExpand = (index) => {
+
+    if (expanded === index) {
+      setExpanded(null);
+    } else {
+      setExpanded(index);
+    }
+  };
+
+  return (
+
+    <>
+      <h1 className="leetcode-main-heading">
+        Leetcode
+      </h1>
+
+      <div className="leetcode_container">
+
+        <div className="grid">
+
+          {problems.map((p, index) => {
+
+            const isOpen = expanded === index;
+
+            return (
+
+              <div
+                key={index}
+                className={`leetcode_card ${
+                  isOpen ? "expanded" : ""
+                }`}
+              >
+
+                {/* TOP */}
+
+                <div className="card-top">
+
+                  <div>
+
+                    <h2 className="title">
+                      {p.questionId}. {p.questionName}
+                    </h2>
+
+                    <span
+                      className={`difficulty ${p.difficulty.toLowerCase()}`}
+                    >
+                      {p.difficulty}
+                    </span>
+
+                  </div>
+
+                  <div className="actions">
+
+                    <a
+                      href={p.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="button"
+                    >
+                      View Problem
+                    </a>
+
+                    <button
+                      className="expand-btn"
+                      onClick={() => toggleExpand(index)}
+                    >
+                      {isOpen ? "▲" : "▼"}
+                    </button>
+
+                  </div>
+
                 </div>
-            </div></>
+
+                {/* EXPANDED CONTENT */}
+
+                {isOpen && (
+
+                  <div className="expanded-content">
+
+                    {/* INTUITION */}
+
+                    <div className="section">
+
+                      <div className="section-title">
+                        Intuition
+                      </div>
+
+                      <div className="section-content">
+
+                        {p.intuition
+                          ?.split("\n")
+                          .map((line, i) => {
+
+                            const text = line.trim();
+
+                            if (!text) return null;
+
+                            return (
+                              <p key={i}>
+                                {text}
+                              </p>
+                            );
+                          })}
+
+                      </div>
+
+                    </div>
+
+                    {/* CODE */}
+
+                    <div className="section">
+
+                      <div className="section-title">
+                        Code
+                      </div>
+
+                      <pre>
+                        <code>
+                          {p.code}
+                        </code>
+                      </pre>
+
+                    </div>
+
+                    {/* COMPLEXITIES */}
+
+                    <div className="complexities">
+
+                      <div className="tag complexity">
+                        Time: {p.timeComplexity}
+                      </div>
+
+                      <div className="tag complexity">
+                        Space: {p.spaceComplexity}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+              </div>
+
+            );
+          })}
+
+        </div>
+
+      </div>
+    </>
+
   );
 }
 

@@ -1,7 +1,7 @@
 import HomePage from '../HomePage';
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle, FaUserFriends, FaPlus } from "react-icons/fa";
+import { FaUserCircle, FaUserFriends, FaPlus, FaComments } from "react-icons/fa";
 import "./Home.css";
 
 function Home() {
@@ -46,6 +46,12 @@ function Home() {
             onClick={() => navigate("/friends")}
           />
 
+          <FaComments
+            className={`nav-icon ${
+              location.pathname.includes("/friends/chat") ? "active-icon" : ""
+            }`}
+            onClick={() => navigate("/chat")}
+          />
           <FaUserCircle
             className="nav-icon"
             onClick={() => navigate("/profile")}

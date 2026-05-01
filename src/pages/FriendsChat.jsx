@@ -56,7 +56,7 @@ function FriendsChat() {
 
     const openChat = (friend) => {
     navigate(`/friends/chat/${friend.id}`, {
-        state: { friend } // optional (passes data without refetch)
+        state: { friend }
     });
     };
 

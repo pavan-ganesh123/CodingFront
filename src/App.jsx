@@ -12,10 +12,9 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 
 import FriendsLayout from "./pages/FriendsLayout";
-import FriendsChat from "./pages/FriendsChat";
 import FriendRequests from "./pages/FriendRequests";
 import FindFriends from "./pages/FindFriends";
-import ChatWindow from "./pages/ChatWindow";
+import ChatPage from "./pages/ChatPage";
 import { Navigate } from "react-router-dom";
 
 function App() {
@@ -33,12 +32,12 @@ function App() {
         <Route path="/profile" element={<Profile />} />
 
         <Route path="/friends" element={<FriendsLayout />}>
-          <Route index element={<Navigate to="chat" />} />
-          <Route path="chat" element={<FriendsChat />} />
+          <Route index element={<Navigate to="requests" />} />
           <Route path="requests" element={<FriendRequests />} />
           <Route path="find-friends" element={<FindFriends />} />
-          <Route path="chat/:friendId" element={<ChatWindow />} />
         </Route>
+
+        <Route path="/chat" element={<ChatPage />} />
       </Routes>
     </BrowserRouter>
   );

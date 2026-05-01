@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
-import "./Friends.css";
+import "./FriendRequests.css";
 import { getUserFromToken } from "../utils/auth";
 
 function FriendRequests() {
@@ -67,7 +67,7 @@ function FriendRequests() {
         requestId: String(requestId)
       });
 
-      console.log("✅ Friend request accepted");
+      console.log("Friend request accepted");
       fetchRequests(); // refresh list
 
     } catch (err) {
