@@ -40,14 +40,14 @@ function Signup() {
       console.log("Signup success:", data);
 
       if (data.data) {
-        alert("Signup successful!");
+        console.log("Signup successful!");
         navigate("/");
       } else {
-        alert("Signup failed");
+        console.log("Signup failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Error occurred");
+      console.log("Error occurred");
     }
   };
 

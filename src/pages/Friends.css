@@ -4,6 +4,58 @@
   color: white;
 }
 
+/* 🔹 Tabs Container */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+/* 🔹 Tab Buttons */
+.tabs button {
+  display: inline-flex;              /* ✅ FIX */
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  white-space: nowrap;              /* ✅ prevents icon stacking */
+}
+
+/* 🔥 Hover Effect */
+.tabs button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 🔥 Active Tab */
+.tabs .active {
+  background: linear-gradient(90deg, #6c63ff, #00c6ff);
+  color: white;
+}
+
+/* 🔹 Icon */
+.icon {
+  font-size: 18px;
+  display: inline-block;            /* ✅ FIX */
+}
+
+/* 🔹 Content spacing */
+.tab-content {
+  margin-top: 10px;
+}
+
+/* 🔹 Friend List */
 .friends-list {
   margin-top: 20px;
   display: flex;
@@ -11,9 +63,34 @@
   gap: 12px;
 }
 
+/* 🔹 Friend Card */
 .friend-card {
   padding: 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+
   backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* 🔥 Hover Effect */
+.friend-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.01);
+}
+
+/* 🔹 Clickable */
+.clickable {
+  cursor: pointer;
+}
+
+/* 🔹 Empty state */
+.empty {
+  opacity: 0.7;
+  font-style: italic;
+  margin-top: 10px;
 }
