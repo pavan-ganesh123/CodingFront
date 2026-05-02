@@ -14,7 +14,9 @@ function ChatPage() {
   const [ws, setWs] = useState(null);
 
   const [message, setMessage] = useState("");
+  const [showChatMenu, setShowChatMenu] = useState(false);
 
+  const [showSidebarMenu, setShowSidebarMenu] = useState(false);
   // ALL chats stored here
   const [chat, setChat] = useState([]);
 
@@ -45,6 +47,17 @@ function ChatPage() {
     }
   `;
 
+  const BLOCK_USER = gql`
+  mutation($userId: ID!, $targetUserId: ID!) {
+    blockUser(
+      userId: $userId,
+      targetUserId: $targetUserId
+    ) {
+      id
+      status
+    }
+  }
+`;
   useEffect(() => {
 
     if (userId) {
@@ -192,6 +205,41 @@ function ChatPage() {
     }
   };
 
+  const handleBlockUser = async () => {
+    if (!selectedFriend) return;
+
+    const confirmBlock = window.confirm(
+      `Block ${selectedFriend.userName}?`
+    );
+
+    if (!confirmBlock) return;
+
+    try {
+
+      await client.request(BLOCK_USER, {
+        userId,
+        targetUserId: selectedFriend.id
+      });
+
+      // REMOVE USER FROM FRIEND LIST
+      setFriends(prev =>
+        prev.filter(
+          f => String(f.id) !== String(selectedFriend.id)
+        )
+      );
+
+      // CLOSE CHAT
+      setSelectedFriend(null);
+
+      setShowChatMenu(false);
+
+      alert("User blocked successfully");
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to block user");
+    }
+  };
   return (
 
     <div className="chat-layout">
@@ -201,7 +249,37 @@ function ChatPage() {
       <div className="chat-sidebar">
 
         <div className="sidebar-header">
-          Messages
+
+          <span>Messages</span>
+
+          <div className="sidebar-top-menu">
+
+            <button
+              className="sidebar-menu-button"
+              onClick={() => setShowSidebarMenu(prev => !prev)}
+            >
+              ⋮
+            </button>
+
+            {showSidebarMenu && (
+
+              <div className="sidebar-dropdown">
+
+                <div
+                  className="sidebar-dropdown-item"
+                  onClick={() => {
+                    window.location.href = "/blocked-users";
+                  }}
+                >
+                  Blocked Users
+                </div>
+
+              </div>
+
+            )}
+
+          </div>
+
         </div>
 
         <div className="friends-list">
@@ -272,9 +350,7 @@ function ChatPage() {
 
             <div className="chat-header">
 
-              <div className="chat-header-left">
-
-                <div>
+                <div className="chat-header-left">
 
                   <div className="chat-friend-name">
                     {selectedFriend.userName}
@@ -282,9 +358,33 @@ function ChatPage() {
 
                 </div>
 
-              </div>
+                <div className="chat-header-right">
 
-            </div>
+                  <button
+                    className="menu-button"
+                    onClick={() => setShowChatMenu(!showChatMenu)}
+                  >
+                    ⋮
+                  </button>
+
+                  {showChatMenu && (
+
+                    <div className="chat-menu">
+
+                      <div
+                        className="chat-menu-item danger"
+                        onClick={handleBlockUser}
+                      >
+                        Block
+                      </div>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              </div>
 
             {/* MESSAGES */}
 

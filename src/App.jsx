@@ -15,6 +15,7 @@ import FriendsLayout from "./pages/FriendsLayout";
 import FriendRequests from "./pages/FriendRequests";
 import FindFriends from "./pages/FindFriends";
 import ChatPage from "./pages/ChatPage";
+import Blocked from "./pages/Blocked";
 import { Navigate } from "react-router-dom";
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         </Route>
 
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/blocked-users" element={<Blocked />} />
       </Routes>
     </BrowserRouter>
   );
