@@ -140,6 +140,7 @@
 .message-row {
   display: flex;
   margin-bottom: 10px;
+  animation: fadeIn 0.18s ease;
 }
 
 .message-row.me {
@@ -151,13 +152,31 @@
 }
 
 .message-bubble {
-  max-width: 60%;
+  max-width: 65%;
 
-  padding: 10px 14px;
+  padding: 12px 14px;
 
-  border-radius: 14px;
+  border-radius: 16px;
 
   background: rgba(255,255,255,0.12);
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  transition: 0.2s ease;
+
+  word-break: break-word;
+
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.12);
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px);
 }
 
 /* INPUT */
@@ -281,4 +300,133 @@
 
 .sidebar-dropdown-item:hover {
   background: rgba(255,255,255,0.08);
+}
+.message-actions {
+
+  display: flex;
+
+  gap: 8px;
+
+  margin-top: 4px;
+
+  opacity: 0;
+
+  transition: 0.2s ease;
+}
+.message-bubble:hover .message-actions {
+  opacity: 1;
+}
+.reply-preview {
+
+  padding: 8px 10px;
+
+  border-left: 3px solid rgba(255,255,255,0.4);
+
+  border-radius: 8px;
+
+  font-size: 13px;
+
+  opacity: 0.8;
+
+  background: rgba(255,255,255,0.05);
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  max-width: 100%;
+}
+
+.message-actions button {
+
+  background: rgba(255,255,255,0.08);
+
+  border: none;
+
+  color: white;
+
+  padding: 5px 10px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 12px;
+
+  transition: 0.2s ease;
+}
+
+.message-actions button:hover {
+
+  transform: scale(1.05);
+
+  background: rgba(255,255,255,0.16);
+}
+
+.replying-bar {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 10px 16px;
+
+  border-top: 1px solid rgba(255,255,255,0.08);
+
+  background: rgba(255,255,255,0.04);
+
+  font-size: 14px;
+
+  backdrop-filter: blur(10px);
+}
+
+.replying-bar button {
+
+  background: transparent;
+
+  border: none;
+
+  color: white;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  opacity: 0.7;
+
+  transition: 0.2s;
+}
+
+.replying-bar button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+.chat-messages::-webkit-scrollbar,
+.chat-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb,
+.chat-sidebar::-webkit-scrollbar-thumb {
+
+  background: rgba(255,255,255,0.12);
+
+  border-radius: 10px;
+}
+
+@keyframes fadeIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

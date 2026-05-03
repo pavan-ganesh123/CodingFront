@@ -1,7 +1,7 @@
 .blocked-page {
   min-height: 100vh;
   padding: 40px;
-  background: #0f172a;
+  background: var(--bg-gradient);
   color: white;
 }
 
