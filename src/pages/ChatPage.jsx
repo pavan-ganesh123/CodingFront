@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/immutability */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { gql } from "graphql-request";
+
 import { getClient } from "../api/graphqlClient";
 import { getUserFromToken } from "../utils/auth";
 
@@ -14,11 +16,14 @@ function ChatPage() {
   const [ws, setWs] = useState(null);
 
   const [message, setMessage] = useState("");
+
+  const [chat, setChat] = useState([]);
+
+  const [replyingTo, setReplyingTo] = useState(null);
+
   const [showChatMenu, setShowChatMenu] = useState(false);
 
   const [showSidebarMenu, setShowSidebarMenu] = useState(false);
-  // ALL chats stored here
-  const [chat, setChat] = useState([]);
 
   const messagesEndRef = useRef(null);
 
@@ -27,6 +32,10 @@ function ChatPage() {
   const userId = user?.userId;
 
   const client = getClient();
+
+  // =====================================================
+  // GRAPHQL
+  // =====================================================
 
   const GET_FRIENDS = gql`
     query($userId: ID!) {
@@ -47,17 +56,56 @@ function ChatPage() {
     }
   `;
 
-  const BLOCK_USER = gql`
-  mutation($userId: ID!, $targetUserId: ID!) {
-    blockUser(
-      userId: $userId,
-      targetUserId: $targetUserId
-    ) {
-      id
-      status
+  const GET_MESSAGES = gql`
+    query($senderId: ID!, $receiverId: ID!) {
+      messages(
+        senderId: $senderId,
+        receiverId: $receiverId
+      ) {
+        messageId
+        senderId
+        receiverId
+        content
+        replyToMessageId
+        starred
+        createdAt
+      }
     }
-  }
-`;
+  `;
+
+  const STAR_MESSAGE = gql`
+    mutation($messageId: String!) {
+      starMessage(messageId: $messageId) {
+        messageId
+        starred
+      }
+    }
+  `;
+
+  const UNSTAR_MESSAGE = gql`
+    mutation($messageId: String!) {
+      unstarMessage(messageId: $messageId) {
+        messageId
+        starred
+      }
+    }
+  `;
+
+  const BLOCK_USER = gql`
+    mutation($userId: ID!, $targetUserId: ID!) {
+      blockUser(
+        userId: $userId,
+        targetUserId: $targetUserId
+      ) {
+        id
+      }
+    }
+  `;
+
+  // =====================================================
+  // FETCH FRIENDS
+  // =====================================================
+
   useEffect(() => {
 
     if (userId) {
@@ -70,9 +118,10 @@ function ChatPage() {
 
     try {
 
-      const data = await client.request(GET_FRIENDS, {
-        userId
-      });
+      const data = await client.request(
+        GET_FRIENDS,
+        { userId }
+      );
 
       const friendList = data.getAllFriends
         .filter(f => f.status === "ACCEPTED")
@@ -89,6 +138,52 @@ function ChatPage() {
     }
   };
 
+  // =====================================================
+  // FETCH SAVED MESSAGES
+  // =====================================================
+
+  useEffect(() => {
+
+    if (!selectedFriend) return;
+
+    fetchMessages();
+
+  }, [selectedFriend]);
+
+  const fetchMessages = async () => {
+
+    try {
+
+      const data = await client.request(
+        GET_MESSAGES,
+        {
+          senderId: Number(userId),
+          receiverId: Number(selectedFriend.id)
+        }
+      );
+
+      const formatted = data.messages.map(msg => ({
+        type: "private",
+        messageId: msg.messageId,
+        fromUserId: String(msg.senderId),
+        to: String(msg.receiverId),
+        message: msg.content,
+        replyToMessageId: msg.replyToMessageId,
+        starred: msg.starred,
+        createdAt: msg.createdAt
+      }));
+
+      setChat(formatted);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =====================================================
+  // WEBSOCKET
+  // =====================================================
+
   useEffect(() => {
 
     const token = localStorage.getItem("token");
@@ -98,7 +193,7 @@ function ChatPage() {
     );
 
     socket.onopen = () => {
-      console.log("WebSocket Connected");
+      console.log("✅ WebSocket Connected");
     };
 
     socket.onmessage = (event) => {
@@ -109,15 +204,22 @@ function ChatPage() {
 
       if (msg.type === "private") {
 
-        setChat(prev => [
-          ...prev,
-          msg
-        ]);
+        setChat(prev => {
+
+          // prevent duplicates
+          const exists = prev.some(
+            m => m.messageId === msg.messageId
+          );
+
+          if (exists) return prev;
+
+          return [...prev, msg];
+        });
       }
     };
 
     socket.onclose = () => {
-      console.log("WebSocket Disconnected");
+      console.log("❌ WebSocket Disconnected");
     };
 
     socket.onerror = (err) => {
@@ -130,6 +232,9 @@ function ChatPage() {
 
   }, []);
 
+  // =====================================================
+  // SEND MESSAGE
+  // =====================================================
 
   const sendMessage = () => {
 
@@ -142,25 +247,21 @@ function ChatPage() {
     const payload = {
       type: "private",
       to: String(selectedFriend.id),
-      message
+      message,
+      replyToMessageId:
+        replyingTo?.messageId || null
     };
-
-    console.log("Sending:", payload);
 
     ws.send(JSON.stringify(payload));
 
-    setChat(prev => [
-      ...prev,
-      {
-        type: "private",
-        from: user?.email,
-        to: String(selectedFriend.id),
-        message
-      }
-    ]);
-
     setMessage("");
+
+    setReplyingTo(null);
   };
+
+  // =====================================================
+  // FILTER CHAT
+  // =====================================================
 
   const filteredChat = useMemo(() => {
 
@@ -168,25 +269,23 @@ function ChatPage() {
 
     return chat.filter(msg => {
 
-      // SENT BY ME TO SELECTED FRIEND
       const sentByMe =
-        msg.from === user?.email &&
+        String(msg.fromUserId) === String(userId) &&
         String(msg.to) === String(selectedFriend.id);
 
-      // RECEIVED FROM SELECTED FRIEND
       const receivedFromFriend =
-        msg.from === selectedFriend.email ||
-        msg.from === selectedFriend.userName;
+        String(msg.fromUserId) ===
+        String(selectedFriend.id);
 
       return sentByMe || receivedFromFriend;
 
     });
 
-  }, [chat, selectedFriend, user]);
+  }, [chat, selectedFriend, userId]);
 
-  /* =========================
-     AUTO SCROLL
-  ========================= */
+  // =====================================================
+  // AUTO SCROLL
+  // =====================================================
 
   useEffect(() => {
 
@@ -196,7 +295,9 @@ function ChatPage() {
 
   }, [filteredChat]);
 
-
+  // =====================================================
+  // ENTER SEND
+  // =====================================================
 
   const handleKeyDown = (e) => {
 
@@ -205,7 +306,55 @@ function ChatPage() {
     }
   };
 
+  // =====================================================
+  // STAR MESSAGE
+  // =====================================================
+
+  const toggleStar = async (msg) => {
+
+    try {
+
+      if (msg.starred) {
+
+        await client.request(
+          UNSTAR_MESSAGE,
+          {
+            messageId: msg.messageId
+          }
+        );
+
+      } else {
+
+        await client.request(
+          STAR_MESSAGE,
+          {
+            messageId: msg.messageId
+          }
+        );
+      }
+
+      setChat(prev =>
+        prev.map(m =>
+          m.messageId === msg.messageId
+            ? {
+                ...m,
+                starred: !m.starred
+              }
+            : m
+        )
+      );
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =====================================================
+  // BLOCK USER
+  // =====================================================
+
   const handleBlockUser = async () => {
+
     if (!selectedFriend) return;
 
     const confirmBlock = window.confirm(
@@ -221,30 +370,44 @@ function ChatPage() {
         targetUserId: selectedFriend.id
       });
 
-      // REMOVE USER FROM FRIEND LIST
       setFriends(prev =>
         prev.filter(
-          f => String(f.id) !== String(selectedFriend.id)
+          f => String(f.id)
+            !== String(selectedFriend.id)
         )
       );
 
-      // CLOSE CHAT
       setSelectedFriend(null);
 
       setShowChatMenu(false);
 
-      alert("User blocked successfully");
+      alert("User blocked");
 
     } catch (err) {
       console.error(err);
-      alert("Failed to block user");
     }
   };
+
+  // =====================================================
+  // FIND REPLY MESSAGE
+  // =====================================================
+
+  const findReplyMessage = (replyId) => {
+
+    return chat.find(
+      m => m.messageId === replyId
+    );
+  };
+
+  // =====================================================
+  // UI
+  // =====================================================
+
   return (
 
     <div className="chat-layout">
 
-
+      {/* SIDEBAR */}
 
       <div className="chat-sidebar">
 
@@ -256,7 +419,9 @@ function ChatPage() {
 
             <button
               className="sidebar-menu-button"
-              onClick={() => setShowSidebarMenu(prev => !prev)}
+              onClick={() =>
+                setShowSidebarMenu(prev => !prev)
+              }
             >
               ⋮
             </button>
@@ -268,14 +433,14 @@ function ChatPage() {
                 <div
                   className="sidebar-dropdown-item"
                   onClick={() => {
-                    window.location.href = "/blocked-users";
+                    window.location.href =
+                      "/blocked-users";
                   }}
                 >
                   Blocked Users
                 </div>
 
               </div>
-
             )}
 
           </div>
@@ -284,44 +449,32 @@ function ChatPage() {
 
         <div className="friends-list">
 
-          {friends.length === 0 ? (
+          {friends.map(friend => (
 
-            <div className="empty-friends">
-              No friends found
-            </div>
+            <div
+              key={friend.id}
+              className={`chat-user ${
+                selectedFriend?.id === friend.id
+                  ? "selected"
+                  : ""
+              }`}
+              onClick={() =>
+                setSelectedFriend(friend)
+              }
+            >
 
-          ) : (
-
-            friends.map(friend => (
-
-              <div
-                key={friend.id}
-                className={`chat-user ${
-                  selectedFriend?.id === friend.id
-                    ? "selected"
-                    : ""
-                }`}
-                onClick={() => setSelectedFriend(friend)}
-              >
-
-                <div className="friend-info">
-
-                  <div className="friend-name">
-                    {friend.userName}
-                  </div>
-
-                </div>
-
+              <div className="friend-name">
+                {friend.userName}
               </div>
 
-            ))
-
-          )}
+            </div>
+          ))}
 
         </div>
 
       </div>
 
+      {/* MAIN */}
 
       <div className="chat-main">
 
@@ -329,16 +482,7 @@ function ChatPage() {
 
           <div className="empty-chat">
 
-            <div className="empty-chat-box">
-
-              <h2>Welcome to Chat</h2>
-
-              <p>
-                Select a friend from the sidebar
-                to start messaging
-              </p>
-
-            </div>
+            <h2>Select a friend</h2>
 
           </div>
 
@@ -350,82 +494,132 @@ function ChatPage() {
 
             <div className="chat-header">
 
-                <div className="chat-header-left">
+              <div className="chat-friend-name">
+                {selectedFriend.userName}
+              </div>
 
-                  <div className="chat-friend-name">
-                    {selectedFriend.userName}
+              <button
+                className="menu-button"
+                onClick={() =>
+                  setShowChatMenu(prev => !prev)
+                }
+              >
+                ⋮
+              </button>
+
+              {showChatMenu && (
+
+                <div className="chat-menu">
+
+                  <div
+                    className="chat-menu-item danger"
+                    onClick={handleBlockUser}
+                  >
+                    Block
                   </div>
 
                 </div>
+              )}
 
-                <div className="chat-header-right">
-
-                  <button
-                    className="menu-button"
-                    onClick={() => setShowChatMenu(!showChatMenu)}
-                  >
-                    ⋮
-                  </button>
-
-                  {showChatMenu && (
-
-                    <div className="chat-menu">
-
-                      <div
-                        className="chat-menu-item danger"
-                        onClick={handleBlockUser}
-                      >
-                        Block
-                      </div>
-
-                    </div>
-
-                  )}
-
-                </div>
-
-              </div>
+            </div>
 
             {/* MESSAGES */}
 
             <div className="chat-messages">
 
-              {filteredChat.length === 0 ? (
+              {filteredChat.map(msg => {
 
-                <div className="no-messages">
-                  Start your conversation 👋
-                </div>
+                const isMe =
+                  String(msg.fromUserId)
+                  === String(userId);
 
-              ) : (
+                const replyMessage =
+                  findReplyMessage(
+                    msg.replyToMessageId
+                  );
 
-                filteredChat.map((msg, index) => {
+                return (
 
-                  const isMe =
-                    msg.from === user?.email;
+                  <div
+                    key={msg.messageId}
+                    className={`message-row ${
+                      isMe ? "me" : "other"
+                    }`}
+                  >
 
-                  return (
+                    <div className="message-bubble">
 
-                    <div
-                      key={index}
-                      className={`message-row ${
-                        isMe ? "me" : "other"
-                      }`}
-                    >
+                      {/* REPLY PREVIEW */}
 
-                      <div className="message-bubble">
+                      {replyMessage && (
+
+                        <div className="reply-preview">
+
+                          {replyMessage.message}
+
+                        </div>
+                      )}
+
+                      {/* MESSAGE */}
+
+                      <div>
                         {msg.message}
+                      </div>
+
+                      {/* ACTIONS */}
+
+                      <div className="message-actions">
+
+                        <button
+                          onClick={() =>
+                            setReplyingTo(msg)
+                          }
+                        >
+                          Reply
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            toggleStar(msg)
+                          }
+                        >
+                          {msg.starred
+                            ? "⭐"
+                            : "☆"}
+                        </button>
+
                       </div>
 
                     </div>
 
-                  );
-                })
-
-              )}
+                  </div>
+                );
+              })}
 
               <div ref={messagesEndRef} />
 
             </div>
+
+            {/* REPLY BAR */}
+
+            {replyingTo && (
+
+              <div className="replying-bar">
+
+                Replying to:
+                {" "}
+                {replyingTo.message}
+
+                <button
+                  onClick={() =>
+                    setReplyingTo(null)
+                  }
+                >
+                  ✕
+                </button>
+
+              </div>
+            )}
 
             {/* INPUT */}
 
@@ -448,7 +642,6 @@ function ChatPage() {
             </div>
 
           </>
-
         )}
 
       </div>
