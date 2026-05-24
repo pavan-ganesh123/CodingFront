@@ -1,0 +1,53 @@
+.toast {
+
+  position: fixed;
+
+  top: 20px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  padding: 16px 28px;
+
+  border-radius: 14px;
+
+  background: white;
+
+  font-weight: 600;
+
+  font-size: 16px;
+
+  z-index: 999;
+
+  animation: popup 0.3s ease;
+}
+
+.toast.success {
+  border: 2px solid green;
+  color: green;
+  box-shadow: 0 0 18px rgba(0, 128, 0, 0.2);
+}
+
+.toast.error {
+  border: 2px solid red;
+  color: red;
+  box-shadow: 0 0 18px rgba(255, 0, 0, 0.2);
+}
+
+.toast.info {
+  border: 2px solid blue;
+  color: blue;
+}
+
+@keyframes popup {
+
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

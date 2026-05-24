@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-
+import { useToast } from "../notifications/ToastContext";
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const { showToast } = useToast();
   const handleLogin = async () => {
     const query = `
         mutation ($email: String!, $password: String!) {
@@ -32,10 +32,10 @@ function Login() {
     if (data.data && data.data.login) {
       const token = data.data.login.token;
       localStorage.setItem("token", token);
-      console.log("Login successful!");
+      showToast("Login Successful!", "success");
       navigate("/home");   // ✅ go to home
     } else {
-      console.log("Invalid credentials");
+      showToast("Invalid Credentials!", "error");
     }
   };
 
