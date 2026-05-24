@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastProvider, useToast } from "../notifications/ToastContext";
 
 function Signup() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const handleSignup = async () => {
     const query = `
       mutation AddUser($userName: String!, $email: String!, $password: String!) {
@@ -40,14 +42,14 @@ function Signup() {
       console.log("Signup success:", data);
 
       if (data.data) {
-        console.log("Signup successful!");
+        showToast("Signup successful!","success");
         navigate("/");
       } else {
-        console.log("Signup failed");
+        showToast("Signup failed","error");
       }
     } catch (err) {
       console.error(err);
-      console.log("Error occurred");
+      showToast("Error occurred","error");
     }
   };
 
