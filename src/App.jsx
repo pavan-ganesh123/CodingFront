@@ -17,30 +17,34 @@ import FindFriends from "./pages/FindFriends";
 import ChatPage from "./pages/ChatPage";
 import Blocked from "./pages/Blocked";
 import { Navigate } from "react-router-dom";
+import { ToastProvider } from "./notifications/ToastContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AuthPage />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/leetcode" element={<Leetcode />} />
-        <Route path="/codechef" element={<Codechef />} />
-        <Route path="/codeforces" element={<Codeforces />} />
-        <Route path="/cses" element={<CSES />} />
-        <Route path="/addProblem" element={<AddProblem />} />
-        <Route path="/find" element={<FindQuestion />} />
-        <Route path="/profile" element={<Profile />} />
+      <ToastProvider>
 
-        <Route path="/friends" element={<FriendsLayout />}>
-          <Route index element={<Navigate to="requests" />} />
-          <Route path="requests" element={<FriendRequests />} />
-          <Route path="find-friends" element={<FindFriends />} />
-        </Route>
+        <Routes>
+          <Route path="/" element={<AuthPage />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/leetcode" element={<Leetcode />} />
+          <Route path="/codechef" element={<Codechef />} />
+          <Route path="/codeforces" element={<Codeforces />} />
+          <Route path="/cses" element={<CSES />} />
+          <Route path="/addProblem" element={<AddProblem />} />
+          <Route path="/find" element={<FindQuestion />} />
+          <Route path="/profile" element={<Profile />} />
 
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/blocked-users" element={<Blocked />} />
-      </Routes>
+          <Route path="/friends" element={<FriendsLayout />}>
+            <Route index element={<Navigate to="requests" />} />
+            <Route path="requests" element={<FriendRequests />} />
+            <Route path="find-friends" element={<FindFriends />} />
+          </Route>
+
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/blocked-users" element={<Blocked />} />
+        </Routes>
+      </ToastProvider>
     </BrowserRouter>
   );
 }
