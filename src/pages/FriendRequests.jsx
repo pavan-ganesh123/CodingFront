@@ -4,6 +4,7 @@ import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
 import "./FriendRequests.css";
 import { getUserFromToken } from "../utils/auth";
+import { ToastProvider, useToast } from "../notifications/ToastContext";
 
 function FriendRequests() {
   const [requests, setRequests] = useState([]);
@@ -12,6 +13,7 @@ function FriendRequests() {
   const userId = user?.userId;
 
   const client = getClient();
+  const { showToast } = useToast();
 
   // 🔹 Get all relations
   const GET_FRIENDS = gql`
@@ -68,6 +70,7 @@ function FriendRequests() {
       });
 
       console.log("Friend request accepted");
+      showToast("Friend Request Accepted","info");
       fetchRequests(); // refresh list
 
     } catch (err) {

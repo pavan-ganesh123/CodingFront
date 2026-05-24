@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./AddProblem.css";
+import { ToastProvider, useToast } from "./notifications/ToastContext";
 
 function AddProblem() {
   const [questionName, setQuestionName] = useState("");
@@ -15,6 +16,7 @@ function AddProblem() {
   const [mistakes, setMistakes] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
+  const { showToast } = useToast();
 
   const handleSubmit = async () => {
     // ✅ Validation
@@ -85,10 +87,11 @@ function AddProblem() {
       if (data.errors) {
         console.error("GraphQL Errors:", JSON.stringify(data.errors, null, 2));
         setMessage("❌ Failed to save problem");
+        showToast("Error occurred","error");
       } else {
         console.log("Saved:", data);
         setMessage("✅ Problem added successfully!");
-
+        showToast("Notes Added","info");
         // ✅ Clear form
         setQuestionName("");
         setDifficulty("");

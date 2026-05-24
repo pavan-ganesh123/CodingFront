@@ -4,6 +4,7 @@ import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
 import "./Profile.css";
 import { getUserFromToken } from "../utils/auth";
+import { ToastProvider, useToast } from "../notifications/ToastContext";
 
 function Profile() {
 
@@ -14,7 +15,7 @@ function Profile() {
   const userId = authUser?.userId;
 
   const client = getClient();
-
+  const { showToast } = useToast();
   const GET_USER = gql`
     query {
       getCurrentUser {
@@ -49,6 +50,7 @@ function Profile() {
 
     } catch (err) {
       console.error("Profile Error:", err);
+      showToast("Please login again.!","error");
     }
   };
 
