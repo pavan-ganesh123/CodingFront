@@ -150,8 +150,6 @@ const PostCard = ({ post, refreshFeed }) => {
 
                 <div className="post-message">
 
-                    🎯 <strong>{post.userName}</strong> added a new Problem
-
                     <div
                         className="problem-title"
                         onClick={() =>
@@ -163,25 +161,9 @@ const PostCard = ({ post, refreshFeed }) => {
 
                 </div>
 
-                <div
-                    className={`difficulty-badge difficulty-${post.difficulty?.toLowerCase()}`}
-                >
-                    {post.difficulty}
-                </div>
 
             </div>
 
-            <div className="post-stats">
-
-                <span>
-                    👍 {post.likesCount || 0} Likes
-                </span>
-
-                <span>
-                    💬 {post.commentsCount || 0} Comments
-                </span>
-
-            </div>
 
             <div className="post-actions">
 
