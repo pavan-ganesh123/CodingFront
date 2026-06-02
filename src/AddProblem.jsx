@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./AddProblem.css";
-import { ToastProvider, useToast } from "./notifications/ToastContext";
 
 function AddProblem() {
   const [questionName, setQuestionName] = useState("");
@@ -16,99 +15,82 @@ function AddProblem() {
   const [mistakes, setMistakes] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
-  const { showToast } = useToast();
 
   const handleSubmit = async () => {
-    // ✅ Validation
     if (!questionId || isNaN(Number(questionId))) {
-      setMessage("❌ Question ID must be a valid number");
+      setMessage("Question ID must be a valid number");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:8080/graphql", {
+      const token = localStorage.getItem("token");
+
+      const createResponse = await fetch("http://localhost:8080/api/problems", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          query: `
-            mutation AddProblem(
-              $questionName: String!,
-              $difficulty: String!,
-              $platformName: String!,
-              $questionId: Int,
-              $link: String!,
-              $intuition: String!,
-              $code: String!
-              $keyIdea: String
-              $approach: String
-              $mistakes: String
-              $timeComplexity: String
-              $spaceComplexity: String
-            ) {
-              addProblem(
-                questionName: $questionName,
-                difficulty: $difficulty,
-                platformName: $platformName,
-                questionId: $questionId,
-                link: $link,
-                intuition: $intuition,
-                code: $code
-                keyIdea: $keyIdea
-                approach: $approach
-                mistakes: $mistakes
-                timeComplexity: $timeComplexity
-                spaceComplexity: $spaceComplexity
-              ) {
-                id
-              }
-            }
-          `,
-          variables: {
-            questionName,
-            difficulty: difficulty.toUpperCase(), // ✅ enum safety
-            platformName,
-            questionId: Number(questionId),       // ✅ FIX HERE
-            link,
-            intuition,
-            code,
-            keyIdea,
-            approach,
-            mistakes,
-            timeComplexity,
-            spaceComplexity,
-          },
+          questionName,
+          difficulty,
+          platformName,
+          questionId: Number(questionId),
+          link,
+          intuition,
+          code,
+          keyIdea,
+          approach,
+          mistakes,
+          timeComplexity,
+          spaceComplexity,
         }),
       });
 
-      const data = await response.json();
-
-      if (data.errors) {
-        console.error("GraphQL Errors:", JSON.stringify(data.errors, null, 2));
-        setMessage("❌ Failed to save problem");
-        showToast("Error occurred","error");
-      } else {
-        console.log("Saved:", data);
-        setMessage("✅ Problem added successfully!");
-        showToast("Notes Added","info");
-        // ✅ Clear form
-        setQuestionName("");
-        setDifficulty("");
-        setPlatform("");
-        setQuestionId("");
-        setLink("");
-        setIntuition("");
-        setCode("");
-        setKeyIdea("");
-        setApproach("");
-        setMistakes("");
-        setTimeComplexity("");
-        setSpaceComplexity("");
+      if (!createResponse.ok) {
+        setMessage("Failed to save problem");
+        return;
       }
+
+      const createdProblem = await createResponse.json();
+      const problemId = createdProblem.id;
+
+      const solveResponse = await fetch(
+        `http://localhost:8080/api/problems/my/solve?problemId=${problemId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            solutionCode: code,
+          }),
+        }
+      );
+
+      if (!solveResponse.ok) {
+        setMessage("Problem saved but marking as solved failed");
+        return;
+      }
+
+      setMessage("✅ Problem added and marked as solved!");
+
+      setQuestionName("");
+      setDifficulty("");
+      setPlatform("");
+      setQuestionId("");
+      setLink("");
+      setIntuition("");
+      setCode("");
+      setKeyIdea("");
+      setApproach("");
+      setMistakes("");
+      setTimeComplexity("");
+      setSpaceComplexity("");
     } catch (error) {
       console.error("Error:", error);
-      setMessage("❌ Server error");
+      setMessage("Server error");
     }
   };
 

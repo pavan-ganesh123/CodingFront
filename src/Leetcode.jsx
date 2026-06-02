@@ -6,42 +6,54 @@ function Leetcode() {
   const [problems, setProblems] = useState([]);
 
   const [expanded, setExpanded] = useState(null);
+  const [difficulty, setDifficulty] = useState("");
 
   useEffect(() => {
 
-    fetch("http://localhost:8080/graphql", {
-      method: "POST",
+  const fetchProblems = async () => {
 
-      headers: {
-        "Content-Type": "application/json",
-      },
+    try {
 
-      body: JSON.stringify({
-        query: `
-          query {
-            getLeetcode {
-              questionName
-              questionId
-              difficulty
-              link
-              intuition
-              keyIdea
-              approach
-              mistakes
-              code
-              timeComplexity
-              spaceComplexity
-            }
-          }
-        `,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setProblems(data?.data?.getLeetcode || []);
-      });
+      const token = localStorage.getItem("token");
 
-  }, []);
+      const params = new URLSearchParams();
+      params.append("platform", "Leetcode");
+      
+
+      if (difficulty) {
+        params.append("difficulty", difficulty);
+      }
+
+      const response = await fetch(
+        `http://localhost:8080/api/problems/my/problems?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch problems");
+      }
+
+      const data = await response.json();
+
+      setProblems(data);
+
+    } catch (error) {
+
+      console.error(
+        "Error fetching problems:",
+        error
+      );
+
+    }
+  };
+
+  fetchProblems();
+
+}, [difficulty]);
 
   const toggleExpand = (index) => {
 
@@ -57,6 +69,19 @@ function Leetcode() {
     <>
       <h1 className="leetcode-main-heading">
         Leetcode
+        <div className="filters">
+          
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+          >
+            <option value="">All Difficulties</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+
+        </div>
       </h1>
 
       <div className="leetcode_container">
@@ -83,13 +108,13 @@ function Leetcode() {
                   <div>
 
                     <h2 className="title">
-                      {p.questionId}. {p.questionName}
+                      {p.problem.questionId}. {p.problem.questionName}
                     </h2>
 
                     <span
-                      className={`difficulty ${p.difficulty.toLowerCase()}`}
+                      className={`difficulty ${p.problem.difficulty.toLowerCase()}`}
                     >
-                      {p.difficulty}
+                      {p.problem.difficulty}
                     </span>
 
                   </div>
@@ -97,7 +122,7 @@ function Leetcode() {
                   <div className="actions">
 
                     <a
-                      href={p.link}
+                      href={p.problem.link}
                       target="_blank"
                       rel="noreferrer"
                       className="button"
@@ -132,7 +157,7 @@ function Leetcode() {
 
                       <div className="section-content">
 
-                        {p.intuition
+                        {p.problem.intuition
                           ?.split("\n")
                           .map((line, i) => {
 
@@ -161,7 +186,7 @@ function Leetcode() {
 
                       <pre>
                         <code>
-                          {p.code}
+                          {p.problem.code}
                         </code>
                       </pre>
 
@@ -172,11 +197,11 @@ function Leetcode() {
                     <div className="complexities">
 
                       <div className="tag complexity">
-                        Time: {p.timeComplexity}
+                        Time: {p.problem.timeComplexity}
                       </div>
 
                       <div className="tag complexity">
-                        Space: {p.spaceComplexity}
+                        Space: {p.problem.spaceComplexity}
                       </div>
 
                     </div>
