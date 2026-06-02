@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.16.1",
     "framer-motion": "^12.38.0",
     "graphql-request": "^7.4.0",
     "jwt-decode": "^4.0.0",

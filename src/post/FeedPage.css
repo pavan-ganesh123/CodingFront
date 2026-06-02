@@ -1,0 +1,35 @@
+.feed-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.feed-header {
+    margin-bottom: 24px;
+}
+
+.feed-header h1 {
+    margin-bottom: 8px;
+}
+
+.feed-header p {
+    color: #666;
+}
+
+.feed-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feed-loading,
+.feed-error,
+.empty-feed {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+}
+
+.feed-error {
+    color: red;
+}
