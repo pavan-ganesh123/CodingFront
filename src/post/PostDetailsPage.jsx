@@ -13,6 +13,7 @@ const PostDetailsPage = () => {
     const { postId } = useParams();
 
     const [post, setPost] = useState(null);
+    const [problem, setProblem] = useState(null);
     const [comments, setComments] = useState([]);
     const [commentText, setCommentText] = useState("");
 
@@ -34,6 +35,7 @@ const PostDetailsPage = () => {
                     }
                 );
 
+            console.log("POST DATA:", response.data);
             setPost(response.data);
 
         } catch (error) {
@@ -97,6 +99,26 @@ const PostDetailsPage = () => {
 
         }
     };
+    const loadProblem = async (problemId) => {
+        if (!problemId) {
+            console.warn("No problemId to load problem:", problemId);
+            return;
+        }
+        try {
+            console.log("Loading problem with ID:", problemId);
+            const response = await axios.get(
+                `http://localhost:8080/api/problems/${problemId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            setProblem(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
 
@@ -104,6 +126,12 @@ const PostDetailsPage = () => {
         loadComments();
 
     }, [postId]);
+
+    useEffect(() => {
+        if (post?.questionId) {
+            loadProblem(post.questionId);
+        }
+    }, [post]);
 
     if (!post) {
 
@@ -128,27 +156,61 @@ const PostDetailsPage = () => {
                     {post.questionTitle}
                 </div>
 
-                <div className="difficulty-badge">
-                    {post.difficulty}
+                <div className="problem-intuition">
+                    {post.questionId}
                 </div>
 
+                {problem && (
+                    <div className="problem-details">
+                        <div className="problem-meta">
+                            {problem.difficulty && (
+                                <div className={`difficulty-badge difficulty-${problem.difficulty.toLowerCase()}`}>
+                                    {problem.difficulty}
+                                </div>
+                            )}
+                        </div>
+
+                        {(() => {
+                            console.log("PROBLEM RENDER:", {
+                                timeComplexity: problem.timeComplexity,
+                                spaceComplexity: problem.spaceComplexity,
+                                description: problem.description,
+                                difficulty: problem.difficulty,
+                                allKeys: Object.keys(problem)
+                            });
+                            return null;
+                        })()}
+
+                        {problem.timeComplexity && (
+                            <div className="problem-complexity">
+                                <strong>Time Complexity:</strong> {problem.timeComplexity}
+                            </div>
+                        )}
+
+                        {problem.spaceComplexity && (
+                            <div className="problem-complexity">
+                                <strong>Space Complexity:</strong> {problem.spaceComplexity}
+                            </div>
+                        )}
+
+                        {problem.description && (
+                            <div className="problem-description">
+                                <strong>Description:</strong>
+                                <p>{problem.description}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="post-stats">
 
-                    <span>
-                        👍 {post.likesCount}
-                    </span>
-
-                    <span>
-                        💬 {post.commentsCount}
-                    </span>
+                    <LikeButton
+                        postId={post.id}
+                        initialCount={post.likesCount}
+                        refreshFeed={loadPost}
+                    />
 
                 </div>
 
-                <LikeButton
-                    postId={post.id}
-                    initialCount={post.likesCount}
-                    refreshFeed={loadPost}
-                />
 
             </div>
 

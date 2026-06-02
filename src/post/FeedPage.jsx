@@ -86,14 +86,8 @@ const FeedPage = () => {
         <div className="feed-page">
 
             <div className="feed-header">
-
-                <h1>
-                    Friends Activity Feed
-                </h1>
-
                 <p>
-                    See what your friends
-                    are solving.
+                    Posts
                 </p>
 
             </div>
