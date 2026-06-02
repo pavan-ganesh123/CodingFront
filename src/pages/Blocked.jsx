@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { gql } from "graphql-request";
 import { getClient } from "../api/graphqlClient";
 import { getUserFromToken } from "../utils/auth";
+import { ToastProvider, useToast } from "../notifications/ToastContext";
 
 import "./Blocked.css";
 
@@ -15,7 +16,7 @@ function Blocked() {
   const user = getUserFromToken();
 
   const userId = user?.userId;
-
+  const { showToast } = useToast();
   const GET_RELATIONS = gql`
     query($userId: ID!) {
       getAllFriends(userId: $userId) {
@@ -98,11 +99,11 @@ function Blocked() {
         )
       );
 
-      alert("User unblocked");
+      showToast("User unblocked","info");
 
     } catch (err) {
       console.error(err);
-      alert("Failed to unblock");
+      showToast("Failed to unblock","error");
     }
   };
 

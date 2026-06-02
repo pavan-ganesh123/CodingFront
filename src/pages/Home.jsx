@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaUserFriends, FaPlus, FaComments } from "react-icons/fa";
 import "./Home.css";
+import { FaTimeline } from "react-icons/fa6";
 
 function Home() {
   const navigate = useNavigate();
@@ -56,7 +57,10 @@ function Home() {
             className="nav-icon"
             onClick={() => navigate("/profile")}
           />
-
+          <FaTimeline
+            className="nav-icon"
+            onClick={() => navigate("/feed")}
+          />
         </div>
       </div>
 

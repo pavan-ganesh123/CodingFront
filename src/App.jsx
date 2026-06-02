@@ -18,6 +18,9 @@ import ChatPage from "./pages/ChatPage";
 import Blocked from "./pages/Blocked";
 import { Navigate } from "react-router-dom";
 import { ToastProvider } from "./notifications/ToastContext";
+import MyPostsPage from "./post/MyPostsPage";
+import PostDetailsPage from "./post/PostDetailsPage";
+import FeedPage from "./post/FeedPage";
 
 function App() {
   return (
@@ -43,6 +46,13 @@ function App() {
 
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/blocked-users" element={<Blocked />} />
+          <Route path="/myposts" element={<MyPostsPage />} />
+
+          <Route path="/post/:postId" element={<PostDetailsPage />}/>
+          <Route
+              path="/feed"
+              element={<FeedPage />}
+          />
         </Routes>
       </ToastProvider>
     </BrowserRouter>

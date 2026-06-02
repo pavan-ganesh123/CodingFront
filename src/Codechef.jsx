@@ -1,109 +1,225 @@
-import React,{useEffect, useState} from "react";
-import './Codechef.css';
+import React, { useEffect, useState } from "react";
+import "./Codechef.css";
 
-function Codechef () {
-    const [problems, setProblems] = useState([]);
+function Codechef() {
 
-    useEffect(() => {
-        fetch("http://localhost:8080/graphql",{
-            method :"POST",
-            headers :{
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query: `
-                    query {
-                        getCodechef{
-                            questionName
-                            difficulty
-                            link
-                            intuition
-                            keyIdea
-                            approach
-                            mistakes
-                            code
-                            timeComplexity
-                            spaceComplexity
-                        }
-                    }
-                `,
-            }),
-        })
-            .then((res)=> res.json())
-            .then((data)=> setProblems(data?.data?.getLeetcode || []));
-    }, []);
-    return (
-    <><h1 className="title" style={{ textAlign: "center", marginBottom: "20px" }}>
-            Codechef Problems
-        </h1><div className="codechef_container">
-                <div className="grid">
-                    {problems.map((p, index) => (
-                        <div className="card-wrapper">
-                        <div key={index} className="codechef_card">
+  const [problems, setProblems] = useState([]);
 
-                            {/* Title */}
-                            <h2 className="title">{p.questionName}</h2>
+  const [expanded, setExpanded] = useState(null);
+  const [difficulty, setDifficulty] = useState("");
 
-                            {/* Meta */}
-                            <div className="meta">
-                                
-                                    <a href={p.link} target="_blank" rel="noreferrer" className="button">
-                                        View Problem
-                                    </a>
-                                
-                                <span className={`difficulty ${p.difficulty.toLowerCase()}`}>
-                                    {p.difficulty}
-                                </span>
-                            </div>
+  useEffect(() => {
 
-                            {/* Link */}
-                            
+  const fetchProblems = async () => {
 
-                            {/* Intuition */}
-                            <div className="intuition_block">
-                                <div className="intuition_header">▶ Intuition</div>
-                                <div className="intuition_content">
-                                    {p.intuition?.split("\n").map((line, i) => {
-                                        const text = line.trim();
-                                        if (!text) return null;
+    try {
 
-                                        if (text.toLowerCase().includes("o(")) {
-                                            return (
-                                                <div key={i} className="tag complexity">
-                                                    ⚡ {text}
-                                                </div>
-                                            );
-                                        } else if (text.length < 50) {
-                                            return (
-                                                <div key={i} className="point">
-                                                    {text}
-                                                </div>
-                                            );
-                                        } else {
-                                            return <p key={i}>{text}</p>;
-                                        }
-                                    })}
-                                </div>
-                            </div>
+      const token = localStorage.getItem("token");
 
-                            {/* Code */}
-                            <div className="code_block">
-                                <div className="code_header">💻 Code</div>
-                                <pre className="line-numbers">
-                                    <code className="language-cpp">
-                                    {p.code?.replace(/</g, "<").replace(/>/g, ">")}
-                                    </code>
-                                </pre>
-                            </div>
+      const params = new URLSearchParams();
+      params.append("platform", "Codechef");
+      
 
-                            <div className="intuition_block">
-                                <div className="intuition_header">{p.timeComplexity}</div>
-                            </div>
-                        </div>
-                        </div>
-                    ))}
+      if (difficulty) {
+        params.append("difficulty", difficulty);
+      }
+
+      const response = await fetch(
+        `http://localhost:8080/api/problems/my/problems?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch problems");
+      }
+
+      const data = await response.json();
+
+      setProblems(data);
+
+    } catch (error) {
+
+      console.error(
+        "Error fetching problems:",
+        error
+      );
+
+    }
+  };
+
+  fetchProblems();
+
+}, [difficulty]);
+
+  const toggleExpand = (index) => {
+
+    if (expanded === index) {
+      setExpanded(null);
+    } else {
+      setExpanded(index);
+    }
+  };
+
+  return (
+
+    <>
+      <h1 className="codechef-main-heading">
+        Codechef
+        <div className="filters">
+          
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+          >
+            <option value="">All Difficulties</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+
+        </div>
+      </h1>
+
+      <div className="codechef_container">
+
+        <div className="grid">
+
+          {problems.map((p, index) => {
+
+            const isOpen = expanded === index;
+
+            return (
+
+              <div
+                key={index}
+                className={`codechef_card ${
+                  isOpen ? "expanded" : ""
+                }`}
+              >
+
+                {/* TOP */}
+
+                <div className="card-top">
+
+                  <div>
+
+                    <h2 className="title">
+                      {p.problem.questionId}. {p.problem.questionName}
+                    </h2>
+
+                    <span
+                      className={`difficulty ${p.problem.difficulty.toLowerCase()}`}
+                    >
+                      {p.problem.difficulty}
+                    </span>
+
+                  </div>
+
+                  <div className="actions">
+
+                    <a
+                      href={p.problem.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="button"
+                    >
+                      View Problem
+                    </a>
+
+                    <button
+                      className="expand-btn"
+                      onClick={() => toggleExpand(index)}
+                    >
+                      {isOpen ? "▲" : "▼"}
+                    </button>
+
+                  </div>
+
                 </div>
-            </div></>
+
+                {/* EXPANDED CONTENT */}
+
+                {isOpen && (
+
+                  <div className="expanded-content">
+
+                    {/* INTUITION */}
+
+                    <div className="section">
+
+                      <div className="section-title">
+                        Intuition
+                      </div>
+
+                      <div className="section-content">
+
+                        {p.problem.intuition
+                          ?.split("\n")
+                          .map((line, i) => {
+
+                            const text = line.trim();
+
+                            if (!text) return null;
+
+                            return (
+                              <p key={i}>
+                                {text}
+                              </p>
+                            );
+                          })}
+
+                      </div>
+
+                    </div>
+
+                    {/* CODE */}
+
+                    <div className="section">
+
+                      <div className="section-title">
+                        Code
+                      </div>
+
+                      <pre>
+                        <code>
+                          {p.problem.code}
+                        </code>
+                      </pre>
+
+                    </div>
+
+                    {/* COMPLEXITIES */}
+
+                    <div className="complexities">
+
+                      <div className="tag complexity">
+                        Time: {p.problem.timeComplexity}
+                      </div>
+
+                      <div className="tag complexity">
+                        Space: {p.problem.spaceComplexity}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+              </div>
+
+            );
+          })}
+
+        </div>
+
+      </div>
+    </>
+
   );
 }
 

@@ -1,0 +1,197 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+
+import CommentCard from "./CommentCard";
+import LikeButton from "./LikeButton";
+
+import "./PostDetailsPage.css";
+
+const PostDetailsPage = () => {
+
+    const { postId } = useParams();
+
+    const [post, setPost] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [commentText, setCommentText] = useState("");
+
+    const token =
+        localStorage.getItem("token");
+
+    const loadPost = async () => {
+
+        try {
+
+            const response =
+                await axios.get(
+                    `http://localhost:8080/api/posts/${postId}`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            setPost(response.data);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
+    const loadComments = async () => {
+
+        try {
+
+            const response =
+                await axios.get(
+                    `http://localhost:8080/api/posts/${postId}/comments`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            setComments(response.data);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
+    const addComment = async () => {
+
+        if (!commentText.trim())
+            return;
+
+        try {
+
+            await axios.post(
+                `http://localhost:8080/api/posts/${postId}/comments`,
+                {
+                    comment: commentText
+                },
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+            setCommentText("");
+
+            loadComments();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
+    useEffect(() => {
+
+        loadPost();
+        loadComments();
+
+    }, [postId]);
+
+    if (!post) {
+
+        return (
+            <div className="post-details-loading">
+                Loading...
+            </div>
+        );
+    }
+
+    return (
+
+        <div className="post-details-container">
+
+            <div className="post-details-card">
+
+                <h2>
+                    {post.userName}
+                </h2>
+
+                <div className="problem-title">
+                    {post.questionTitle}
+                </div>
+
+                <div className="difficulty-badge">
+                    {post.difficulty}
+                </div>
+
+                <div className="post-stats">
+
+                    <span>
+                        👍 {post.likesCount}
+                    </span>
+
+                    <span>
+                        💬 {post.commentsCount}
+                    </span>
+
+                </div>
+
+                <LikeButton
+                    postId={post.id}
+                    initialCount={post.likesCount}
+                    refreshFeed={loadPost}
+                />
+
+            </div>
+
+            <div className="comments-section">
+
+                <h3>
+                    Comments
+                </h3>
+
+                <div className="comment-input">
+
+                    <input
+                        value={commentText}
+                        onChange={(e) =>
+                            setCommentText(
+                                e.target.value
+                            )
+                        }
+                        placeholder="Write a comment..."
+                    />
+
+                    <button
+                        onClick={addComment}
+                    >
+                        Post
+                    </button>
+
+                </div>
+
+                {comments.map((comment) => (
+
+                    <CommentCard
+                        key={comment.id}
+                        comment={comment}
+                    />
+
+                ))}
+
+            </div>
+
+        </div>
+
+    );
+};
+
+export default PostDetailsPage;

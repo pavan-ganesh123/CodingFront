@@ -7,6 +7,7 @@ import { FaUserFriends } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { MdPersonAdd } from "react-icons/md";
 import { getUserFromToken } from "../utils/auth";
+import { ToastProvider, useToast } from "../notifications/ToastContext";
 
 function Friends() {
   const [friends, setFriends] = useState([]);
@@ -15,6 +16,7 @@ function Friends() {
   const [activeTab, setActiveTab] = useState("friends");
   const user = getUserFromToken();
   const userId = user?.userId;
+  const { showToast } = useToast();
 
   const client = getClient();
 
@@ -112,6 +114,7 @@ function Friends() {
         friendId: String(friendId)
       });
       console.log("Friend request sent!");
+      showToast("Friend Request sent!!","info");
       fetchData();
     } catch (err) {
       console.error(err);
@@ -124,6 +127,7 @@ function Friends() {
         requestId: String(requestId)
       });
       console.log("Friend request accepted!");
+      showToast("Friend Request Accepted","info");
       fetchData();
     } catch (err) {
       console.error(err);

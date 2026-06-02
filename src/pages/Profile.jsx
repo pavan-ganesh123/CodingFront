@@ -1,60 +1,76 @@
 /* eslint-disable react-hooks/immutability */
 import { useEffect, useState } from "react";
-import { getClient } from "../api/graphqlClient";
-import { gql } from "graphql-request";
 import "./Profile.css";
 import { getUserFromToken } from "../utils/auth";
+import { useToast } from "../notifications/ToastContext";
 
 function Profile() {
 
   const [profile, setProfile] = useState(null);
   const [friendCount, setFriendCount] = useState(0);
 
-  const authUser = getUserFromToken();   
-  const userId = authUser?.userId;
-
-  const client = getClient();
-
-  const GET_USER = gql`
-    query {
-      getCurrentUser {
-        id
-        userName
-        email
-      }
-    }
-  `;
-
-
-  const GET_FRIENDS = gql`
-    query($userId: ID!) {
-      getFriends(userId: $userId) {
-        id
-      }
-    }
-  `;
+  const authUser = getUserFromToken();
+  const { showToast } = useToast();
 
   useEffect(() => {
-    if (userId) {
+    if (authUser) {
       fetchData();
     }
-  }, [userId]);
+  }, []);
 
   const fetchData = async () => {
     try {
-      const userData = await client.request(GET_USER);
-      const friendsData = await client.request(GET_FRIENDS, { userId });
-      setProfile(userData.getCurrentUser);
-      setFriendCount(friendsData.getFriends.length);
+
+      const token = localStorage.getItem("token");
+
+      const profileResponse = await fetch(
+        "http://localhost:8080/api/users/profile",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!profileResponse.ok) {
+        throw new Error("Failed to load profile");
+      }
+
+      const profileData = await profileResponse.json();
+
+      const friendResponse = await fetch(
+        "http://localhost:8080/api/users/countFriends",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!friendResponse.ok) {
+        throw new Error("Failed to load friend count");
+      }
+
+      const count = await friendResponse.json();
+
+      setProfile(profileData);
+      setFriendCount(count);
 
     } catch (err) {
       console.error("Profile Error:", err);
+      showToast("Please login again!", "error");
     }
   };
 
-  if (!userId) return <p>Please login again</p>;
+  if (!authUser) {
+    return <p>Please login again</p>;
+  }
 
-  if (!profile) return <p>Loading...</p>;
+  if (!profile) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="profile-container">

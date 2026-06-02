@@ -4,6 +4,7 @@ import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
 import "./FindFriends.css";
 import { getUserFromToken } from "../utils/auth";
+import { ToastProvider, useToast } from "../notifications/ToastContext";
 
 function FindFriends() {
   const [users, setUsers] = useState([]);
@@ -12,7 +13,7 @@ function FindFriends() {
   const userId = user?.userId;
 
   const client = getClient();
-
+  const { showToast } = useToast();
   const GET_USERS = gql`
     query {
       getAllUsers {
@@ -88,6 +89,7 @@ function FindFriends() {
       });
 
       console.log("Friend request sent!");
+      showToast("Friend request Sent","info");
       fetchUsers(); // refresh list
 
     } catch (err) {

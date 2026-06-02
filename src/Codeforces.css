@@ -1,75 +1,89 @@
-/* ================= CONTAINER ================= */
+/* ================= MAIN ================= */
+
+.codeforces-main-heading {
+  text-align: center;
+  margin: 30px 0;
+
+  font-size: 38px;
+  font-weight: 550;
+
+  color: white;
+}
 
 .codeforces_container {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 24px;
+  max-width: 1300px;
+
+  margin: auto;
+
+  padding: 20px;
 }
-/* ================= GRID LAYOUT ================= */
+
+/* ================= GRID ================= */
 
 .grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 30px;
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
 }
 
 /* ================= CARD ================= */
 
 .codeforces_card {
-  width: min(85%, 1100px);
-  max-width: 1000px;
-  margin: 0 auto;   /* center */
-  box-sizing: border-box;
 
-  background: rgba(243, 239, 239, 0.05);
+  background: rgba(255,255,255,0.05);
+
   backdrop-filter: blur(12px);
-  border-radius: 18px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  overflow: hidden; /* prevents content overflow */
+  border-radius: 18px;
+
+  padding: 16px 18px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  transition: 0.35s ease;
+
+  overflow: hidden;
 }
 
-/* Hover effect */
 .codeforces_card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+  transform: translateY(-4px);
+
+  background: rgba(255,255,255,0.08);
+}
+
+/* ================= CARD TOP ================= */
+
+.card-top {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 12px;
 }
 
 /* ================= TITLE ================= */
 
 .title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 10px;
-  text-align: left;
-}
 
-/* ================= META ================= */
+  margin-bottom: 12px;
 
-.meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.codeforces_platform {
-  font-size: 13px;
-  color: #9ca3af;
+  color: white;
 }
 
 /* ================= DIFFICULTY ================= */
 
 .difficulty {
-  padding: 4px 10px;
+  padding: 6px 14px;
+
   border-radius: 12px;
+
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .difficulty.easy {
@@ -87,131 +101,154 @@
   color: #ef4444;
 }
 
-/* ================= INTUITION ================= */
+/* ================= ACTIONS ================= */
 
-.intuition_block {
-  margin-top: 12px;
-}
+.actions {
+  display: flex;
+  align-items: center;
 
-.intuition_header {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #c084fc;
-  text-align: left;
-}
-
-.intuition_content p {
-  font-size: 14px;
-  color: #d1d5db;
-  margin-bottom: 6px;
-  text-align: left;
-
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Highlighted text */
-.highlight {
-  color: #a78bfa;
-  font-weight: 500;
-}
-
-/* Bullet points */
-.point {
-  font-size: 13px;
-  margin-bottom: 4px;
-  color: #9ca3af;
-
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* ================= TAG ================= */
-
-.tag {
-  display: inline-block;
-  padding: 4px 8px;
-  margin-bottom: 6px;
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-.tag.complexity {
-  background: rgba(168, 85, 247, 0.15);
-  color: #a855f7;
-}
-
-/* ================= CODE BLOCK ================= */
-
-.code_block {
-  margin-top: 15px;
-}
-
-.code_header {
-  font-weight: 600;
-  margin-bottom: 6px;
-  text-align: left;
-}
-
-/* Prism override */
-pre {
-  background: #1e1e2e !important;
-  border-radius: 10px;
-  padding: 14px !important;
-  overflow-x: auto;
-  font-size: 13px;
-  margin: 0;
-
-  white-space: pre-wrap !important;   /* FIX: prevents horizontal stretch */
-  word-break: break-word;
-}
-
-/* inline code */
-code {
-  display: block;
-  text-align: left;
-  white-space: pre-wrap;
-  word-break: break-word;
+  gap: 14px;
 }
 
 /* ================= BUTTON ================= */
 
-.button {
-  margin-top: 12px;
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-size: 13px;
+.button,
+.expand-btn {
+
+  padding: 10px 16px;
+
+  border-radius: 12px;
+
+  border: none;
 
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
+
   color: white;
+
+  cursor: pointer;
+
   text-decoration: none;
 
-  transition: all 0.2s ease;
+  transition: 0.25s ease;
 }
 
-.button:hover {
-  background: rgba(255,255,255,0.15);
+.button:hover,
+.expand-btn:hover {
+
+  background: rgba(255,255,255,0.16);
+
+  transform: scale(1.05);
 }
 
-/* ================= EMPTY ================= */
+/* ================= EXPANDED ================= */
 
-.empty {
-  text-align: center;
-  margin-top: 50px;
-  color: #9ca3af;
+.expanded-content {
+  margin-top: 24px;
+
+  border-top: 1px solid rgba(255,255,255,0.08);
+
+  padding-top: 24px;
+
+  animation: fadeIn 0.3s ease;
 }
 
-/* ================= RESPONSIVE ================= */
+/* ================= SECTION ================= */
 
-@media (max-width: 768px) {
-  .container {
-    padding: 20px;
+.section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+
+  font-size: 18px;
+  font-weight: 700;
+
+  margin-bottom: 12px;
+
+  color: #c084fc;
+}
+
+.section-content p {
+
+  color: #d1d5db;
+
+  line-height: 1.7;
+
+  margin-bottom: 10px;
+}
+
+/* ================= CODE ================= */
+
+pre {
+  background: #1e1e2e;
+
+  border-radius: 16px;
+
+  padding: 18px;
+
+  overflow-x: auto;
+
+  font-size: 14px;
+
+  color: #f8fafc;
+}
+
+code {
+  white-space: pre-wrap;
+}
+
+/* ================= TAGS ================= */
+
+.complexities {
+  display: flex;
+
+  gap: 12px;
+
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 8px 14px;
+
+  border-radius: 12px;
+
+  background: rgba(168, 85, 247, 0.15);
+
+  color: #c084fc;
+
+  font-size: 13px;
+}
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 
-  .codeforces_card {
-    width: 95%;
-    max-width: 95%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+  .card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .title {
+    font-size: 18px;
   }
 }
