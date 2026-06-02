@@ -67,7 +67,7 @@ function CSES() {
   return (
 
     <>
-      <h1 className="CSES-main-heading">
+      <h1 className="cses-main-heading">
         CSES
         <div className="filters">
           
@@ -84,7 +84,7 @@ function CSES() {
         </div>
       </h1>
 
-      <div className="CSES_container">
+      <div className="cses_container">
 
         <div className="grid">
 
@@ -96,7 +96,7 @@ function CSES() {
 
               <div
                 key={index}
-                className={`CSES_card ${
+                className={`cses_card ${
                   isOpen ? "expanded" : ""
                 }`}
               >
