@@ -191,9 +191,9 @@ const PostCard = ({ post, refreshFeed }) => {
 
             {showComments && (
 
-                <div className="comments-section">
+                <div className="commentws-section">
 
-                    <div className="comment-input-row">
+                    <div className="commentw-input-row">
 
                         <input
                             type="text"
