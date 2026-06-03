@@ -99,15 +99,15 @@ const PostDetailsPage = () => {
 
         }
     };
-    const loadProblem = async (problemId) => {
-        if (!problemId) {
-            console.warn("No problemId to load problem:", problemId);
+    const loadProblem = async (questionId) => {
+        if (!questionId) {
+            console.warn("No problemId to load problem:", questionId);
             return;
         }
         try {
-            console.log("Loading problem with ID:", problemId);
+            console.log("Loading problem with ID:", questionId);
             const response = await axios.get(
-                `http://localhost:8080/api/problems/${problemId}`,
+                `http://localhost:8080/api/problems/${questionId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -156,16 +156,13 @@ const PostDetailsPage = () => {
                     {post.questionTitle}
                 </div>
 
-                <div className="problem-intuition">
-                    {post.questionId}
-                </div>
 
                 {problem && (
                     <div className="problem-details">
                         <div className="problem-meta">
                             {problem.difficulty && (
                                 <div className={`difficulty-badge difficulty-${problem.difficulty.toLowerCase()}`}>
-                                    {problem.difficulty}
+                                    {problem.intuition}
                                 </div>
                             )}
                         </div>
@@ -176,6 +173,7 @@ const PostDetailsPage = () => {
                                 spaceComplexity: problem.spaceComplexity,
                                 description: problem.description,
                                 difficulty: problem.difficulty,
+                                intuition: problem.intuition,
                                 allKeys: Object.keys(problem)
                             });
                             return null;
