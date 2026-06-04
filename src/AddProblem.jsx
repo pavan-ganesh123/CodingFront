@@ -15,6 +15,7 @@ function AddProblem() {
   const [mistakes, setMistakes] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
+  const [visibility, setVisibility] = useState("FRIENDS");
 
   const handleSubmit = async () => {
     if (!questionId || isNaN(Number(questionId))) {
@@ -32,6 +33,7 @@ function AddProblem() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+        problem: {
           questionName,
           difficulty,
           platformName,
@@ -44,7 +46,9 @@ function AddProblem() {
           mistakes,
           timeComplexity,
           spaceComplexity,
-        }),
+        },
+        visibility,
+      }),
       });
 
       if (!createResponse.ok) {
@@ -187,6 +191,24 @@ function AddProblem() {
           onChange={(e) => setSpaceComplexity(e.target.value)}
         />
         
+        <div className="visibility-section">
+
+          <label className="visibility-label">
+            Post Visibility
+          </label>
+
+          <select
+            className="visibility-input"
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+          >
+            <option value="PUBLIC">Public</option>
+            <option value="FRIENDS">Friends Only</option>
+            <option value="PRIVATE">Only Me</option>
+          </select>
+
+        </div>
+
         <button className="button button-accent" onClick={handleSubmit}>
           Add Problem
         </button>
