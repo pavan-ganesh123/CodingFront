@@ -25,7 +25,7 @@
 
 .adding_container .adding_card {
   width: 100%;
-  max-width: 500px;   /* slightly bigger */
+  max-width: 500px;
   padding: 28px;
 
   border-radius: 20px;
@@ -51,9 +51,10 @@
 .adding_container .input {
   width: 95%;
   padding: 12px 14px;
-  border-radius: 10px;
 
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   background: rgba(255, 255, 255, 0.04);
 
   color: #e2e8f0;
@@ -63,22 +64,76 @@
   transition: all 0.25s ease;
 }
 
-/* Placeholder */
 .adding_container .input::placeholder {
   color: rgba(226, 232, 240, 0.5);
 }
 
-/* Focus */
 .adding_container .input:focus {
   border: 1px solid #a855f7;
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Textarea */
+/* ================= TEXTAREA ================= */
+
 .adding_container textarea.input {
   resize: vertical;
   min-height: 80px;
+}
+
+/* ================= VISIBILITY ================= */
+
+.adding_container .visibility-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adding_container .visibility-label {
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.adding_container .visibility-input {
+  width: 100%;
+  padding: 12px 14px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+
+  font-size: 14px;
+  cursor: pointer;
+
+  outline: none;
+  transition: all 0.25s ease;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #a855f7 50%),
+    linear-gradient(135deg, #a855f7 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) calc(50% - 3px),
+    calc(100% - 14px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.adding_container .visibility-input:focus {
+  border: 1px solid #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.adding_container .visibility-input option {
+  background: #1e293b;
+  color: #e2e8f0;
 }
 
 /* ================= BUTTON ================= */
@@ -86,10 +141,12 @@
 .adding_container .button {
   margin-top: 10px;
   padding: 14px;
-  border-radius: 12px;
 
+  border-radius: 12px;
   border: none;
+
   cursor: pointer;
+
   font-weight: 600;
   font-size: 15px;
 
@@ -117,12 +174,10 @@
   font-weight: 500;
 }
 
-/* Success */
 .adding_container .message.success {
   color: #4ade80;
 }
 
-/* Error */
 .adding_container .message.error {
   color: #f87171;
 }
