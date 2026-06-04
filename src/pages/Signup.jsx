@@ -8,6 +8,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { showToast } = useToast();
+
   const handleSignup = async () => {
     const query = `
       mutation AddUser($userName: String!, $email: String!, $password: String!) {
@@ -39,17 +40,27 @@ function Signup() {
 
       const data = await res.json();
 
-      console.log("Signup success:", data);
+      console.log("Signup response:", data);
 
-      if (data.data) {
-        showToast("Signup successful!","success");
+      // Check for GraphQL errors (even if HTTP status is 200)
+      if (data.errors) {
+        console.error("GraphQL errors:", data.errors);
+        const errorMsg = data.errors[0]?.message || "Signup failed";
+        showToast(errorMsg, "error");
+        return;
+      }
+
+      if (data.data?.addUser) {
+        console.log("Signup success:", data.data.addUser);
+        showToast("Signup successful!", "success");
         navigate("/");
       } else {
-        showToast("Signup failed","error");
+        console.warn("Signup failed: no data returned");
+        showToast("Signup failed", "error");
       }
     } catch (err) {
-      console.error(err);
-      showToast("Error occurred","error");
+      console.error("Network or parsing error:", err);
+      showToast("Error occurred", "error");
     }
   };
 

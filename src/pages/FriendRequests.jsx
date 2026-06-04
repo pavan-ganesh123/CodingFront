@@ -81,7 +81,14 @@ function FriendRequests() {
   return (
     <div className="friends-container">
       <h2>Friend Requests</h2>
-
+      <button
+          className="friendreq-back-btn"
+          onClick={() => {
+            window.location.href = "/home";
+          }}
+        >
+          Back
+      </button>
       {requests.length === 0 ? (
         <p className="empty">No pending requests</p>
       ) : (
