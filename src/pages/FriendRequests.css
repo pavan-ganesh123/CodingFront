@@ -131,3 +131,29 @@
     font-size: 13px;
   }
 }
+
+.friendreq-back-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #161a20;
+  color: #e6e6e6;
+  border: 1px solid #2a303c;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.friendreq-back-btn:hover {
+  border-color: #3d4655;
+  background: #1a1f26;
+}
+
+.friendreq-back-btn:focus {
+  border-color: #5c67f2;
+  box-shadow: 0 0 0 3px rgba(92, 103, 242, 0.25);
+  outline: none;
+}
