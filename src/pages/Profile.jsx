@@ -3,11 +3,19 @@ import { useEffect, useState, useRef } from "react";
 import "./Profile.css";
 import { getUserFromToken } from "../utils/auth";
 import { useToast } from "../notifications/ToastContext";
+import getCroppedImg from "../utils/cropImage";
+import Cropper from "react-easy-crop";
 
 function Profile() {
   const [profile, setProfile] = useState(null);
   const [friendCount, setFriendCount] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const fileInputRef = useRef(null);
   const authUser = getUserFromToken();
   const { showToast } = useToast();
@@ -61,9 +69,9 @@ function Profile() {
 
     // Convert to Base64
     const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result; // e.g. "data:image/png;base64,..."
-      await uploadProfilePicture(base64);
+    reader.onloadend = () => {
+      setSelectedImage(reader.result);
+      setShowCropModal(true);
     };
     reader.readAsDataURL(file);
   };
@@ -91,6 +99,26 @@ function Profile() {
       showToast("Failed to upload picture", "error");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleCropSave = async () => {
+    try {
+      const croppedImage = await getCroppedImg(
+        selectedImage,
+        croppedAreaPixels
+      );
+
+      await uploadProfilePicture(croppedImage);
+
+      setShowCropModal(false);
+      setSelectedImage(null);
+      setZoom(1);
+      setCrop({ x: 0, y: 0 });
+
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to crop image", "error");
     }
   };
 
@@ -132,6 +160,61 @@ function Profile() {
         <p><strong>Email:</strong> {profile.email}</p>
         <p><strong>Friends:</strong> {friendCount}</p>
       </div>
+      {
+        showCropModal && (
+          <div className="crop-modal">
+
+            <div className="crop-container">
+
+              <Cropper
+                image={selectedImage}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={(croppedArea, croppedAreaPixels) =>
+                  setCroppedAreaPixels(croppedAreaPixels)
+                }
+              />
+
+            </div>
+
+            <div className="crop-controls">
+
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.1}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+              />
+
+              <button
+                className="save-crop-btn"
+                onClick={handleCropSave}
+              >
+                Save
+              </button>
+
+              <button
+                className="cancel-crop-btn"
+                onClick={() => {
+                  setShowCropModal(false);
+                  setSelectedImage(null);
+                }}
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </div>
+        )
+      }
     </div>
   );
 }
