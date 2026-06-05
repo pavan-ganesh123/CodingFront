@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./PostCard.css";
 import LikeButton from "./LikeButton";
@@ -11,6 +11,7 @@ const PostCard = ({ post, refreshFeed }) => {
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [loadingComments, setLoadingComments] = useState(false);
+    const [profilePicture, setProfilePic] = useState(null);
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
@@ -65,6 +66,24 @@ const PostCard = ({ post, refreshFeed }) => {
         }
     };
 
+    const handleProfile = async () => {
+        try{
+            const response = await axios.get(
+                `http://localhost:8080/api/users/${post.userId}/profile-picture`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            setProfilePic(response.data);
+        }
+        catch (error) {
+
+            console.error(error);
+
+        }
+    };
     const handleCommentSubmit = async () => {
 
         if (!commentText.trim()) {
@@ -122,6 +141,9 @@ const PostCard = ({ post, refreshFeed }) => {
         }
     };
 
+    useEffect(() => {
+        handleProfile();
+    }, []);
     return (
 
         <div className="post-card">
@@ -129,7 +151,15 @@ const PostCard = ({ post, refreshFeed }) => {
             <div className="post-header">
 
                 <div className="avatar">
-                    {post.userName?.charAt(0)?.toUpperCase()}
+                    {profilePicture ? (
+                        <img
+                            src={profilePicture.profilePicture}
+                            alt={post.userName}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+                        />
+                    ) : (
+                        post.userName?.charAt(0)?.toUpperCase()
+                    )}
                 </div>
 
                 <div>
