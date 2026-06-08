@@ -40,7 +40,7 @@ function Signup() {
 
       const data = await res.json();
 
-      console.log("Signup response:", data);
+    
 
       // Check for GraphQL errors (even if HTTP status is 200)
       if (data.errors) {
@@ -51,7 +51,6 @@ function Signup() {
       }
 
       if (data.data?.addUser) {
-        console.log("Signup success:", data.data.addUser);
         showToast("Signup successful!", "success");
         navigate("/");
       } else {

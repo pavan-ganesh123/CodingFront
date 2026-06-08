@@ -65,16 +65,11 @@ function FindFriends() {
       }
       
       const allUsers = await usersRes.json();
-      console.log('All users (from REST API):', allUsers);
-
-
-      // ✅ Use GraphQL for getting friends
       const friendsData = await client.request(GET_FRIENDS, { userId });
       const allRelations = friendsData.getAllFriends;
 
 
       if (!allRelations) {
-        console.log("Friends is null, showing all users except current");
         setUsers(
           allUsers.filter(u => String(u.id) !== String(userId))
         );
@@ -102,7 +97,6 @@ function FindFriends() {
 
 
       setUsers(filteredUsers);
-      console.log('Filtered users:', filteredUsers);
 
 
     } catch (err) {

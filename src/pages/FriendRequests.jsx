@@ -68,8 +68,6 @@ function FriendRequests() {
       await client.request(ACCEPT_REQUEST, {
         requestId: String(requestId)
       });
-
-      console.log("Friend request accepted");
       showToast("Friend Request Accepted","info");
       fetchRequests(); // refresh list
 

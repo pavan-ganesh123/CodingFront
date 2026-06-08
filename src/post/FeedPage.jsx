@@ -17,7 +17,6 @@ const FeedPage = () => {
             const token =
                 localStorage.getItem("token");
 
-            console.log("Token:", token);
             const response =
                 await axios.get(
                     "http://localhost:8080/api/posts/feed",
@@ -29,8 +28,6 @@ const FeedPage = () => {
                     }
                 );
 
-            console.log("Feed Response:");
-            console.log(response.data);
 
             setPosts(response.data);
             setError("");
