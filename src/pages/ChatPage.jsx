@@ -193,14 +193,13 @@ function ChatPage() {
     );
 
     socket.onopen = () => {
-      console.log("✅ WebSocket Connected");
+      console.log("WebSocket Connected");
     };
 
     socket.onmessage = (event) => {
 
       const msg = JSON.parse(event.data);
 
-      console.log("Incoming:", msg);
 
       if (msg.type === "private") {
 
@@ -219,7 +218,7 @@ function ChatPage() {
     };
 
     socket.onclose = () => {
-      console.log("❌ WebSocket Disconnected");
+      console.log("WebSocket Disconnected");
     };
 
     socket.onerror = (err) => {

@@ -5,13 +5,12 @@ import LikeButton from "./LikeButton";
 import CommentCard from "./CommentCard";
 import { useNavigate } from "react-router-dom";
 
-const PostCard = ({ post, refreshFeed }) => {
+const PostCard = ({ post, refreshFeed, profilePicture }) => {
 
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [loadingComments, setLoadingComments] = useState(false);
-    const [profilePicture, setProfilePic] = useState(null);
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
@@ -66,24 +65,7 @@ const PostCard = ({ post, refreshFeed }) => {
         }
     };
 
-    const handleProfile = async () => {
-        try{
-            const response = await axios.get(
-                `http://localhost:8080/api/users/${post.userId}/profile-picture`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-            setProfilePic(response.data);
-        }
-        catch (error) {
-
-            console.error(error);
-
-        }
-    };
+    
     const handleCommentSubmit = async () => {
 
         if (!commentText.trim()) {
@@ -141,9 +123,6 @@ const PostCard = ({ post, refreshFeed }) => {
         }
     };
 
-    useEffect(() => {
-        handleProfile();
-    }, []);
     return (
 
         <div className="post-card">
@@ -153,7 +132,7 @@ const PostCard = ({ post, refreshFeed }) => {
                 <div className="avatar">
                     {profilePicture ? (
                         <img
-                            src={profilePicture.profilePicture}
+                            src={profilePicture}
                             alt={post.userName}
                             style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
                         />

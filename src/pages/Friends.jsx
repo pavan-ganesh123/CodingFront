@@ -113,7 +113,6 @@ function Friends() {
         userId: String(userId),   // safer
         friendId: String(friendId)
       });
-      console.log("Friend request sent!");
       showToast("Friend Request sent!!","info");
       fetchData();
     } catch (err) {
@@ -126,7 +125,6 @@ function Friends() {
       await client.request(ACCEPT_REQUEST, {
         requestId: String(requestId)
       });
-      console.log("Friend request accepted!");
       showToast("Friend Request Accepted","info");
       fetchData();
     } catch (err) {

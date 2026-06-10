@@ -35,7 +35,6 @@ const PostDetailsPage = () => {
                     }
                 );
 
-            console.log("POST DATA:", response.data);
             setPost(response.data);
 
         } catch (error) {
@@ -105,7 +104,6 @@ const PostDetailsPage = () => {
             return;
         }
         try {
-            console.log("Loading problem with ID:", questionId);
             const response = await axios.get(
                 `http://localhost:8080/api/problems/${questionId}`,
                 {
@@ -167,17 +165,6 @@ const PostDetailsPage = () => {
                             )}
                         </div>
 
-                        {(() => {
-                            console.log("PROBLEM RENDER:", {
-                                timeComplexity: problem.timeComplexity,
-                                spaceComplexity: problem.spaceComplexity,
-                                description: problem.description,
-                                difficulty: problem.difficulty,
-                                intuition: problem.intuition,
-                                allKeys: Object.keys(problem)
-                            });
-                            return null;
-                        })()}
 
                         {problem.timeComplexity && (
                             <div className="problem-complexity">
