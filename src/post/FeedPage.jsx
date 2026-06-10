@@ -8,7 +8,7 @@ const FeedPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
+    const [profilePictures, setProfilePictures] = useState({});
     const fetchFeed = async () => {
 
         try {
@@ -30,6 +30,28 @@ const FeedPage = () => {
 
 
             setPosts(response.data);
+            const userIds = [...new Set(response.data.map(post => post.userId))];
+            const pictureMap = {};
+
+            await Promise.all(
+                userIds.map(async (userId) => {
+                    try {
+                        const picResponse = await axios.get(
+                            `http://localhost:8080/api/users/${userId}/profile-picture`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            }
+                        );
+                        pictureMap[userId] = picResponse.data.profilePicture;
+                    } catch (err) {
+                        console.error(`Failed to fetch picture for user ${userId}`, err);
+                        pictureMap[userId] = null;
+                    }
+                })
+            );
+            setProfilePictures(pictureMap);
             setError("");
 
         } catch (err) {
@@ -107,6 +129,7 @@ const FeedPage = () => {
                             key={post.id}
                             post={post}
                             refreshFeed={fetchFeed}
+                            profilePicture={profilePictures[post.userId]}
                         />
 
                     ))
