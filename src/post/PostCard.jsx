@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import "./PostCard.css";
 import LikeButton from "./LikeButton";
 import CommentCard from "./CommentCard";
 import { useNavigate } from "react-router-dom";
 
-const PostCard = ({ post, refreshFeed, profilePicture }) => {
-
+const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [loadingComments, setLoadingComments] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [uploadMessage, setUploadMessage] = useState("");
+    
+    const canUploadImage = currentUser && currentUser.id === post.userId;
     const navigate = useNavigate();
-
     const token = localStorage.getItem("token");
 
     const fetchComments = async () => {
-
         try {
-
             setLoadingComments(true);
 
             const response = await axios.get(
@@ -31,22 +32,15 @@ const PostCard = ({ post, refreshFeed, profilePicture }) => {
             );
 
             setComments(response.data);
-
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setLoadingComments(false);
-
         }
     };
 
     const handleUnlike = async () => {
-
         try {
-
             await axios.delete(
                 `http://localhost:8080/api/posts/${post.id}/like`,
                 {
@@ -57,23 +51,17 @@ const PostCard = ({ post, refreshFeed, profilePicture }) => {
             );
 
             refreshFeed();
-
         } catch (error) {
-
             console.error(error);
-
         }
     };
 
-    
     const handleCommentSubmit = async () => {
-
         if (!commentText.trim()) {
             return;
         }
 
         try {
-
             await axios.post(
                 `http://localhost:8080/api/posts/${post.id}/comments`,
                 {
@@ -87,54 +75,84 @@ const PostCard = ({ post, refreshFeed, profilePicture }) => {
             );
 
             setCommentText("");
-
             fetchComments();
-
             refreshFeed();
-
         } catch (error) {
-
             console.error(error);
-
         }
     };
 
     const toggleComments = () => {
-
         const nextState = !showComments;
-
         setShowComments(nextState);
-
         if (nextState) {
             fetchComments();
         }
     };
 
     const formatDate = (dateString) => {
-
         try {
-
-            return new Date(dateString)
-                .toLocaleString();
-
+            return new Date(dateString).toLocaleString();
         } catch {
-
             return "";
         }
     };
 
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+        setUploadMessage("");
+    };
+
+    const handleImageUpload = async () => {
+        if (!selectedFile) {
+            setUploadMessage("Please select an image first.");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+            setUploadMessage("");
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+            formData.append("userId", localStorage.getItem("userId"));
+
+            await axios.post(
+                `http://localhost:8080/api/posts/${post.id}/images`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            );
+
+            setSelectedFile(null);
+            setUploadMessage("Image uploaded successfully. It is pending approval.");
+            refreshFeed();
+        } catch (error) {
+            console.error(error);
+            setUploadMessage("Image upload failed.");
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     return (
-
         <div className="post-card">
-
             <div className="post-header">
-
                 <div className="avatar">
                     {profilePicture ? (
                         <img
                             src={profilePicture}
                             alt={post.userName}
-                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: "50%"
+                            }}
                         />
                     ) : (
                         post.userName?.charAt(0)?.toUpperCase()
@@ -142,109 +160,100 @@ const PostCard = ({ post, refreshFeed, profilePicture }) => {
                 </div>
 
                 <div>
-
-                    <h3>
-                        {post.userName}
-                    </h3>
-
+                    <h3>{post.userName}</h3>
                     <span className="post-time">
                         {formatDate(post.createdAt)}
                     </span>
-
                 </div>
-
             </div>
 
             <div className="post-content">
-
                 <div className="post-message">
-
                     <div
                         className="problem-title"
-                        onClick={() =>
-                            navigate(`/post/${post.id}`)
-                        }
+                        onClick={() => navigate(`/post/${post.id}`)}
                     >
                         {post.questionTitle}
                     </div>
-
                 </div>
 
+                {post.imageUrl ? (
+                    <div className="post-image-wrapper">
+                        <img
+                            src={post.imageUrl}
+                            alt={post.questionTitle}
+                            loading="lazy"
+                            className="post-image"
+                        />
+                    </div>
+                ) : canUploadImage ? (
+                    <div className="post-image-upload">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                        <button
+                            className="action-btn"
+                            onClick={handleImageUpload}
+                            disabled={uploadingImage}
+                        >
+                            {uploadingImage ? "Uploading..." : "Upload Image"}
+                        </button>
 
+                        {uploadMessage && (
+                            <div className="upload-message">
+                                {uploadMessage}
+                            </div>
+                        )}
+                    </div>
+                ) : null}
             </div>
 
-
             <div className="post-actions">
-
                 <LikeButton
                     postId={post.id}
                     initialCount={post.likesCount}
                     refreshFeed={refreshFeed}
                 />
 
-                <button
-                    className="action-btn"
-                    onClick={handleUnlike}
-                >
+                <button className="action-btn" onClick={handleUnlike}>
                     👎 Unlike
                 </button>
 
-                <button
-                    className="action-btn"
-                    onClick={toggleComments}
-                >
+                <button className="action-btn" onClick={toggleComments}>
                     💬 Comments
                 </button>
-
             </div>
 
             {showComments && (
-
                 <div className="commentws-section">
-
                     <div className="commentw-input-row">
-
                         <input
                             type="text"
                             placeholder="Write a comment..."
                             value={commentText}
-                            onChange={(e) =>
-                                setCommentText(e.target.value)
-                            }
+                            onChange={(e) => setCommentText(e.target.value)}
                         />
 
-                        <button
-                            onClick={handleCommentSubmit}
-                        >
-                            Post
-                        </button>
-
+                        <button onClick={handleCommentSubmit}>Post</button>
                     </div>
 
                     {loadingComments ? (
-
                         <div className="loading-comments">
                             Loading comments...
                         </div>
-
                     ) : (
-
                         comments.map((comment) => (
                             <CommentCard
                                 key={comment.id}
                                 comment={comment}
                             />
-
                         ))
-
                     )}
-
                 </div>
-
             )}
-
         </div>
-
     );
 };
 
