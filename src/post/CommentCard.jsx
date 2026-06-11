@@ -16,9 +16,7 @@ const CommentCard = ({ comment }) => {
 
             <div className="comment-header">
 
-                <div className="comment-avatar">
-                    {comment.username?.charAt(0)?.toUpperCase()}
-                </div>
+                
 
                 <div>
 

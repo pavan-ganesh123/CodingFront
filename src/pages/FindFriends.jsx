@@ -6,30 +6,15 @@ import "./FindFriends.css";
 import { getUserFromToken } from "../utils/auth";
 import { ToastProvider, useToast } from "../notifications/ToastContext";
 
-
 function FindFriends() {
   const [users, setUsers] = useState([]);
-
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
   const user = getUserFromToken();
   const userId = user?.userId;
-
-
   const client = getClient();
   const { showToast } = useToast();
-
-
-  const GET_FRIENDS = gql`
-    query($userId: ID!) {
-      getAllFriends(userId: $userId) {
-        id
-        status
-        user { id }
-        friend { id }
-      }
-    }
-  `;
-
 
   const SEND_REQUEST = gql`
     mutation($userId: ID!, $friendId: ID!) {
@@ -40,70 +25,46 @@ function FindFriends() {
     }
   `;
 
-
+  // Only fetch when search query changes (debounced)
   useEffect(() => {
-    if (userId) {
-      fetchUsers();
-    }
-  }, [userId]);
+    const timer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchUsers(searchQuery.trim());
+      } else {
+        setUsers([]);
+      }
+    }, 300); // 300ms debounce
 
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (query) => {
+    setIsLoading(true);
     try {
-      // ✅ Use REST API for getting all users
       const token = localStorage.getItem("token");
-      const usersRes = await fetch('http://localhost:8080/api/users/all',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      
+      const url = `http://localhost:8080/api/users/search?query=${query}`;
+      
+      const usersRes = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       
       if (!usersRes.ok) {
         throw new Error(`HTTP error! status: ${usersRes.status}`);
       }
       
       const allUsers = await usersRes.json();
-      const friendsData = await client.request(GET_FRIENDS, { userId });
-      const allRelations = friendsData.getAllFriends;
-
-
-      if (!allRelations) {
-        setUsers(
-          allUsers.filter(u => String(u.id) !== String(userId))
-        );
-        return;
-      }
-
-
-      const excludedIds = allRelations
-        .filter(f =>
-          String(f.user.id) === String(userId) ||
-          f.status === "ACCEPTED"
-        )
-        .map(f =>
-          String(f.user.id) === String(userId)
-            ? String(f.friend.id)
-            : String(f.user.id)
-        );
-
-
-      const filteredUsers = allUsers.filter(
-        u =>
-          String(u.id) !== String(userId) &&
-          !excludedIds.includes(String(u.id))
-      );
-
-
-      setUsers(filteredUsers);
-
-
+      setUsers(allUsers); // Backend already filters out friends/pending
+      
     } catch (err) {
       console.error(err);
+      showToast("Failed to fetch users", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
-
 
   const handleAddFriend = async (friendId) => {
     try {
@@ -112,38 +73,54 @@ function FindFriends() {
         friendId: String(friendId)
       });
 
-
       console.log("Friend request sent!");
-      showToast("Friend request Sent","info");
-      fetchUsers(); // refresh list
-
-
+      showToast("Friend request sent", "info");
+      
+      // Optional: Clear search or remove user from list
+      setUsers(users.filter(u => u.id !== friendId));
+      
     } catch (err) {
       console.error(err);
+      showToast("Failed to send friend request", "error");
     }
   };
-
 
   return (
     <div className="friends-container">
       <h2>Find Friends</h2>
+      
+      {/* Search Bar Only - No "All Users" */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Enter username..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+          autoFocus
+        />
+      </div>
 
-
-      {users.length === 0 ? (
-        <p className="empty">No users available</p>
+      {searchQuery && users.length === 0 ? (
+        <p className="empty">No users match "{searchQuery}"</p>
+      ) : users.length === 0 ? (
+        <p className="empty">
+          Start typing a username to find friends.<br />
+        </p>
       ) : (
-        users.map(u => (
-          <div key={u.id} className="friend-card">
-            <span>{u.userName}</span>
-            <button onClick={() => handleAddFriend(u.id)}>
-              Add Friend
-            </button>
-          </div>
-        ))
+        <div className="user-list">
+          {users.map(u => (
+            <div key={u.id} className="friend-card">
+              <span>{u.userName}</span>
+              <button onClick={() => handleAddFriend(u.id)}>
+                Add Friend
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
 }
-
 
 export default FindFriends;

@@ -9,6 +9,8 @@ const FeedPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [profilePictures, setProfilePictures] = useState({});
+    const [currentUser, setCurrentUser] = useState(null);
+    const token = localStorage.getItem("token");
     const fetchFeed = async () => {
 
         try {
@@ -68,14 +70,26 @@ const FeedPage = () => {
 
         }
     };
-
     useEffect(() => {
+        const loadAll = async () => {
+            try {
+                const userRes = await axios.get("http://localhost:8080/api/users/me", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setCurrentUser(userRes.data);
+                await fetchFeed(); // fetch feed after user is loaded
+            } catch (error) {
+                console.error("Failed to load current user", error);
+            }
+        };
 
-        fetchFeed();
+        if (token) {
+            loadAll();
+        }
+    }, [token]);
 
-    }, []);
 
-    if (loading) {
+    if (loading || !currentUser) {
 
         return (
             <div className="feed-page">
@@ -130,6 +144,7 @@ const FeedPage = () => {
                             post={post}
                             refreshFeed={fetchFeed}
                             profilePicture={profilePictures[post.userId]}
+                            currentUser={currentUser}
                         />
 
                     ))
