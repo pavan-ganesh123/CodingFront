@@ -4,15 +4,11 @@ import "./AddProblem.css";
 function AddProblem() {
   const [questionName, setQuestionName] = useState("");
   const [difficulty, setDifficulty] = useState("");
-  const [platformName, setPlatform] = useState("");
   const [questionId, setQuestionId] = useState("");
   const [link, setLink] = useState("");
   const [intuition, setIntuition] = useState("");
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
-  const [keyIdea, setKeyIdea] = useState("");
-  const [approach, setApproach] = useState("");
-  const [mistakes, setMistakes] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
   const [visibility, setVisibility] = useState("FRIENDS");
@@ -25,7 +21,21 @@ function AddProblem() {
 
     try {
       const token = localStorage.getItem("token");
+      let platformName = "";
 
+      const lowerLink = link.toLowerCase();
+
+      if (lowerLink.includes("leetcode")) {
+        platformName = "Leetcode";
+      } else if (lowerLink.includes("codechef")) {
+        platformName = "Codechef";
+      } else if (lowerLink.includes("codeforces")) {
+        platformName = "Codeforces";
+      } else if (lowerLink.includes("cses")) {
+        platformName = "CSES";
+      } else {
+        platformName = "Other";
+      }
       const createResponse = await fetch("http://localhost:8080/api/problems", {
         method: "POST",
         headers: {
@@ -41,9 +51,6 @@ function AddProblem() {
           link,
           intuition,
           code,
-          keyIdea,
-          approach,
-          mistakes,
           timeComplexity,
           spaceComplexity,
         },
@@ -82,14 +89,10 @@ function AddProblem() {
 
       setQuestionName("");
       setDifficulty("");
-      setPlatform("");
       setQuestionId("");
       setLink("");
       setIntuition("");
       setCode("");
-      setKeyIdea("");
-      setApproach("");
-      setMistakes("");
       setTimeComplexity("");
       setSpaceComplexity("");
     } catch (error) {
@@ -108,13 +111,6 @@ function AddProblem() {
           placeholder="Question Name"
           value={questionName}
           onChange={(e) => setQuestionName(e.target.value)}
-        />
-
-        <input
-          className="input"
-          placeholder="Platform Name (Leetcode / CodeChef)"
-          value={platformName}
-          onChange={(e) => setPlatform(e.target.value)}
         />
 
         <input
@@ -146,29 +142,6 @@ function AddProblem() {
           onChange={(e) => setIntuition(e.target.value)}
         />
 
-        <textarea
-          className="input"
-          placeholder="KeyIdea"
-          rows="3"
-          value={keyIdea}
-          onChange={(e) => setKeyIdea(e.target.value)}
-        />
-
-        <textarea
-          className="input"
-          placeholder="Approach"
-          rows="3"
-          value={approach}
-          onChange={(e) => setApproach(e.target.value)}
-        />
-
-        <textarea
-          className="input"
-          placeholder="Common Mistakes"
-          rows="2"
-          value={mistakes}
-          onChange={(e) => setMistakes(e.target.value)}
-        />
         <textarea
           className="input"
           placeholder="Code"
