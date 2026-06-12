@@ -100,10 +100,12 @@ function FindFriends() {
           autoFocus
         />
       </div>
-
-      {searchQuery && users.length === 0 ? (
+      {searchQuery && isLoading && (
+        <p className="loading">Searching...</p>  
+      )}
+      {searchQuery && !isLoading && users.length === 0 ? (
         <p className="empty">No users match "{searchQuery}"</p>
-      ) : users.length === 0 ? (
+      ) : !searchQuery && users.length === 0 ? (
         <p className="empty">
           Start typing a username to find friends.<br />
         </p>
