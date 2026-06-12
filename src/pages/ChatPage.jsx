@@ -42,6 +42,7 @@ function ChatPage() {
       getAllFriends(userId: $userId) {
         id
         status
+        profileImage
         user {
           id
           userName
@@ -124,12 +125,16 @@ function ChatPage() {
       );
 
       const friendList = data.getAllFriends
-        .filter(f => f.status === "ACCEPTED")
-        .map(f =>
-          String(f.user.id) === String(userId)
-            ? f.friend
-            : f.user
-        );
+      .filter(f => f.status === "ACCEPTED")
+        .map(f => {
+          const isCurrentUser = String(f.user.id) === String(userId);
+          const friendData = isCurrentUser ? f.friend : f.user;
+          
+          return {
+            ...friendData,
+            profileImage: f.profileImage
+          };
+        });
 
       setFriends(friendList);
 
@@ -463,6 +468,18 @@ function ChatPage() {
             >
 
               <div className="friend-name">
+                {friend.profileImage ? (
+                  <img 
+                    src={friend.profileImage} 
+                    alt={friend.userName}
+                    className="friend-profile-image"
+                  />
+                ) : (
+                  <div className="friend-profile-image-placeholder">
+                    {friend.userName.charAt(0)}
+                  </div>
+                )}
+                
                 {friend.userName}
               </div>
 
