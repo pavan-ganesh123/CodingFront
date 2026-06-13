@@ -476,7 +476,7 @@ function ChatPage() {
                   />
                 ) : (
                   <div className="friend-profile-image-placeholder">
-                    {friend.userName.charAt(0)}
+                    {friend.userName.charAt(0).toUpperCase()}
                   </div>
                 )}
                 

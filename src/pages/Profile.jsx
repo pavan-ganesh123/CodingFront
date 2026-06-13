@@ -5,25 +5,7 @@ import { getUserFromToken } from "../utils/auth";
 import { useToast } from "../notifications/ToastContext";
 import getCroppedImg from "../utils/cropImage";
 import Cropper from "react-easy-crop";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { DotLottie } from "@lottiefiles/dotlottie-web";
 
 function Profile() {
   const [profile, setProfile] = useState(null);
@@ -37,16 +19,62 @@ function Profile() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
   const fileInputRef = useRef(null);
+  const fireCanvasRef = useRef(null);
+  const DiamondCanvasRef = useRef(null);
+  const StreakCanvasRef = useRef(null);
   const authUser = getUserFromToken();
   const { showToast } = useToast();
 
+  // ✅ All useEffects together at the top, before any early returns
   useEffect(() => {
     if (authUser) {
       fetchData();
     }
   }, []);
 
+  useEffect(() => {
+    if (!userStats) return;        // wait until stats are loaded
+    if (!fireCanvasRef.current) return;
+
+    const dotLottie = new DotLottie({
+      autoplay: true,
+      loop: true,
+      canvas: fireCanvasRef.current,
+      src: "/Fire.lottie",
+    });
+
+    return () => dotLottie.destroy();
+  }, [userStats]); // re-runs when userStats loads and canvas becomes visible
+
+    useEffect(() => {
+      if (!userStats) return;        // wait until stats are loaded
+      if (!DiamondCanvasRef.current) return;
+
+      const dotLottie = new DotLottie({
+        autoplay: true,
+        loop: true,
+        canvas: DiamondCanvasRef.current,
+        src: "/Points.lottie",
+      });
+
+      return () => dotLottie.destroy();
+    }, [userStats]); 
+    
+    useEffect(() => {
+      if (!userStats) return;        // wait until stats are loaded
+      if (!StreakCanvasRef.current) return;
+
+      const dotLottie = new DotLottie({
+        autoplay: true,
+        loop: true,
+        canvas: StreakCanvasRef.current,
+        src: "/Streak.lottie",
+      });
+
+      return () => dotLottie.destroy();
+    }, [userStats]); 
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -65,7 +93,7 @@ function Profile() {
       if (!friendResponse.ok) throw new Error("Failed to load friend count");
       const count = await friendResponse.json();
 
-      const statsResponse = await fetch(`http://localhost:8080/api/users/my-stats`, {
+      const statsResponse = await fetch("http://localhost:8080/api/users/my-stats", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -77,10 +105,14 @@ function Profile() {
         }
       }
 
-      const submissionsResponse = await fetch(`http://localhost:8080/api/users/my-yearly-submissions`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const submissionsResponse = await fetch(
+        "http://localhost:8080/api/users/my-yearly-submissions",
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       let submissions = {};
       if (submissionsResponse.ok) {
         const submissionsText = await submissionsResponse.text();
@@ -88,6 +120,7 @@ function Profile() {
           submissions = JSON.parse(submissionsText);
         }
       }
+
       setProfile(profileData);
       setFriendCount(count);
       setUserStats(stats);
@@ -124,14 +157,17 @@ function Profile() {
     try {
       setUploading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/api/users/my-profile-picture", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ profilePicture: base64Image }),
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/users/my-profile-picture",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ profilePicture: base64Image }),
+        }
+      );
 
       if (!response.ok) throw new Error("Upload failed");
 
@@ -159,80 +195,92 @@ function Profile() {
     }
   };
 
-  // Prepare chart data
-  const chartData = {
-    labels: Object.keys(yearlySubmissions),
-    datasets: [
-      {
-        label: "Question Submissions",
-        data: Object.values(yearlySubmissions),
-        backgroundColor: Object.keys(yearlySubmissions).map((date) => {
-          // Check if consecutive (previous day exists)
-          const prevDate = new Date(date);
-          prevDate.setDate(prevDate.getDate() - 1);
-          const prevDateStr = prevDate.toISOString().split("T")[0];
-          return yearlySubmissions[prevDateStr] ? "#4CAF50" : "#2196F3";
-        }),
-        borderRadius: 4,
-      },
-    ],
+  const formatDateKey = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      title: {
-        display: true,
-        text: "Yearly Question Submissions",
-        font: { size: 16 },
-      },
-      tooltip: {
-        callbacks: {
-          title: (context) => `Date: ${context[0].label}`,
-          label: (context) => `Submissions: ${context[0].parsed.y}`,
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Date",
-        },
-        ticks: {
-          maxRotation: 45,
-          minRotation: 45,
-          font: { size: 10 },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Number of Submissions",
-        },
-        beginAtZero: true,
-      },
-    },
+  const getContributionColumns = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 364);
+    startDate.setHours(0, 0, 0, 0);
+
+    const columns = [];
+    let currentCol = null;
+    let prevMonth = -1;
+    const cur = new Date(startDate);
+
+    while (cur <= today) {
+      const dow = cur.getDay();
+      const month = cur.getMonth();
+
+      if (prevMonth !== -1 && month !== prevMonth) {
+        if (currentCol) columns.push(currentCol);
+        columns.push({ type: "spacer" });
+        currentCol = {
+          type: "week",
+          days: Array(7).fill(null),
+          newMonth: cur.toLocaleString("default", { month: "short" }),
+        };
+        currentCol.days[dow] = new Date(cur);
+      } else if (!currentCol) {
+        currentCol = {
+          type: "week",
+          days: Array(7).fill(null),
+          newMonth: cur.toLocaleString("default", { month: "short" }),
+        };
+        currentCol.days[dow] = new Date(cur);
+      } else if (dow === 0 && currentCol.days.some((d) => d !== null)) {
+        columns.push(currentCol);
+        currentCol = {
+          type: "week",
+          days: Array(7).fill(null),
+          newMonth: null,
+        };
+        currentCol.days[dow] = new Date(cur);
+      } else {
+        currentCol.days[dow] = new Date(cur);
+      }
+
+      prevMonth = month;
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    if (currentCol) columns.push(currentCol);
+    return columns;
   };
 
+  // ✅ Early returns AFTER all hooks
   if (!authUser) return <p>Please login again</p>;
   if (!profile) return <p>Loading...</p>;
 
+  const columns = getContributionColumns();
+
   return (
     <div className="profile-container">
-      <h2>Profile</h2>
-      <div className="profile-card">
-        {/* Profile Picture */}
-        <div className="profile-picture-wrapper" onClick={() => fileInputRef.current.click()}>
+      {/* LEFT SIDEBAR */}
+      <div className="profile-sidebar">
+        <div
+          className="profile-picture-wrapper"
+          onClick={() => fileInputRef.current.click()}
+        >
           {profile.profilePicture ? (
-            <img src={profile.profilePicture} alt="Profile" className="profile-picture" />
+            <img
+              src={profile.profilePicture}
+              alt="Profile"
+              className="profile-picture"
+            />
           ) : (
             <div className="profile-picture-placeholder">
               {profile.userName?.charAt(0).toUpperCase()}
             </div>
           )}
+
           <div className="profile-picture-overlay">
             {uploading ? "Uploading..." : "Change"}
           </div>
@@ -246,103 +294,149 @@ function Profile() {
           onChange={handleImageChange}
         />
 
-        <p><strong>Name:</strong> {profile.userName}</p>
-        <p><strong>Email:</strong> {profile.email}</p>
-        <p><strong>Friends:</strong> {friendCount}</p>
-        {
-        showCropModal && (
-          <div className="crop-modal">
+        <h2>{profile.userName}</h2>
 
-            <div className="crop-container">
+        <div className="profile-details">
+          <p>
+            <strong>Email</strong>
+            <br />
+            {profile.email}
+          </p>
 
-              <Cropper
-                image={selectedImage}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                cropShape="round"
-                showGrid={false}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={(croppedArea, croppedAreaPixels) =>
-                  setCroppedAreaPixels(croppedAreaPixels)
-                }
-              />
+          <p>
+            <strong>Friends</strong>
+            <br />
+            {friendCount}
+          </p>
+        </div>
 
-            </div>
-
-            <div className="crop-controls">
-
-              <input
-                type="range"
-                min={1}
-                max={3}
-                step={0.1}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-              />
-
-              <button
-                className="save-crop-btn"
-                onClick={handleCropSave}
-              >
-                Save
-              </button>
-
-              <button
-                className="cancel-crop-btn"
-                onClick={() => {
-                  setShowCropModal(false);
-                  setSelectedImage(null);
-                }}
-              >
-                Cancel
-              </button>
-
-            </div>
-
-          </div>
-        )
-      }
-        {/* NEW: Stats Section */}
         {userStats && (
           <div className="user-stats">
-            <h3>📊 Your Stats</h3>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-icon">⭐</div>
-                <div className="stat-value">{userStats.totalPoints}</div>
-                <div className="stat-label">Points</div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <canvas ref={DiamondCanvasRef} width="65" height="65" />
               </div>
-              <div className="stat-card">
-                <div className="stat-icon">🔥</div>
-                <div className="stat-value">{userStats.currentStreak}</div>
-                <div className="stat-label">Current Streak</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">🏆</div>
+              <div className="stat-value">{userStats.totalPoints}</div>
+              <div className="stat-label">Points</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon">
+                <canvas ref={StreakCanvasRef} width="55" height="55" />
                 <div className="stat-value">{userStats.longestStreak}</div>
-                <div className="stat-label">Longest Streak</div>
               </div>
+              <div className="stat-label">Longest Streak</div>
             </div>
           </div>
         )}
       </div>
 
-      {/* NEW: Yearly Submissions Chart */}
-      {userStats && yearlySubmissions && Object.keys(yearlySubmissions).length > 0 && (
-        <div className="submissions-chart">
-          <h3>📅 Yearly Question Submissions</h3>
-          <div className="chart-container">
-            <Bar data={chartData} options={chartOptions} height={300} />
+      {/* RIGHT SECTION */}
+      <div className="profile-main">
+        {userStats && (
+          <div className="streak-card">
+              {/* ✅ width/height as attributes, not just CSS */}
+              <canvas ref={fireCanvasRef} width="50" height="50" />
+            <div className="streak-number">{userStats.currentStreak}</div>
           </div>
-          <div className="chart-legend">
-            <span className="legend-item">
-              <span className="legend-color green"></span> Consecutive Days
-            </span>
-            <span className="legend-item">
-              <span className="legend-color blue"></span> Non-Consecutive
-            </span>
+        )}
+
+        {/* GRID SCROLL WRAPPER */}
+        <div className="grid-scroll-wrapper">
+          <div style={{ display: "inline-block", minWidth: "max-content" }}>
+
+            {/* MONTH LABELS ROW */}
+            <div className="months-row">
+              {columns.map((col, i) =>
+                col.type === "spacer" ? (
+                  <div key={i} className="month-label month-spacer" />
+                ) : (
+                  <div key={i} className="month-label month-week">
+                    {col.newMonth || ""}
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* CONTRIBUTION GRID */}
+            <div className="contribution-grid">
+              {columns.map((col, i) =>
+                col.type === "spacer" ? (
+                  <div key={i} className="spacer-column" />
+                ) : (
+                  <div key={i} className="week-column">
+                    {col.days.map((date, d) => {
+                      if (!date) {
+                        return <div key={d} className="empty-box" />;
+                      }
+                      const key = formatDateKey(date);
+                      const count = yearlySubmissions[key] || 0;
+
+                      let levelClass = "level0";
+                      if (count >= 1) levelClass = "level1";
+                      if (count >= 3) levelClass = "level2";
+                      if (count >= 5) levelClass = "level3";
+                      if (count >= 10) levelClass = "level4";
+
+                      return (
+                        <div
+                          key={key}
+                          className={`day-box ${levelClass}`}
+                          title={`${key}: ${count} submissions`}
+                        />
+                      );
+                    })}
+                  </div>
+                )
+              )}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* Crop Modal */}
+      {showCropModal && (
+        <div className="crop-modal">
+          <div className="crop-container">
+            <Cropper
+              image={selectedImage}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="round"
+              showGrid={false}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(croppedArea, croppedAreaPixels) =>
+                setCroppedAreaPixels(croppedAreaPixels)
+              }
+            />
+          </div>
+
+          <div className="crop-controls">
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.1}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+            />
+
+            <button className="save-crop-btn" onClick={handleCropSave}>
+              Save
+            </button>
+
+            <button
+              className="cancel-crop-btn"
+              onClick={() => {
+                setShowCropModal(false);
+                setSelectedImage(null);
+              }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
