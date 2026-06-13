@@ -1,67 +1,301 @@
+/* ================= MAIN LAYOUT ================= */
+
 .profile-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
+    min-height: 100vh;
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+    align-items: flex-start;
+    color: white;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.profile-card {
-  padding: 20px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
-  margin: 20px 0;
+
+/* ================= LEFT SIDEBAR ================= */
+
+.profile-sidebar {
+    width: 260px;
+    min-width: 260px;
+    position: sticky;
+    top: 25px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.04)
+        );
+
+    border-radius: 25px;
+    padding: 28px 22px;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.3);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    box-sizing: border-box;
 }
 
+.profile-details {
+    width: 100%;
+    margin-top: 18px;
+}
+
+.profile-details p {
+    margin-bottom: 16px;
+    line-height: 1.5;
+    color: #d1d5db;
+    text-align: center;
+    font-size: 1rem;
+}
+
+
+/* ================= PROFILE IMAGE ================= */
 
 .profile-picture-wrapper {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 16px;
-  cursor: pointer;
-  border-radius: 50%;
-  overflow: hidden;
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .profile-picture {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .profile-picture-placeholder {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: #4f46e5;
-  color: white;
-  font-size: 2.5rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .profile-picture-overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-size: 0.75rem;
-  padding: 4px 0;
-  opacity: 0;
-  transition: opacity 0.2s;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0,0,0,.6);
+    text-align: center;
+    padding: 6px 0;
+    font-size: .8rem;
+    opacity: 0;
+    transition: .3s;
 }
 
 .profile-picture-wrapper:hover .profile-picture-overlay {
-  opacity: 1;
+    opacity: 1;
 }
+
+
+/* ================= STATS ================= */
+
+.user-stats {
+    width: 100%;
+    margin-top: 18px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.stat-card {
+    flex: 1;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 15px;
+    padding: 18px 10px;
+    text-align: center;
+    transition: .3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    font-size: 1.7rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    margin-top: 8px;
+    color: #94a3b8;
+    font-size: .82rem;
+}
+
+.profile-sidebar h2 {
+    text-align: center;
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+}
+
+
+/* ================= RIGHT SECTION ================= */
+
+.profile-main {
+    flex: 1;
+    min-width: 0;
+
+    background: rgba(255,255,255,.05);
+    backdrop-filter: blur(20px);
+
+    border-radius: 25px;
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 0;
+    box-sizing: border-box;
+}
+
+
+/* ================= STREAK ================= */
+
+.streak-card {
+    width: fit-content;
+    margin-left: auto;
+
+    border-radius: 20px;
+    padding: 12px 20px;
+    align-self: flex-end;
+    margin-bottom: 20px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.streak-number {
+    font-size: 1.9rem;
+    font-weight: bold;
+}
+
+
+
+/* ================= MONTH LABELS ================= */
+
+.months-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    margin-bottom: 8px;
+    min-height: 20px;
+    color: #94a3b8;
+    font-size: .78rem;
+}
+
+.month-label {
+    white-space: nowrap;
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+.month-label.month-week {
+    width: 15px;
+    flex: 0 0 15px;
+    margin-right: 3px;
+}
+
+.month-label.month-spacer {
+    width: 8px;
+    flex: 0 0 8px;
+    margin-right: 3px;
+}
+
+
+/* ================= CONTRIBUTION GRID ================= */
+
+.contribution-grid {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.week-column {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 15px;
+    flex: 0 0 15px;
+    margin-right: 3px;
+}
+
+.spacer-column {
+    width: 8px;
+    flex: 0 0 8px;
+    margin-right: 3px;
+}
+
+.day-box {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    transition: .2s;
+}
+
+.day-box:hover {
+    transform: scale(1.3);
+    border: 1px solid white;
+    z-index: 2;
+}
+
+.empty-box {
+    width: 15px;
+    height: 15px;
+}
+
+
+/* ================= HEATMAP COLORS ================= */
+
+.level0 { background: #1e293b; }
+.level1 { background: #0e4429; }
+.level2 { background: #26a641; }
+.level3 { background: #39d353; }
+.level4 { background: #6eff8a; }
+
+
+/* ================= SUBMISSION CARD ================= */
+
+.submission-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.06),
+            rgba(255,255,255,.02)
+        );
+
+    border-radius: 25px;
+    padding: 35px;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.2);
+}
+
+
+/* ================= CROP MODAL ================= */
 
 .crop-modal {
     position: fixed;
@@ -78,14 +312,14 @@
 
 .crop-container {
     position: relative;
-    width: 400px;
-    height: 400px;
+    width: 380px;
+    height: 380px;
     background: #222;
     border-radius: 20px;
 }
 
 .crop-controls {
-    margin-top: 30px;
+    margin-top: 28px;
 
     display: flex;
     gap: 15px;
@@ -93,7 +327,7 @@
 }
 
 .crop-controls input {
-    width: 250px;
+    width: 220px;
 }
 
 .save-crop-btn {
@@ -103,13 +337,84 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    font-size: .95rem;
 }
 
 .cancel-crop-btn {
     padding: 10px 20px;
-    background: rgb(189, 34, 65);
+    background: rgb(189,34,65);
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    font-size: .95rem;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 900px) {
+
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .profile-sidebar {
+        width: 100%;
+        max-width: 500px;
+        position: static;
+    }
+
+    .user-stats {
+        flex-direction: row;
+    }
+
+    .profile-main {
+        width: 100%;
+    }
+
+    .streak-card {
+        position: static;
+        margin-bottom: 16px;
+        width: fit-content;
+    }
+
+    .crop-container {
+        width: 300px;
+        height: 300px;
+    }
+
+    .crop-controls input {
+        width: 160px;
+    }
+}
+
+.grid-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 8px; /* space for the scrollbar */
+
+    /* Custom scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.2) transparent;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar {
+    height: 5px;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.2);
+    border-radius: 10px;
+}
+
+.grid-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,.4);
 }

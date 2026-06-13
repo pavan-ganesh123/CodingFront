@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.19.4",
+    "@lottiefiles/dotlottie-web": "^0.74.0",
     "axios": "^1.17.0",
     "chart.js": "^4.5.1",
     "framer-motion": "^12.38.0",
     "graphql-request": "^7.4.0",
     "jwt-decode": "^4.0.0",
+    "lottie-react": "^2.4.1",
     "react": "^19.2.4",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.4",

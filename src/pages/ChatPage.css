@@ -16,10 +16,10 @@
 }
 
 .chat-user {
-  padding: 14px;
+
   margin-top: 10px;
 
-  border-radius: 12px;
+  border-radius: 16px;
 
   cursor: pointer;
 
@@ -431,21 +431,67 @@
   }
 }
 
-.friend-profile-image {
-  width: 40px;
-  height: 40px;
+.friend-name {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+}
+
+.friend-name:hover {
+  background: rgba(79,70,229,0.12);
+  border-color: rgba(99,102,241,0.4);
+  box-shadow: 0 8px 25px rgba(99,102,241,0.2);
+  transform: translateX(4px);
+}
+
+.friend-profile-image,
+.friend-profile-image-placeholder {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.friend-profile-image {
   object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.15);
+  box-shadow:
+      0 4px 15px rgba(0,0,0,0.3);
+}
+
+.friend-name:hover .friend-profile-image {
+  transform: scale(1.08);
+  border-color: #4f46e5;
 }
 
 .friend-profile-image-placeholder {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  color: #666;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+
+  box-shadow:
+      0 4px 15px rgba(99, 100, 167, 0.4);
+}
+
+.friend-username {
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
