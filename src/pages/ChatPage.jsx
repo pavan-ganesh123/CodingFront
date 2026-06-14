@@ -5,7 +5,8 @@ import { gql } from "graphql-request";
 
 import { getClient } from "../api/graphqlClient";
 import { getUserFromToken } from "../utils/auth";
-
+import { FaTrashAlt } from "react-icons/fa";
+import { MdReply } from "react-icons/md";
 import "./ChatPage.css";
 
 function ChatPage() {
@@ -67,6 +68,7 @@ function ChatPage() {
         senderId
         receiverId
         content
+        deletedForEveryone
         replyToMessageId
         starred
         createdAt
@@ -168,14 +170,15 @@ function ChatPage() {
       );
 
       const formatted = data.messages.map(msg => ({
-        type: "private",
-        messageId: msg.messageId,
-        fromUserId: String(msg.senderId),
-        to: String(msg.receiverId),
-        message: msg.content,
-        replyToMessageId: msg.replyToMessageId,
-        starred: msg.starred,
-        createdAt: msg.createdAt
+          type: "private",
+          messageId: msg.messageId,
+          fromUserId: String(msg.senderId),
+          to: String(msg.receiverId),
+          message: msg.content,
+          deletedForEveryone: msg.deletedForEveryone,
+          replyToMessageId: msg.replyToMessageId,
+          starred: msg.starred,
+          createdAt: msg.createdAt
       }));
 
       setChat(formatted);
@@ -210,7 +213,6 @@ function ChatPage() {
 
         setChat(prev => {
 
-          // prevent duplicates
           const exists = prev.some(
             m => m.messageId === msg.messageId
           );
@@ -219,6 +221,21 @@ function ChatPage() {
 
           return [...prev, msg];
         });
+
+      }
+      if (msg.type === "delete") {
+
+        setChat(prev =>
+          prev.map(m =>
+            m.messageId === msg.messageId
+              ? {
+                  ...m,
+                  deletedForEveryone: true
+                }
+              : m
+          )
+        );
+
       }
     };
 
@@ -261,6 +278,19 @@ function ChatPage() {
     setMessage("");
 
     setReplyingTo(null);
+  };
+
+  const deleteForEveryone = (msg) => {
+
+    if (!ws) return;
+
+    ws.send(
+      JSON.stringify({
+        type: "delete",
+        messageId: msg.messageId,
+        to: msg.to
+      })
+    );
   };
 
   // =====================================================
@@ -562,7 +592,6 @@ function ChatPage() {
                       isMe ? "me" : "other"
                     }`}
                   >
-
                     <div className="message-bubble">
 
                       {/* REPLY PREVIEW */}
@@ -578,33 +607,63 @@ function ChatPage() {
 
                       {/* MESSAGE */}
 
-                      <div>
-                        {msg.message}
-                      </div>
+                      {
+                          msg.deletedForEveryone ?
+                          (
+                              <span
+                                style={{
+                                  fontStyle: "italic",
+                                  color: "#888"
+                                }}
+                              >
+                                This message was deleted
+                              </span>
+                          )
+                          :
+                          (
+                              msg.message
+                          )
+                      }
 
                       {/* ACTIONS */}
 
                       <div className="message-actions">
 
-                        <button
-                          onClick={() =>
-                            setReplyingTo(msg)
-                          }
-                        >
-                          Reply
-                        </button>
+                          {
+                            !msg.deletedForEveryone && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    setReplyingTo(msg)
+                                  }
+                                >
+                                  <MdReply />
+                                </button>
 
-                        <button
-                          onClick={() =>
-                            toggleStar(msg)
+                                <button
+                                  onClick={() =>
+                                    toggleStar(msg)
+                                  }
+                                >
+                                  {msg.starred ? "⭐" : "☆"}
+                                </button>
+                              </>
+                            )
                           }
-                        >
-                          {msg.starred
-                            ? "⭐"
-                            : "☆"}
-                        </button>
 
-                      </div>
+                          {
+                            isMe && !msg.deletedForEveryone && (
+
+                              <button
+                                onClick={() => deleteForEveryone(msg)}
+                              >
+                                <FaTrashAlt />
+                              </button>
+
+                            )
+                          }
+
+                        </div>
 
                     </div>
 
@@ -637,6 +696,7 @@ function ChatPage() {
               </div>
             )}
 
+            
             {/* INPUT */}
 
             <div className="chat-input-area">
