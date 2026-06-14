@@ -1,0 +1,160 @@
+.find-question-container{
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 25px;
+    color: white;
+}
+
+.find-question-heading{
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Search Box */
+
+.find-question-input{
+    width: 100%;
+    padding: 16px 20px;
+
+    border: none;
+    border-radius: 18px;
+
+    background: rgba(255,255,255,0.08);
+
+    color: white;
+    font-size: 16px;
+
+    outline: none;
+
+    transition: .3s;
+}
+
+.find-question-input:focus{
+    box-shadow:
+        0 0 0 3px rgba(59,130,246,.4);
+}
+
+.find-question-input::placeholder{
+    color: rgba(255,255,255,.5);
+}
+
+
+/* Loading */
+
+.loading-text{
+    margin-top: 15px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+
+/* Results */
+
+.results-container{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.no-result{
+    text-align: center;
+    color: #94a3b8;
+}
+
+
+/* Card */
+
+.problem-card{
+
+    background:
+        linear-gradient(
+            135deg,
+            #1c2128,
+            #333539
+        );
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    transition: .3s;
+    width: 500px;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25);
+}
+
+.problem-card:hover{
+
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.35);
+}
+
+
+/* Header */
+
+.problem-header{
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+}
+
+.problem-title{
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.platform-badge{
+
+    background:
+        linear-gradient(
+            135deg,
+            #636363,
+            #384344
+        );
+
+    padding: 7px 14px;
+
+    border-radius: 30px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* Link */
+
+.problem-link{
+
+    display: inline-block;
+
+    margin-top: 10px;
+
+    color: #60a5fa;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    transition: .25s;
+}
+
+.problem-link:hover{
+
+    color: white;
+
+    transform: translateX(6px);
+}
