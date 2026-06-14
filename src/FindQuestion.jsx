@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "./FindQuestion.css";
 
 function FindQuestion() {
   const [text, setText] = useState("");
@@ -31,8 +32,9 @@ function FindQuestion() {
           query($questionName: String!) {
             getByquestionName(questionName: $questionName) {
               id
+              questionName
               platformName
-              code
+              link
             }
           }
         `;
@@ -70,84 +72,70 @@ function FindQuestion() {
   }, [debouncedText]);
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Find Questions</h2>
+  <div className="find-question-container">
 
-      {/* 🔹 Search Box */}
-      <input
-        type="text"
-        placeholder="Search by problem name..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        style={styles.input}
-      />
+    <h2 className="find-question-heading">
+      Find Questions
+    </h2>
 
-      {/* 🔹 Loading */}
-      {loading && <p style={styles.loading}>Searching...</p>}
+    <input
+      type="text"
+      placeholder="Search by problem name..."
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      className="find-question-input"
+    />
 
-      {/* 🔹 Results */}
-      <div style={styles.results}>
-        {problems.length === 0 && debouncedText && !loading && (
-          <p style={styles.noResult}>No results found</p>
-        )}
+    {loading && (
+      <p className="loading-text">
+        Searching...
+      </p>
+    )}
 
-        {problems.map((p) => (
-          <div key={p.id} style={styles.card}>
-            <h3 style={styles.title}>{p.name}</h3>
-            <p style={styles.platform}>{p.platformName}</p>
-            <p style={{ fontSize: "12px", opacity: 0.6 }}>
-              Code: {p.code}
-            </p>
+    <div className="results-container">
+
+      {problems.length === 0 && debouncedText && !loading && (
+        <p className="no-result">
+          No results found
+        </p>
+      )}
+
+      {problems.map((p) => (
+
+        <div
+          key={p.id}
+          className="problem-card"
+        >
+
+          <div className="problem-header">
+
+            <h3 className="problem-title">
+              {p.questionName}
+            </h3>
+
+            <span className="platform-badge">
+              {p.platformName}
+            </span>
+
           </div>
-        ))}
-      </div>
+
+          <a
+            href={p.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="problem-link"
+          >
+            Solve Problem ↗
+          </a>
+
+        </div>
+
+      ))}
+
     </div>
-  );
+
+  </div>
+);
 }
 
 export default FindQuestion;
-
-const styles = {
-  container: {
-    maxWidth: "700px",
-    margin: "40px auto",
-    padding: "20px",
-    textAlign: "center",
-  },
-  heading: {
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: "10px",
-    border: "1px solid #ccc",
-    fontSize: "16px",
-  },
-  loading: {
-    marginTop: "10px",
-    color: "#888",
-  },
-  results: {
-    marginTop: "20px",
-  },
-  card: {
-    padding: "15px",
-    marginBottom: "10px",
-    borderRadius: "12px",
-    background: "#1e293b",
-    color: "white",
-    textAlign: "left",
-  },
-  title: {
-    margin: 0,
-  },
-  platform: {
-    fontSize: "14px",
-    opacity: 0.7,
-  },
-  noResult: {
-    marginTop: "15px",
-    color: "#999",
-  },
-};
