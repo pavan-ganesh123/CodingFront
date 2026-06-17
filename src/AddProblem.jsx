@@ -76,6 +76,9 @@ function AddProblem() {
           },
           body: JSON.stringify({
             solutionCode: code,
+            intuition: intuition,
+            timeComplexity: timeComplexity,
+            spaceComplexity: spaceComplexity,
           }),
         }
       );
