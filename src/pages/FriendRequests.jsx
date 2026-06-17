@@ -18,7 +18,7 @@ function FriendRequests() {
   // 🔹 Get all relations
   const GET_FRIENDS = gql`
     query($userId: ID!) {
-      getAllFriends(userId: $userId) {
+      getPendingFriends(userId: $userId) {
         id
         status
         user { id userName }
@@ -47,14 +47,7 @@ function FriendRequests() {
     try {
       const data = await client.request(GET_FRIENDS, { userId });
 
-      const allRelations = data.getAllFriends;
-
-      // 👉 Only incoming pending requests
-      const pendingRequests = allRelations.filter(
-        f =>
-          f.status === "PENDING" &&
-          String(f.friend.id) === String(userId)
-      );
+      const pendingRequests = data.getPendingFriends;
 
       setRequests(pendingRequests);
 
