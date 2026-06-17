@@ -13,6 +13,7 @@ const PostDetailsPage = () => {
     const { postId } = useParams();
 
     const [post, setPost] = useState(null);
+    const [Userproblem, setUserProblem] = useState(null);
     const [problem, setProblem] = useState(null);
     const [comments, setComments] = useState([]);
     const [commentText, setCommentText] = useState("");
@@ -98,8 +99,28 @@ const PostDetailsPage = () => {
 
         }
     };
-    const loadProblem = async (questionId) => {
-        if (!questionId) {
+    const loadUserProblem = async (postUserId, questionId) => {
+        if (!questionId || !postUserId) {
+            console.warn("No problemId to load problem with respective User:", questionId);
+            return;
+        }
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/api/problems/${postUserId}/${questionId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            setUserProblem(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const loadProblem = async ( questionId) => {
+        if (!questionId ) {
             console.warn("No problemId to load problem:", questionId);
             return;
         }
@@ -117,7 +138,6 @@ const PostDetailsPage = () => {
             console.error(error);
         }
     };
-
     useEffect(() => {
 
         loadPost();
@@ -126,7 +146,8 @@ const PostDetailsPage = () => {
     }, [postId]);
 
     useEffect(() => {
-        if (post?.questionId) {
+        if (post?.questionId && post?.userId) {
+            loadUserProblem(post.userId, post.questionId);
             loadProblem(post.questionId);
         }
     }, [post]);
@@ -155,35 +176,29 @@ const PostDetailsPage = () => {
                 </div>
 
 
-                {problem && (
+                {Userproblem && (
                     <div className="problem-details">
                         <div className="problem-meta">
                             {problem.difficulty && (
                                 <div className={`difficulty-badge difficulty-${problem.difficulty.toLowerCase()}`}>
-                                    {problem.intuition}
+                                    {Userproblem.intuition}
                                 </div>
                             )}
                         </div>
 
 
-                        {problem.timeComplexity && (
+                        {Userproblem.timeComplexity && (
                             <div className="problem-complexity">
-                                <strong>Time Complexity:</strong> {problem.timeComplexity}
+                                <strong>Time Complexity:</strong> {Userproblem.timeComplexity}
                             </div>
                         )}
 
-                        {problem.spaceComplexity && (
+                        {Userproblem.spaceComplexity && (
                             <div className="problem-complexity">
-                                <strong>Space Complexity:</strong> {problem.spaceComplexity}
+                                <strong>Space Complexity:</strong> {Userproblem.spaceComplexity}
                             </div>
                         )}
 
-                        {problem.description && (
-                            <div className="problem-description">
-                                <strong>Description:</strong>
-                                <p>{problem.description}</p>
-                            </div>
-                        )}
                     </div>
                 )}
                 <div className="post-stats">

@@ -19,7 +19,7 @@ function Blocked() {
   const { showToast } = useToast();
   const GET_RELATIONS = gql`
     query($userId: ID!) {
-      getAllFriends(userId: $userId) {
+      getBlockedFriends(userId: $userId) {
         id
         status
 
@@ -66,14 +66,7 @@ function Blocked() {
         { userId }
       );
 
-      const blocked = data.getAllFriends
-        .filter(f => f.status === "BLOCKED")
-        .map(f =>
-          String(f.user.id) === String(userId)
-            ? f.friend
-            : f.user
-        );
-
+      const blocked = data.getBlockedFriends;
       setBlockedUsers(blocked);
 
     } catch (err) {
@@ -94,12 +87,18 @@ function Blocked() {
       );
 
       setBlockedUsers(prev =>
-        prev.filter(
-          u => String(u.id) !== String(targetId)
-        )
-      );
+      prev.filter(relation => {
 
-      showToast("User unblocked","info");
+        const blockedPerson =
+          String(relation.user.id) === String(userId)
+            ? relation.friend
+            : relation.user;
+
+        return String(blockedPerson.id) !== String(targetId);
+      })
+    );
+
+      showToast("User unblocked", "info");
 
     } catch (err) {
       console.error(err);
@@ -136,38 +135,37 @@ function Blocked() {
 
         ) : (
 
-          blockedUsers.map(user => (
+          blockedUsers.map(relation => {
 
-            <div
-              key={user.id}
-              className="blocked-user-card"
-            >
+            const blockedPerson =
+              String(relation.user.id) === String(userId)
+                ? relation.friend
+                : relation.user;
 
-              <div>
-
-                <div className="blocked-name">
-                  {user.userName}
-                </div>
-
-                <div className="blocked-email">
-                  {user.email}
-                </div>
-
-              </div>
-
-              <button
-                className="unblock-btn"
-                onClick={() =>
-                  handleUnblock(user.id)
-                }
+            return (
+              <div
+                key={relation.id}
+                className="blocked-user-card"
               >
-                Unblock
-              </button>
+                <div>
+                  <div className="blocked-name">
+                    {blockedPerson.userName}
+                  </div>
 
-            </div>
+                  <div className="blocked-email">
+                    {blockedPerson.email}
+                  </div>
+                </div>
 
-          ))
-
+                <button
+                  className="unblock-btn"
+                  onClick={() => handleUnblock(blockedPerson.id)}
+                >
+                  Unblock
+                </button>
+              </div>
+            );
+          })
         )}
 
       </div>
