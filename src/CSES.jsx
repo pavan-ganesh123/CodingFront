@@ -157,7 +157,7 @@ function CSES() {
 
                       <div className="section-content">
 
-                        {p.problem.intuition
+                        {p.intuition
                           ?.split("\n")
                           .map((line, i) => {
 
@@ -186,7 +186,7 @@ function CSES() {
 
                       <pre>
                         <code>
-                          {p.problem.code}
+                          {p.solutionCode}
                         </code>
                       </pre>
 
@@ -197,11 +197,11 @@ function CSES() {
                     <div className="complexities">
 
                       <div className="tag complexity">
-                        Time: {p.problem.timeComplexity}
+                        Time: {p.timeComplexity}
                       </div>
 
                       <div className="tag complexity">
-                        Space: {p.problem.spaceComplexity}
+                        Space: {p.spaceComplexity}
                       </div>
 
                     </div>
