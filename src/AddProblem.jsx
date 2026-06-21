@@ -2,72 +2,24 @@ import React, { useState } from "react";
 import "./AddProblem.css";
 
 function AddProblem() {
-  const [questionName, setQuestionName] = useState("");
-  const [difficulty, setDifficulty] = useState("");
-  const [questionId, setQuestionId] = useState("");
   const [link, setLink] = useState("");
   const [intuition, setIntuition] = useState("");
-  const [code, setCode] = useState("");
-  const [message, setMessage] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
   const [visibility, setVisibility] = useState("FRIENDS");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async () => {
-    if (!questionId || isNaN(Number(questionId))) {
-      setMessage("Question ID must be a valid number");
+    if (!link.trim()) {
+      setMessage("Please enter a problem link");
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
-      let platformName = "";
 
-      const lowerLink = link.toLowerCase();
-
-      if (lowerLink.includes("leetcode")) {
-        platformName = "Leetcode";
-      } else if (lowerLink.includes("codechef")) {
-        platformName = "Codechef";
-      } else if (lowerLink.includes("codeforces")) {
-        platformName = "Codeforces";
-      } else if (lowerLink.includes("cses")) {
-        platformName = "CSES";
-      } else {
-        platformName = "Other";
-      }
-      const createResponse = await fetch("http://localhost:8080/api/problems", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-        problem: {
-          questionName,
-          difficulty,
-          platformName,
-          questionId: Number(questionId),
-          link,
-          intuition,
-          code,
-          timeComplexity,
-          spaceComplexity,
-        },
-        visibility,
-      }),
-      });
-
-      if (!createResponse.ok) {
-        setMessage("Failed to save problem");
-        return;
-      }
-
-      const createdProblem = await createResponse.json();
-      const problemId = createdProblem.id;
-
-      const solveResponse = await fetch(
-        `http://localhost:8080/api/problems/my/solve?problemId=${problemId}`,
+      const response = await fetch(
+        "http://localhost:8080/api/problems/my/solve",
         {
           method: "POST",
           headers: {
@@ -75,32 +27,37 @@ function AddProblem() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            solutionCode: code,
-            intuition: intuition,
-            timeComplexity: timeComplexity,
-            spaceComplexity: spaceComplexity,
+            link,
+            intuition,
+            timeComplexity,
+            spaceComplexity,
+            visibility,
+            timeTaken: null,
           }),
         }
       );
 
-      if (!solveResponse.ok) {
-        setMessage("Problem saved but marking as solved failed");
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        setMessage(
+          errorText || "❌ Failed to add problem"
+        );
+
         return;
       }
 
-      setMessage("✅ Problem added and marked as solved!");
+      setMessage("✅ Problem added successfully!");
 
-      setQuestionName("");
-      setDifficulty("");
-      setQuestionId("");
       setLink("");
       setIntuition("");
-      setCode("");
       setTimeComplexity("");
       setSpaceComplexity("");
+      setVisibility("FRIENDS");
+
     } catch (error) {
-      console.error("Error:", error);
-      setMessage("Server error");
+      console.error(error);
+      setMessage("❌ Server error");
     }
   };
 
@@ -111,28 +68,7 @@ function AddProblem() {
       <div className="adding_card" style={{ maxWidth: "450px" }}>
         <input
           className="input"
-          placeholder="Question Name"
-          value={questionName}
-          onChange={(e) => setQuestionName(e.target.value)}
-        />
-
-        <input
-          className="input"
-          placeholder="Question Id (number)"
-          value={questionId}
-          onChange={(e) => setQuestionId(e.target.value)}
-        />
-
-        <input
-          className="input"
-          placeholder="Difficulty (easy / medium / hard)"
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-        />
-
-        <input
-          className="input"
-          placeholder="Link"
+          placeholder="Problem Link"
           value={link}
           onChange={(e) => setLink(e.target.value)}
         />
@@ -140,17 +76,9 @@ function AddProblem() {
         <textarea
           className="input"
           placeholder="Intuition"
-          rows="4"
+          rows="5"
           value={intuition}
           onChange={(e) => setIntuition(e.target.value)}
-        />
-
-        <textarea
-          className="input"
-          placeholder="Code"
-          rows="6"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
         />
 
         <input
@@ -166,9 +94,8 @@ function AddProblem() {
           value={spaceComplexity}
           onChange={(e) => setSpaceComplexity(e.target.value)}
         />
-        
-        <div className="visibility-section">
 
+        <div className="visibility-section">
           <label className="visibility-label">
             Post Visibility
           </label>
@@ -182,17 +109,19 @@ function AddProblem() {
             <option value="FRIENDS">Friends Only</option>
             <option value="PRIVATE">Only Me</option>
           </select>
-
         </div>
 
-        <button className="button button-accent" onClick={handleSubmit}>
+        <button
+          className="button button-accent"
+          onClick={handleSubmit}
+        >
           Add Problem
         </button>
 
         {message && (
           <p
             className={`message ${
-              message.includes("❌") ? "error" : "success"
+              message.startsWith("❌") ? "error" : "success"
             }`}
           >
             {message}
