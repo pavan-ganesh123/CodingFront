@@ -14,7 +14,6 @@ const PostDetailsPage = () => {
 
     const [post, setPost] = useState(null);
     const [Userproblem, setUserProblem] = useState(null);
-    const [problem, setProblem] = useState(null);
     const [comments, setComments] = useState([]);
     const [commentText, setCommentText] = useState("");
 
@@ -119,25 +118,6 @@ const PostDetailsPage = () => {
         }
     };
 
-    const loadProblem = async ( questionId) => {
-        if (!questionId ) {
-            console.warn("No problemId to load problem:", questionId);
-            return;
-        }
-        try {
-            const response = await axios.get(
-                `http://localhost:8080/api/problems/${questionId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-            setProblem(response.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
     useEffect(() => {
 
         loadPost();
@@ -148,7 +128,6 @@ const PostDetailsPage = () => {
     useEffect(() => {
         if (post?.questionId && post?.userId) {
             loadUserProblem(post.userId, post.questionId);
-            loadProblem(post.questionId);
         }
     }, [post]);
 
@@ -175,17 +154,34 @@ const PostDetailsPage = () => {
                     {post.questionTitle}
                 </div>
 
+                {post.imageUrls && post.imageUrls.length > 0 && (
+                    <div className="post-images-gallery">
+                        {post.imageUrls.map((url, index) => (
+                            <img
+                                key={index}
+                                src={url}
+                                alt={`${post.questionTitle} - image ${index + 1}`}
+                                className="post-detail-image"
+                            />
+                        ))}
+                    </div>
+                )}
 
                 {Userproblem && (
                     <div className="problem-details">
                         <div className="problem-meta">
-                            {problem.difficulty && (
-                                <div className={`difficulty-badge difficulty-${problem.difficulty.toLowerCase()}`}>
-                                    {Userproblem.intuition}
+                            {post.difficulty && (
+                                <div className={`difficulty-badge difficulty-${post.difficulty.toLowerCase()}`}>
+                                    {post.difficulty}
                                 </div>
                             )}
                         </div>
 
+                        {Userproblem.intuition && (
+                            <div className="problem-intuition">
+                                <strong>Intuition:</strong> {Userproblem.intuition}
+                            </div>
+                        )}
 
                         {Userproblem.timeComplexity && (
                             <div className="problem-complexity">

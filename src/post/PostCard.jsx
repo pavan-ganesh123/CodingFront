@@ -1,9 +1,15 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from "react";
 import axios from "axios";
 import "./PostCard.css";
 import LikeButton from "./LikeButton";
 import CommentCard from "./CommentCard";
 import { useNavigate } from "react-router-dom";
+import { gql } from "graphql-request";
+import { getClient } from "../api/graphqlClient";
+import {
+    useWebSocket
+} from "../context/WebSocketContext";
 
 const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const [comments, setComments] = useState([]);
@@ -13,11 +19,33 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadMessage, setUploadMessage] = useState("");
-    
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [friends, setFriends] = useState([]);
+    const [selectedFriends, setSelectedFriends] = useState([]);
     const canUploadImage = currentUser && currentUser.id === post.userId;
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
-
+    const client = getClient();
+    const socketRef = useWebSocket();
+    const GET_FRIENDS = gql`
+        query($userId: ID!) {
+          getAllFriends(userId: $userId) {
+            id
+            status
+            profileImage
+            user {
+              id
+              userName
+              email
+            }
+            friend {
+              id
+              userName
+              email
+            }
+          }
+        }
+      `;
     const fetchComments = async () => {
         try {
             setLoadingComments(true);
@@ -138,6 +166,74 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
         }
     };
 
+    const openShareModal = async () => {
+    try {
+
+        setSelectedFriends([]);
+        setShowShareModal(true);
+
+        const data = await client.request(
+            GET_FRIENDS,
+            {
+                userId: currentUser.id
+            }
+        );
+
+        const friendList = data.getAllFriends
+            .filter(
+                f => f.status === "ACCEPTED"
+            )
+            .map(f => {
+
+                const isCurrentUser =
+                    String(f.user.id) ===
+                    String(currentUser.id);
+
+                return isCurrentUser
+                    ? f.friend
+                    : f.user;
+            });
+
+        setFriends(friendList);
+
+    } catch (err) {
+
+        console.error(err);
+
+        setShowShareModal(false);
+    }
+};
+    
+    const handleShare = () => {
+
+    if (
+        !socketRef.current ||
+        socketRef.current.readyState !==
+            WebSocket.OPEN
+    ) {
+        alert(
+            "Chat connection unavailable"
+        );
+        return;
+    }
+
+    selectedFriends.forEach(friendId => {
+
+        socketRef.current.send(
+            JSON.stringify({
+                type: "share_post",
+                to: String(friendId),
+                postId: String(post.id),
+                postTitle: post.questionTitle,
+                postImage: post.imageUrl
+            })
+        );
+
+    });
+
+    setSelectedFriends([]);
+    setShowShareModal(false);
+};
     return (
         <div className="post-card">
             <div className="post-header">
@@ -223,6 +319,12 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                 <button className="action-btn" onClick={toggleComments}>
                     💬 Comments
                 </button>
+                <button
+                    className="action-btn"
+                    onClick={openShareModal}
+                >
+                    📤 Share
+                </button>
             </div>
 
             {showComments && (
@@ -252,8 +354,63 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                     )}
                 </div>
             )}
+            {
+showShareModal && (
+    <div className="share-modal">
+
+        <h3>Share Post</h3>
+
+        {
+            friends.map(friend => (
+                <label key={friend.id}>
+                    <input
+                        type="checkbox"
+                        checked={
+                            selectedFriends.includes(friend.id)
+                        }
+                        onChange={() => {
+
+                            if (
+                                selectedFriends.includes(friend.id)
+                            ) {
+                                setSelectedFriends(
+                                    selectedFriends.filter(
+                                        id => id !== friend.id
+                                    )
+                                );
+                            } else {
+                                setSelectedFriends([
+                                    ...selectedFriends,
+                                    friend.id
+                                ]);
+                            }
+                        }}
+                    />
+
+                    {friend.userName}
+                </label>
+            ))
+        }
+
+        <button onClick={handleShare}>
+            Send
+        </button>
+
+        <button
+            onClick={() => {
+                setShowShareModal(false);
+                setSelectedFriends([]);
+            }}
+        >
+            Cancel
+        </button>
+
+    </div>
+)
+}
         </div>
     );
+    
 };
 
 export default PostCard;

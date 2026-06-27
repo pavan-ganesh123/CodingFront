@@ -179,6 +179,84 @@
   transform: translateY(-1px);
 }
 
+/* SHARED POST CARD */
+
+.shared-post-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  background: rgba(255,255,255,0.04);
+
+  border: 1px solid rgba(255,255,255,0.1);
+
+  border-radius: 14px;
+
+  padding: 12px;
+
+  max-width: 240px;
+
+  overflow: hidden;
+}
+
+.shared-post-header {
+  font-size: 11px;
+
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+
+  font-weight: 600;
+
+  opacity: 0.55;
+}
+
+.shared-post-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+
+  color: white;
+}
+
+.shared-post-image {
+  width: 100%;
+  height: 140px;
+
+  object-fit: cover;
+
+  border-radius: 10px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.shared-post-card button {
+  align-self: flex-start;
+
+  margin-top: 2px;
+
+  padding: 8px 14px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: rgba(101, 102, 136, 0.85);
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.shared-post-card button:hover {
+  background: rgb(82, 125, 133);
+  transform: translateY(-1px);
+}
+
 /* INPUT */
 
 .chat-input-area {
@@ -469,7 +547,7 @@
 
 .friend-name:hover .friend-profile-image {
   transform: scale(1.08);
-  border-color: #4f46e5;
+  border-color: #cecbf9;
 }
 
 .friend-profile-image-placeholder {
