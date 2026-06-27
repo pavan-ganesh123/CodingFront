@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/immutability */
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,13 +9,14 @@ import { getUserFromToken } from "../utils/auth";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdReply } from "react-icons/md";
 import "./ChatPage.css";
+import { useWebSocket }
+from "../context/WebSocketContext";
 
 function ChatPage() {
 
   const [friends, setFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
 
-  const [ws, setWs] = useState(null);
 
   const [message, setMessage] = useState("");
 
@@ -33,7 +35,7 @@ function ChatPage() {
   const userId = user?.userId;
 
   const client = getClient();
-
+  const socketRef = useWebSocket();
   // =====================================================
   // GRAPHQL
   // =====================================================
@@ -58,23 +60,30 @@ function ChatPage() {
     }
   `;
 
-  const GET_MESSAGES = gql`
-    query($senderId: ID!, $receiverId: ID!) {
-      messages(
-        senderId: $senderId,
-        receiverId: $receiverId
-      ) {
-        messageId
-        senderId
-        receiverId
-        content
-        deletedForEveryone
-        replyToMessageId
-        starred
-        createdAt
+const GET_MESSAGES = gql`
+  query($senderId: ID!, $receiverId: ID!) {
+    messages(
+      senderId: $senderId,
+      receiverId: $receiverId
+    ) {
+      messageId
+      senderId
+      receiverId
+      content
+      messageType
+      sharedPostId
+      sharedPost {
+        id
+        questionTitle
+        primaryImageUrl
       }
+      deletedForEveryone
+      replyToMessageId
+      starred
+      createdAt
     }
-  `;
+  }
+`;
 
   const STAR_MESSAGE = gql`
     mutation($messageId: String!) {
@@ -170,15 +179,26 @@ function ChatPage() {
       );
 
       const formatted = data.messages.map(msg => ({
-          type: "private",
-          messageId: msg.messageId,
-          fromUserId: String(msg.senderId),
-          to: String(msg.receiverId),
-          message: msg.content,
-          deletedForEveryone: msg.deletedForEveryone,
-          replyToMessageId: msg.replyToMessageId,
-          starred: msg.starred,
-          createdAt: msg.createdAt
+        type:
+          msg.messageType === "POST_SHARE"
+            ? "share_post"
+            : "private",
+
+        messageId: msg.messageId,
+        fromUserId: String(msg.senderId),
+        to: String(msg.receiverId),
+
+        message: msg.content,
+
+        messageType: msg.messageType,
+        postId: msg.sharedPost?.id ?? msg.sharedPostId,
+        postTitle: msg.sharedPost?.questionTitle,
+        postImage: msg.sharedPost?.primaryImageUrl,
+
+        deletedForEveryone: msg.deletedForEveryone,
+        replyToMessageId: msg.replyToMessageId,
+        starred: msg.starred,
+        createdAt: msg.createdAt
       }));
 
       setChat(formatted);
@@ -194,64 +214,63 @@ function ChatPage() {
 
   useEffect(() => {
 
-    const token = localStorage.getItem("token");
+    if (!socketRef.current) {
+        return;
+    }
 
-    const socket = new WebSocket(
-      `ws://localhost:8081/ws?token=${token}`
-    );
+    const socket = socketRef.current;
 
-    socket.onopen = () => {
-      console.log("WebSocket Connected");
-    };
+      const handleMessage = (event) => {
 
-    socket.onmessage = (event) => {
+          const msg = JSON.parse(event.data);
 
-      const msg = JSON.parse(event.data);
+          if (
+              msg.type === "private" ||
+              msg.type === "share_post"
+          ) {
 
+              setChat(prev => {
 
-      if (msg.type === "private") {
+                  const exists = prev.some(
+                      m => m.messageId === msg.messageId
+                  );
 
-        setChat(prev => {
+                  if (exists) {
+                      return prev;
+                  }
 
-          const exists = prev.some(
-            m => m.messageId === msg.messageId
+                  return [...prev, msg];
+              });
+          }
+
+          if (msg.type === "delete") {
+
+              setChat(prev =>
+                  prev.map(m =>
+                      m.messageId === msg.messageId
+                          ? {
+                              ...m,
+                              deletedForEveryone: true
+                          }
+                          : m
+                  )
+              );
+          }
+      };
+
+      socket.addEventListener(
+          "message",
+          handleMessage
+      );
+
+      return () => {
+          socket.removeEventListener(
+              "message",
+              handleMessage
           );
+      };
 
-          if (exists) return prev;
-
-          return [...prev, msg];
-        });
-
-      }
-      if (msg.type === "delete") {
-
-        setChat(prev =>
-          prev.map(m =>
-            m.messageId === msg.messageId
-              ? {
-                  ...m,
-                  deletedForEveryone: true
-                }
-              : m
-          )
-        );
-
-      }
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket Disconnected");
-    };
-
-    socket.onerror = (err) => {
-      console.error("WS Error:", err);
-    };
-
-    setWs(socket);
-
-    return () => socket.close();
-
-  }, []);
+  }, [socketRef]);
 
   // =====================================================
   // SEND MESSAGE
@@ -263,35 +282,47 @@ function ChatPage() {
 
     if (!message.trim()) return;
 
-    if (!ws) return;
+    if (
+        !socketRef.current ||
+        socketRef.current.readyState !== WebSocket.OPEN
+    ) {
+        console.log("WebSocket not connected");
+        return;
+    }
 
     const payload = {
-      type: "private",
-      to: String(selectedFriend.id),
-      message,
-      replyToMessageId:
-        replyingTo?.messageId || null
+        type: "private",
+        to: String(selectedFriend.id),
+        message,
+        replyToMessageId:
+            replyingTo?.messageId || null
     };
 
-    ws.send(JSON.stringify(payload));
+    socketRef.current.send(
+        JSON.stringify(payload)
+    );
 
     setMessage("");
-
     setReplyingTo(null);
-  };
+};
 
   const deleteForEveryone = (msg) => {
 
-    if (!ws) return;
+    if (
+        !socketRef.current ||
+        socketRef.current.readyState !== WebSocket.OPEN
+    ) {
+        return;
+    }
 
-    ws.send(
-      JSON.stringify({
-        type: "delete",
-        messageId: msg.messageId,
-        to: msg.to
-      })
+    socketRef.current.send(
+        JSON.stringify({
+            type: "delete",
+            messageId: msg.messageId,
+            to: msg.to
+        })
     );
-  };
+};
 
   // =====================================================
   // FILTER CHAT
@@ -608,21 +639,51 @@ function ChatPage() {
                       {/* MESSAGE */}
 
                       {
-                          msg.deletedForEveryone ?
-                          (
-                              <span
-                                style={{
+                          msg.deletedForEveryone ? (
+                          <span
+                              style={{
                                   fontStyle: "italic",
                                   color: "#888"
-                                }}
+                              }}
+                          >
+                              This message was deleted
+                          </span>
+                      ) : msg.type === "share_post" ? (
+
+                          <div className="shared-post-card">
+
+                              <div className="shared-post-header">
+                                  Shared a post
+                              </div>
+
+                              <div className="shared-post-title">
+                                  {msg.postTitle}
+                              </div>
+
+                              {
+                                  msg.postImage && (
+                                      <img
+                                          src={msg.postImage}
+                                          alt={msg.postTitle}
+                                          className="shared-post-image"
+                                      />
+                                  )
+                              }
+
+                              <button
+                                  onClick={() =>
+                                      window.location.href =
+                                          `/post/${msg.postId}`
+                                  }
                               >
-                                This message was deleted
-                              </span>
-                          )
-                          :
-                          (
-                              msg.message
-                          )
+                                  View Post
+                              </button>
+
+                          </div>
+
+                      ) : (
+                          msg.message
+                      )
                       }
 
                       {/* ACTIONS */}
