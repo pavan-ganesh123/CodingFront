@@ -5,8 +5,8 @@ import "./PostCard.css";
 import LikeButton from "./LikeButton";
 import CommentCard from "./CommentCard";
 import { useNavigate } from "react-router-dom";
-import { gql } from "graphql-request";
-import { getClient } from "../api/graphqlClient";
+import { useFriends } from "../hooks/useFriends";
+import { getUserFromToken } from "../utils/auth";
 import {
     useWebSocket
 } from "../context/WebSocketContext";
@@ -20,32 +20,17 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadMessage, setUploadMessage] = useState("");
     const [showShareModal, setShowShareModal] = useState(false);
-    const [friends, setFriends] = useState([]);
+    
     const [selectedFriends, setSelectedFriends] = useState([]);
     const canUploadImage = currentUser && currentUser.id === post.userId;
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
-    const client = getClient();
     const socketRef = useWebSocket();
-    const GET_FRIENDS = gql`
-        query($userId: ID!) {
-          getAllFriends(userId: $userId) {
-            id
-            status
-            profileImage
-            user {
-              id
-              userName
-              email
-            }
-            friend {
-              id
-              userName
-              email
-            }
-          }
-        }
-      `;
+    const user = getUserFromToken();
+    const userId = user?.userId;
+    const {
+        data: friends = []
+    } = useFriends(userId);
     const fetchComments = async () => {
         try {
             setLoadingComments(true);
@@ -171,30 +156,6 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
 
         setSelectedFriends([]);
         setShowShareModal(true);
-
-        const data = await client.request(
-            GET_FRIENDS,
-            {
-                userId: currentUser.id
-            }
-        );
-
-        const friendList = data.getAllFriends
-            .filter(
-                f => f.status === "ACCEPTED"
-            )
-            .map(f => {
-
-                const isCurrentUser =
-                    String(f.user.id) ===
-                    String(currentUser.id);
-
-                return isCurrentUser
-                    ? f.friend
-                    : f.user;
-            });
-
-        setFriends(friendList);
 
     } catch (err) {
 

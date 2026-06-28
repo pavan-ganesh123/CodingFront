@@ -11,10 +11,12 @@ import { MdReply } from "react-icons/md";
 import "./ChatPage.css";
 import { useWebSocket }
 from "../context/WebSocketContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFriends } from "../hooks/useFriends";
 
 function ChatPage() {
 
-  const [friends, setFriends] = useState([]);
+  const queryClient = useQueryClient();
   const [selectedFriend, setSelectedFriend] = useState(null);
 
 
@@ -39,26 +41,9 @@ function ChatPage() {
   // =====================================================
   // GRAPHQL
   // =====================================================
-
-  const GET_FRIENDS = gql`
-    query($userId: ID!) {
-      getAllFriends(userId: $userId) {
-        id
-        status
-        profileImage
-        user {
-          id
-          userName
-          email
-        }
-        friend {
-          id
-          userName
-          email
-        }
-      }
-    }
-  `;
+  const {
+      data: friends = []
+  } = useFriends(userId);
 
 const GET_MESSAGES = gql`
   query($senderId: ID!, $receiverId: ID!) {
@@ -118,41 +103,7 @@ const GET_MESSAGES = gql`
   // FETCH FRIENDS
   // =====================================================
 
-  useEffect(() => {
-
-    if (userId) {
-      fetchFriends();
-    }
-
-  }, [userId]);
-
-  const fetchFriends = async () => {
-
-    try {
-
-      const data = await client.request(
-        GET_FRIENDS,
-        { userId }
-      );
-
-      const friendList = data.getAllFriends
-      .filter(f => f.status === "ACCEPTED")
-        .map(f => {
-          const isCurrentUser = String(f.user.id) === String(userId);
-          const friendData = isCurrentUser ? f.friend : f.user;
-          
-          return {
-            ...friendData,
-            profileImage: f.profileImage
-          };
-        });
-
-      setFriends(friendList);
-
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  
 
   // =====================================================
   // FETCH SAVED MESSAGES
@@ -435,12 +386,13 @@ const GET_MESSAGES = gql`
         targetUserId: selectedFriend.id
       });
 
-      setFriends(prev =>
-        prev.filter(
-          f => String(f.id)
-            !== String(selectedFriend.id)
-        )
-      );
+      queryClient.setQueryData(
+            ["friends", userId],
+            (oldFriends = []) =>
+                oldFriends.filter(
+                    f => String(f.id) !== String(selectedFriend.id)
+                )
+        );
 
       setSelectedFriend(null);
 
