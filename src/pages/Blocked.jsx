@@ -4,11 +4,12 @@ import { gql } from "graphql-request";
 import { getClient } from "../api/graphqlClient";
 import { getUserFromToken } from "../utils/auth";
 import { ToastProvider, useToast } from "../notifications/ToastContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 import "./Blocked.css";
 
 function Blocked() {
-
+  const queryClient = useQueryClient();
   const [blockedUsers, setBlockedUsers] = useState([]);
 
   const client = getClient();
@@ -76,17 +77,35 @@ function Blocked() {
 
   const handleUnblock = async (targetId) => {
 
-    try {
+  try {
 
-      await client.request(
-        UNBLOCK_USER,
-        {
-          userId,
-          targetUserId: targetId
-        }
-      );
+    await client.request(
+      UNBLOCK_USER,
+      {
+        userId,
+        targetUserId: targetId
+      }
+    );
 
-      setBlockedUsers(prev =>
+    const unblockedRelation = blockedUsers.find(
+      relation => {
+
+        const blockedPerson =
+          String(relation.user.id) === String(userId)
+            ? relation.friend
+            : relation.user;
+
+        return String(blockedPerson.id) === String(targetId);
+      }
+    );
+
+    const unblockedFriend =
+      String(unblockedRelation.user.id) === String(userId)
+        ? unblockedRelation.friend
+        : unblockedRelation.user;
+
+    // Remove from blocked page UI
+    setBlockedUsers(prev =>
       prev.filter(relation => {
 
         const blockedPerson =
@@ -98,13 +117,42 @@ function Blocked() {
       })
     );
 
-      showToast("User unblocked", "info");
+    // Add back to friends cache
+    queryClient.setQueryData(
+      ["friends", userId],
+      (oldFriends = []) => {
 
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to unblock","error");
-    }
-  };
+        const alreadyExists =
+          oldFriends.some(
+            f => String(f.id) === String(unblockedFriend.id)
+          );
+
+        if (alreadyExists) {
+          return oldFriends;
+        }
+
+        return [
+          ...oldFriends,
+          unblockedFriend
+        ];
+      }
+    );
+
+    showToast(
+      "User unblocked",
+      "info"
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    showToast(
+      "Failed to unblock",
+      "error"
+    );
+  }
+};
 
   return (
 

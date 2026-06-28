@@ -32,6 +32,7 @@ function Login() {
     if (data.data && data.data.login) {
       const token = data.data.login.token;
       localStorage.setItem("token", token);
+      window.dispatchEvent(new Event("auth-changed"));
       showToast("Login Successful!", "success");
       navigate("/home");   // ✅ go to home
     } else {

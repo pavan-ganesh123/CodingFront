@@ -7,26 +7,39 @@ import { FaUserFriends } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { MdPersonAdd } from "react-icons/md";
 import { getUserFromToken } from "../utils/auth";
-import { ToastProvider, useToast } from "../notifications/ToastContext";
+import { useToast } from "../notifications/ToastContext";
+import { useFriends } from "../hooks/useFriends";
 
 function Friends() {
-  const [friends, setFriends] = useState([]);
   const [users, setUsers] = useState([]);
-  const [requests, setRequests] = useState([]); 
+  const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState("friends");
+
   const user = getUserFromToken();
   const userId = user?.userId;
+
   const { showToast } = useToast();
 
   const client = getClient();
 
-  const GET_FRIENDS = gql`
+  const {
+    data: friends = [],
+    isLoading: friendsLoading
+  } = useFriends(userId);
+
+  const GET_RELATIONS = gql`
     query($userId: ID!) {
       getAllFriends(userId: $userId) {
         id
         status
-        user { id userName }
-        friend { id userName }
+        user {
+          id
+          userName
+        }
+        friend {
+          id
+          userName
+        }
       }
     }
   `;
@@ -66,39 +79,45 @@ function Friends() {
 
   const fetchData = async () => {
     try {
-      const friendsData = await client.request(GET_FRIENDS, { userId });
-      const usersData = await client.request(GET_USERS);
 
-      const allRelations = friendsData.getAllFriends;
-      const friendList = allRelations
-        .filter(f => f.status === "ACCEPTED")
-        .map(f =>
-            String(f.user.id) === String(userId) ? f.friend : f.user
-        );
-
-      setFriends(friendList);
-
-      const pendingRequests = allRelations.filter(
-        f => f.status === "PENDING" && String(f.friend.id) === String(userId)
+      const relationsData = await client.request(
+        GET_RELATIONS,
+        { userId }
       );
 
+      const usersData =
+        await client.request(GET_USERS);
+
+      const allRelations =
+        relationsData.getAllFriends;
+
+      const pendingRequests =
+        allRelations.filter(
+          f =>
+            f.status === "PENDING" &&
+            String(f.friend.id) === String(userId)
+        );
+
       setRequests(pendingRequests);
+
       const requestedIds = allRelations
-        .filter(f =>
-            // only outgoing OR accepted
-            String(f.user.id) === String(userId) || f.status === "ACCEPTED"
+        .filter(
+          f =>
+            String(f.user.id) === String(userId) ||
+            f.status === "ACCEPTED"
         )
         .map(f =>
-            String(f.user.id) === String(userId)
+          String(f.user.id) === String(userId)
             ? String(f.friend.id)
             : String(f.user.id)
         );
 
-      const filteredUsers = usersData.getAllUsers.filter(
-        u =>
-          u.id != userId &&
-          !requestedIds.includes(String(u.id))
-      );
+      const filteredUsers =
+        usersData.getAllUsers.filter(
+          u =>
+            String(u.id) !== String(userId) &&
+            !requestedIds.includes(String(u.id))
+        );
 
       setUsers(filteredUsers);
 
@@ -109,12 +128,22 @@ function Friends() {
 
   const handleAddFriend = async (friendId) => {
     try {
-      await client.request(SEND_REQUEST, {
-        userId: String(userId),   // safer
-        friendId: String(friendId)
-      });
-      showToast("Friend Request sent!!","info");
+
+      await client.request(
+        SEND_REQUEST,
+        {
+          userId: String(userId),
+          friendId: String(friendId)
+        }
+      );
+
+      showToast(
+        "Friend Request sent!!",
+        "info"
+      );
+
       fetchData();
+
     } catch (err) {
       console.error(err);
     }
@@ -122,11 +151,21 @@ function Friends() {
 
   const handleAccept = async (requestId) => {
     try {
-      await client.request(ACCEPT_REQUEST, {
-        requestId: String(requestId)
-      });
-      showToast("Friend Request Accepted","info");
+
+      await client.request(
+        ACCEPT_REQUEST,
+        {
+          requestId: String(requestId)
+        }
+      );
+
+      showToast(
+        "Friend Request Accepted",
+        "info"
+      );
+
       fetchData();
+
     } catch (err) {
       console.error(err);
     }
@@ -135,49 +174,74 @@ function Friends() {
   return (
     <div className="friends-container">
 
-      {/* 🔹 Tabs */}
       <div className="tabs">
+
         <button
-          className={activeTab === "friends" ? "active" : ""}
-          onClick={() => setActiveTab("friends")}
+          className={
+            activeTab === "friends"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            setActiveTab("friends")
+          }
         >
           <FaUserFriends className="icon" />
-          
         </button>
 
         <button
-          className={activeTab === "requests" ? "active" : ""}
-          onClick={() => setActiveTab("requests")}
+          className={
+            activeTab === "requests"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            setActiveTab("requests")
+          }
         >
           <IoNotifications className="icon" />
-           {requests.length > 0 && `(${requests.length})`}
+          {requests.length > 0 &&
+            `(${requests.length})`}
         </button>
 
         <button
-          className={activeTab === "add" ? "active" : ""}
-          onClick={() => setActiveTab("add")}
+          className={
+            activeTab === "add"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            setActiveTab("add")
+          }
         >
           <MdPersonAdd className="icon" />
-          
         </button>
+
       </div>
 
-      {/* 🔹 CONTENT AREA */}
       <div className="tab-content">
 
-        {/* 👥 FRIENDS */}
         {activeTab === "friends" && (
           <>
             <h2>Your Friends</h2>
 
-            {friends.length === 0 ? (
-              <p className="empty">No friends yet</p>
+            {friendsLoading ? (
+              <p>Loading...</p>
+            ) : friends.length === 0 ? (
+              <p className="empty">
+                No friends yet
+              </p>
             ) : (
               friends.map(friend => (
                 <div
                   key={friend.id}
                   className="friend-card clickable"
-                  onClick={() => console.log("Open chat with", friend)}
+                  onClick={() =>
+                    console.log(
+                      "Open chat with",
+                      friend
+                    )
+                  }
                 >
                   {friend.userName}
                 </div>
@@ -186,18 +250,29 @@ function Friends() {
           </>
         )}
 
-        {/* 🔔 REQUESTS */}
         {activeTab === "requests" && (
           <>
             <h2>Friend Requests</h2>
 
             {requests.length === 0 ? (
-              <p className="empty">No pending requests</p>
+              <p className="empty">
+                No pending requests
+              </p>
             ) : (
               requests.map(req => (
-                <div key={req.id} className="friend-card">
-                  <span>{req.user.userName}</span>
-                  <button onClick={() => handleAccept(req.id)}>
+                <div
+                  key={req.id}
+                  className="friend-card"
+                >
+                  <span>
+                    {req.user.userName}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      handleAccept(req.id)
+                    }
+                  >
                     Accept
                   </button>
                 </div>
@@ -206,18 +281,27 @@ function Friends() {
           </>
         )}
 
-        {/* ➕ ADD FRIENDS */}
         {activeTab === "add" && (
           <>
             <h2>Add Friends</h2>
 
             {users.length === 0 ? (
-              <p className="empty">No users available</p>
+              <p className="empty">
+                No users available
+              </p>
             ) : (
               users.map(u => (
-                <div key={u.id} className="friend-card">
+                <div
+                  key={u.id}
+                  className="friend-card"
+                >
                   <span>{u.userName}</span>
-                  <button onClick={() => handleAddFriend(u.id)}>
+
+                  <button
+                    onClick={() =>
+                      handleAddFriend(u.id)
+                    }
+                  >
                     Add Friend
                   </button>
                 </div>
