@@ -172,16 +172,15 @@ const PostDetailsPage = () => {
                         <div className="problem-meta">
                             {post.difficulty && (
                                 <div className={`difficulty-badge difficulty-${post.difficulty.toLowerCase()}`}>
-                                    {post.difficulty}
+                                    {Userproblem.intuition && (
+                                        <div className="problem-intuition">
+                                            {Userproblem.intuition}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
 
-                        {Userproblem.intuition && (
-                            <div className="problem-intuition">
-                                <strong>Intuition:</strong> {Userproblem.intuition}
-                            </div>
-                        )}
 
                         {Userproblem.timeComplexity && (
                             <div className="problem-complexity">

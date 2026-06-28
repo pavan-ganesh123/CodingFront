@@ -291,6 +291,13 @@
 .post-details-container::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
 }
+.problem-intuition {
+    white-space: pre-wrap;
+    line-height: 1.8;
+    color: #cbd5e1;
+    font-size: 15px;
+    word-break: break-word;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -341,3 +348,4 @@
     height: 180px;
   }
 }
+
