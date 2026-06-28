@@ -315,60 +315,75 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                     )}
                 </div>
             )}
+            {showShareModal && (
+                <div
+                    className="share-overlay"
+                    onClick={() => {
+                        setShowShareModal(false);
+                        setSelectedFriends([]);
+                    }}
+                />
+            )}
             {
-showShareModal && (
-    <div className="share-modal">
+                showShareModal && (
+                    <div className="share-modal">
 
-        <h3>Share Post</h3>
+                        <h3>Share Post</h3>
 
-        {
-            friends.map(friend => (
-                <label key={friend.id}>
-                    <input
-                        type="checkbox"
-                        checked={
-                            selectedFriends.includes(friend.id)
-                        }
-                        onChange={() => {
+                        <div className="share-friends-list">
+                            {
+                                friends.map(friend => (
+                                    <label key={friend.id} className="share-friend-item">
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                selectedFriends.includes(friend.id)
+                                            }
+                                            onChange={() => {
 
-                            if (
-                                selectedFriends.includes(friend.id)
-                            ) {
-                                setSelectedFriends(
-                                    selectedFriends.filter(
-                                        id => id !== friend.id
-                                    )
-                                );
-                            } else {
-                                setSelectedFriends([
-                                    ...selectedFriends,
-                                    friend.id
-                                ]);
+                                                if (
+                                                    selectedFriends.includes(friend.id)
+                                                ) {
+                                                    setSelectedFriends(
+                                                        selectedFriends.filter(
+                                                            id => id !== friend.id
+                                                        )
+                                                    );
+                                                } else {
+                                                    setSelectedFriends([
+                                                        ...selectedFriends,
+                                                        friend.id
+                                                    ]);
+                                                }
+                                            }}
+                                        />
+
+                                        {friend.userName}
+                                    </label>
+                                ))
                             }
-                        }}
-                    />
+                        </div>
+                        <div className="share-actions">
 
-                    {friend.userName}
-                </label>
-            ))
-        }
+                            <button className="share-send-btn" 
+                                    onClick={handleShare}>
+                                Send
+                            </button>
 
-        <button onClick={handleShare}>
-            Send
-        </button>
+                            <button
+                                className="share-cancel-btn"
+                                onClick={() => {
+                                    setShowShareModal(false);
+                                    setSelectedFriends([]);
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
 
-        <button
-            onClick={() => {
-                setShowShareModal(false);
-                setSelectedFriends([]);
-            }}
-        >
-            Cancel
-        </button>
-
-    </div>
-)
-}
+                    </div>
+                )
+            }
         </div>
     );
     

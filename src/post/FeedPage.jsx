@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import PostCard from "./PostCard";
 import "./FeedPage.css";
@@ -10,11 +10,12 @@ const FeedPage = () => {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState("");
-    const [page, setPage] = useState(0);
+    const [, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
-
+    const observer = useRef();
     const token = localStorage.getItem("token");
+    const pageRef = useRef(0);
 
     const fetchFeed = async (pageNumber = 0) => {
         try {
@@ -56,22 +57,65 @@ const FeedPage = () => {
     };
 
     const refreshFeed = async () => {
+        pageRef.current = 0;
         setPage(0);
+        setHasMore(true);
+
         await fetchFeed(0);
     };
 
     const loadMore = async () => {
+
         if (loadingMore || !hasMore) {
             return;
         }
 
-        const nextPage = page + 1;
+        const nextPage = pageRef.current + 1;
 
+        pageRef.current = nextPage;
         setPage(nextPage);
 
         await fetchFeed(nextPage);
     };
 
+    const lastPostRef = useCallback((node) => {
+
+        if (loadingMore) return;
+
+        if (observer.current) {
+            observer.current.disconnect();
+        }
+
+        observer.current = new IntersectionObserver(
+            entries => {
+                if (
+                    entries[0].isIntersecting &&
+                    hasMore
+                ) {
+                    loadMore();
+                }
+            },
+            {
+                threshold: 0.5
+            },
+            {
+                rootMargin: "300px"
+            }
+        );
+
+        if (node) {
+            observer.current.observe(node);
+        }
+
+    }, [loadingMore, hasMore]);
+
+    useEffect(() => {
+        return () => {
+            if (observer.current) {
+                observer.current.disconnect();
+            }
+        };
+    }, []);
     useEffect(() => {
         const loadAll = async () => {
             try {
@@ -83,7 +127,8 @@ const FeedPage = () => {
                         }
                     }
                 );
-
+                pageRef.current = 0;
+                setPage(0);
                 setCurrentUser(userRes.data);
 
                 await fetchFeed(0);
@@ -133,27 +178,38 @@ const FeedPage = () => {
                     </div>
                 ) : (
                     <>
-                        {posts.map(post => (
-                            <PostCard
-                                key={post.id}
-                                post={post}
-                                refreshFeed={refreshFeed}
-                                profilePicture={post.profilePicture}
-                                currentUser={currentUser}
-                            />
-                        ))}
+                        {posts.map((post, index) => {
 
-                        {hasMore && (
-                            <button
-                                className="load-more-btn"
-                                disabled={loadingMore}
-                                onClick={loadMore}
-                            >
-                                {loadingMore
-                                    ? "Loading..."
-                                    : "Load More"}
-                            </button>
+                            const isLastPost =
+                                index === posts.length - 1;
+
+                            return (
+                                <div
+                                    key={post.id}
+                                    ref={
+                                        isLastPost
+                                            ? lastPostRef
+                                            : null
+                                    }
+                                >
+                                    <PostCard
+                                        post={post}
+                                        refreshFeed={refreshFeed}
+                                        profilePicture={
+                                            post.profilePicture
+                                        }
+                                        currentUser={currentUser}
+                                    />
+                                </div>
+                            );
+                        })}
+
+                        {loadingMore && (
+                            <div className="feed-loading-more">
+                                Loading more posts...
+                            </div>
                         )}
+                        
                     </>
                 )}
             </div>

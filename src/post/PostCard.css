@@ -443,3 +443,176 @@
 
     pointer-events: none;
 }
+
+.share-modal {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 420px;
+    max-width: 90vw;
+
+    padding: 28px;
+
+    border-radius: 24px;
+
+    background:
+        rgba(23, 37, 44, 0.92);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(148,163,184,.16);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.5);
+
+    z-index: 9999;
+}
+
+.share-modal h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+
+    color: #f8fafc;
+
+    font-size: 1.3rem;
+    font-weight: 800;
+
+    text-align: center;
+}
+
+.share-friends-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    max-height: 320px;
+
+    overflow-y: auto;
+
+    padding-right: 6px;
+}
+
+.share-friend-item {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 14px 16px;
+
+    border-radius: 16px;
+
+    cursor: pointer;
+
+    background:
+        rgba(15,23,42,.45);
+
+    border: 1px solid rgba(148,163,184,.12);
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.share-friend-item:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(96,165,250,.3);
+
+    background:
+        rgba(30,41,59,.8);
+}
+
+.share-friend-item input {
+    width: 18px;
+    height: 18px;
+
+    accent-color: #3b82f6;
+
+    cursor: pointer;
+}
+
+.share-friend-name {
+    color: #e2e8f0;
+
+    font-weight: 600;
+
+    font-size: .95rem;
+}
+
+.share-actions {
+    margin-top: 24px;
+
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.share-send-btn,
+.share-cancel-btn {
+    width: 100px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    font-size: .95rem;
+    font-weight: 700;
+
+    transition:
+        transform .2s ease,
+        filter .2s ease;
+}
+
+.share-send-btn {
+    background:
+        linear-gradient(
+            135deg,
+            #8a8af6,
+            #8c92f4
+        );
+
+    color: white;
+}
+
+.share-cancel-btn {
+    background:
+        rgba(51,65,85,.9);
+
+    color: white;
+}
+
+.share-send-btn:hover,
+.share-cancel-btn:hover {
+    transform: translateY(-2px);
+}
+
+.share-send-btn:active,
+.share-cancel-btn:active {
+    transform: scale(.98);
+}
+
+.share-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,.65);
+
+    backdrop-filter: blur(4px);
+
+    z-index: 9998;
+}
