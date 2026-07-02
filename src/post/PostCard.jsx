@@ -10,6 +10,7 @@ import { getUserFromToken } from "../utils/auth";
 import {
     useWebSocket
 } from "../context/WebSocketContext";
+import { FaRegThumbsDown, FaRegComment, FaShareNodes } from "react-icons/fa6";
 
 const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const [comments, setComments] = useState([]);
@@ -274,17 +275,15 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                 />
 
                 <button className="action-btn" onClick={handleUnlike}>
-                    👎 Unlike
+                    <FaRegThumbsDown /> 
                 </button>
 
                 <button className="action-btn" onClick={toggleComments}>
-                    💬 Comments
+                    <FaRegComment /> 
                 </button>
-                <button
-                    className="action-btn"
-                    onClick={openShareModal}
-                >
-                    📤 Share
+
+                <button className="action-btn" onClick={openShareModal}>
+                    <FaShareNodes /> 
                 </button>
             </div>
 

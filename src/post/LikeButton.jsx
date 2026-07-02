@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { FaRegThumbsUp } from "react-icons/fa6";
 
 const LikeButton = ({
     postId,
@@ -42,11 +43,12 @@ const LikeButton = ({
 
     return (
         <button
-            className="action-btn"
+            className="like-btn"
             disabled={loading}
             onClick={handleLike}
         >
-            👍 {initialCount}
+            <FaRegThumbsUp className="like-icon" size={18} />
+            <span>{initialCount}</span>
         </button>
     );
 };
