@@ -16,7 +16,9 @@ const FeedPage = () => {
     const observer = useRef();
     const token = localStorage.getItem("token");
     const pageRef = useRef(0);
-
+    const [feedSeed] = useState(() =>
+        Math.floor(Math.random() * 1000000000)
+    );
     const fetchFeed = async (pageNumber = 0) => {
         try {
             if (pageNumber === 0) {
@@ -26,7 +28,7 @@ const FeedPage = () => {
             }
 
             const response = await axios.get(
-                `http://localhost:8080/api/posts/feed?page=${pageNumber}&size=${PAGE_SIZE}`,
+                `http://localhost:8080/api/posts/feed?page=${pageNumber}&size=${PAGE_SIZE}&seed=${feedSeed}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
