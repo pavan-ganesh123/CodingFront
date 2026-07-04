@@ -228,7 +228,11 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                 <div className="post-message">
                     <div
                         className="problem-title"
-                        onClick={() => navigate(`/post/${post.id}`)}
+                        onClick={() => {
+                        navigate(
+                            `/post/${post.id}`
+                        );
+                    }}
                     >
                         {post.questionTitle}
                     </div>
