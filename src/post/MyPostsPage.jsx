@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PostCard from "./PostCard";
+import "./MyPosts.css";
 
 const MyPostsPage = () => {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [currentUser, setCurrentUser] = useState(null);
 
     const fetchMyPosts = async () => {
 
@@ -14,19 +16,27 @@ const MyPostsPage = () => {
 
             setLoading(true);
 
-            const token =
-                localStorage.getItem("token");
+            const token = localStorage.getItem("token");
 
-            const response =
-                await axios.get(
-                    "http://localhost:8080/api/posts/mine",
-                    {
-                        headers: {
-                            Authorization:
-                                `Bearer ${token}`
-                        }
+            const userRes = await axios.get(
+                "http://localhost:8080/api/users/me",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
-                );
+                }
+            );
+
+            setCurrentUser(userRes.data);
+
+            const response = await axios.get(
+                "http://localhost:8080/api/posts/mine",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
 
             setPosts(response.data);
             setError("");
@@ -34,10 +44,7 @@ const MyPostsPage = () => {
         } catch (err) {
 
             console.error(err);
-
-            setError(
-                "Unable to load your posts."
-            );
+            setError("Unable to load your posts.");
 
         } finally {
 
@@ -55,8 +62,10 @@ const MyPostsPage = () => {
     if (loading) {
 
         return (
-            <div className="feed-page">
-                Loading your posts...
+            <div className="my-posts-page">
+                <div className="my-posts-status">
+                    Loading your posts...
+                </div>
             </div>
         );
     }
@@ -64,43 +73,51 @@ const MyPostsPage = () => {
     if (error) {
 
         return (
-            <div className="feed-page">
-                {error}
+            <div className="my-posts-page">
+                <div className="my-posts-status error">
+                    {error}
+                </div>
             </div>
         );
     }
 
     return (
 
-        <div className="feed-page">
+        <div className="my-posts-page">
 
-            <div className="feed-header">
+            <div className="my-posts-header">
 
-                <h1>My Posts</h1>
+                <h2>My Posts</h2>
 
                 <p>
-                    Problems you've shared.
+                    Problems solved
                 </p>
 
             </div>
 
             {posts.length === 0 ? (
 
-                <div>
+                <div className="my-posts-empty">
                     You haven't created any posts yet.
                 </div>
 
             ) : (
 
-                posts.map((post) => (
+                <div className="my-posts-list">
 
-                    <PostCard
-                        key={post.id}
-                        post={post}
-                        refreshFeed={fetchMyPosts}
-                    />
+                    {posts.map((post) => (
 
-                ))
+                        <PostCard
+                            key={post.id}
+                            post={post}
+                            refreshFeed={fetchMyPosts}
+                            profilePicture={post.profilePicture}
+                            currentUser={currentUser}
+                        />
+
+                    ))}
+
+                </div>
 
             )}
 
