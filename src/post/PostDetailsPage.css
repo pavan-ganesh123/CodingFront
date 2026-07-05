@@ -349,3 +349,174 @@
   }
 }
 
+.problem-details-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* --- View mode: the small "Edit" button --- */
+.edit-problem-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #d1d5db;
+    background: #232342;
+    border: 1px solid #3f3f46;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.edit-problem-button:hover {
+    background: #242447;
+    border-color: #52525b;
+    color: #f4f4f5;
+}
+
+/* --- Edit mode container --- */
+.problem-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    background: transparent;
+    
+    border-radius: 10px;
+}
+
+.edit-field-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d4d4d8;
+    flex: 1;
+}
+
+.edit-field-row {
+    display: flex;
+    gap: 14px;
+}
+
+.edit-field-row .edit-field-label {
+    min-width: 0;
+}
+
+.edit-field-input {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    color: #f4f4f5;
+    padding: 9px 11px;
+    border: 1px solid #3f3f46;
+    border-radius: 8px;
+    background: #27272a;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.edit-field-input::placeholder {
+    color: #71717a;
+}
+
+.edit-field-input:focus {
+    border-color: #482274;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+}
+
+textarea.edit-field-input {
+    min-height: 84px;
+    line-height: 1.5;
+}
+
+.edit-error {
+    font-size: 13px;
+    color: #fca5a5;
+    background: rgba(127, 29, 29, 0.3);
+    border: 1px solid #7f1d1d;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+.edit-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-save-button,
+.edit-cancel-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.edit-save-button {
+    color: #ffffff;
+    background: #532e66;
+}
+
+.edit-save-button:hover:not(:disabled) {
+    background: #5d336c;
+}
+
+.edit-cancel-button {
+    color: #d4d4d8;
+    background: transparent;
+    border-color: #3f3f46;
+}
+
+.edit-cancel-button:hover:not(:disabled) {
+    background: #27272a;
+    border-color: #52525b;
+}
+
+.edit-save-button:disabled,
+.edit-cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Loading spinner icon on Save --- */
+.spin-icon {
+    animation: spin-icon-rotate 0.8s linear infinite;
+}
+
+@keyframes spin-icon-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Small screens --- */
+@media (max-width: 480px) {
+    .edit-field-row {
+        flex-direction: column;
+    }
+
+    .problem-details-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .edit-problem-button {
+        align-self: flex-start;
+    }
+}

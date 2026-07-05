@@ -33,3 +33,33 @@
 .feed-error {
     color: red;
 }
+
+.feed-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.my-posts-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 550;
+    color: rgb(216, 212, 212); /* Text color */
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    background: linear-gradient(
+        180deg,
+        rgba(59, 65, 75, 0.95),
+        rgba(35, 44, 62, 0.95)
+    );
+}
+.my-posts-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+.my-posts-btn:active {
+    transform: translateY(0);
+}

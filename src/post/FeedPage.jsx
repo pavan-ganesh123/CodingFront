@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import PostCard from "./PostCard";
 import "./FeedPage.css";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 10;
 let hasHandledReload = false;
@@ -28,8 +29,8 @@ const FeedPage = () => {
     const observer = useRef();
     const token = localStorage.getItem("token");
     const pageRef = useRef(0);
+    const navigate = useNavigate();
     const [feedSeed, setFeedSeed] = useState(() => {
-
     const savedSeed =
         sessionStorage.getItem(
             "feedSeed"
@@ -324,7 +325,17 @@ const FeedPage = () => {
     return (
         <div className="feed-page">
             <div className="feed-header">
-                <p>Posts</p>
+                <div className="feed-header-top">
+                    <h4>Posts</h4>
+                <button
+                    className="my-posts-btn"
+                    onClick={() => navigate("/myPosts")}
+                >
+                    My Posts
+                </button>
+
+            </div>
+
             </div>
 
             <div className="feed-content">

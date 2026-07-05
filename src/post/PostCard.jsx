@@ -7,6 +7,7 @@ import CommentCard from "./CommentCard";
 import { useNavigate } from "react-router-dom";
 import { useFriends } from "../hooks/useFriends";
 import { getUserFromToken } from "../utils/auth";
+import { FiCamera } from "react-icons/fi";
 import {
     useWebSocket
 } from "../context/WebSocketContext";
@@ -17,7 +18,7 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [loadingComments, setLoadingComments] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [, setSelectedFile] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadMessage, setUploadMessage] = useState("");
     const [showShareModal, setShowShareModal] = useState(false);
@@ -113,12 +114,16 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     };
 
     const handleFileChange = (e) => {
-        setSelectedFile(e.target.files[0]);
-        setUploadMessage("");
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setSelectedFile(file); // optional, if you need it elsewhere
+
+        handleImageUpload(file, !!post.imageUrl);
     };
 
-    const handleImageUpload = async () => {
-        if (!selectedFile) {
+    const handleImageUpload = async (file, isUpdate = false) => {
+        if (!file) {
             setUploadMessage("Please select an image first.");
             return;
         }
@@ -128,11 +133,12 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
             setUploadMessage("");
 
             const formData = new FormData();
-            formData.append("file", selectedFile);
-            formData.append("userId", localStorage.getItem("userId"));
+            formData.append("file", file);
+
+            const endpoint = isUpdate ? "updateimages" : "images";
 
             await axios.post(
-                `http://localhost:8080/api/posts/${post.id}/images`,
+                `http://localhost:8080/api/posts/${post.id}/${endpoint}`,
                 formData,
                 {
                     headers: {
@@ -142,11 +148,21 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
             );
 
             setSelectedFile(null);
-            setUploadMessage("Image uploaded successfully. It is pending approval.");
+
+            setUploadMessage(
+                isUpdate
+                    ? "Image updated successfully. It is pending approval."
+                    : "Image uploaded successfully. It is pending approval."
+            );
+
             refreshFeed();
         } catch (error) {
             console.error(error);
-            setUploadMessage("Image upload failed.");
+            setUploadMessage(
+                isUpdate
+                    ? "Image update failed."
+                    : "Image upload failed."
+            );
         } finally {
             setUploadingImage(false);
         }
@@ -238,37 +254,62 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                     </div>
                 </div>
 
-                {post.imageUrl ? (
-                    <div className="post-image-wrapper">
-                        <img
-                            src={post.imageUrl}
-                            alt={post.questionTitle}
-                            loading="lazy"
-                            className="post-image"
-                        />
-                    </div>
-                ) : canUploadImage ? (
-                    <div className="post-image-upload">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                        />
-                        <button
-                            className="action-btn"
-                            onClick={handleImageUpload}
-                            disabled={uploadingImage}
-                        >
-                            {uploadingImage ? "Uploading..." : "Upload Image"}
-                        </button>
+                <div className="post-image-container">
+                    <input
+                        id={`image-input-${post.id}`}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={handleFileChange}
+                        disabled={uploadingImage}
+                    />
 
-                        {uploadMessage && (
-                            <div className="upload-message">
-                                {uploadMessage}
-                            </div>
-                        )}
-                    </div>
-                ) : null}
+                    {post.imageUrl ? (
+                        <div className="post-image-wrapper">
+                            <img
+                                src={post.imageUrl}
+                                alt={post.questionTitle}
+                                loading="lazy"
+                                className="post-image"
+                            />
+
+                            {canUploadImage && (
+                                <button
+                                    className="image-edit-btn"
+                                    disabled={uploadingImage}
+                                    onClick={() =>
+                                        document
+                                            .getElementById(`image-input-${post.id}`)
+                                            .click()
+                                    }
+                                >
+                                    <FiCamera />
+                                </button>
+                            )}
+                        </div>
+                    ) : canUploadImage ? (
+                        <div
+                            className="image-upload-placeholder"
+                            onClick={() =>
+                                document
+                                    .getElementById(`image-input-${post.id}`)
+                                    .click()
+                            }
+                        >
+                            <FiCamera className="upload-camera-icon" />
+
+                            <span>
+                                {uploadingImage ? "Uploading..." : "Add Image"}
+                            </span>
+                        </div>
+                    ) : null}
+
+                    {uploadMessage && (
+                        <div className="upload-message">
+                            {uploadMessage}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="post-actions">

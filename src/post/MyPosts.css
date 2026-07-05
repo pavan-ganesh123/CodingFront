@@ -1,0 +1,120 @@
+/* ===========================
+   Main Container
+=========================== */
+
+.my-posts-page {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+    box-sizing: border-box;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.my-posts-header {
+    margin-bottom: 36px;
+}
+
+.my-posts-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.my-posts-header p {
+    margin-top: 10px;
+    font-size: 1rem;
+    opacity: 0.75;
+    line-height: 1.6;
+}
+
+/* ===========================
+   Posts List
+=========================== */
+
+.my-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* ===========================
+   Loading / Error / Empty
+=========================== */
+
+.my-posts-status,
+.my-posts-empty {
+    text-align: center;
+    font-size: 1.05rem;
+    padding: 60px 20px;
+    opacity: 0.8;
+}
+
+.my-posts-status.error {
+    font-weight: 600;
+}
+
+/* ===========================
+   Nice entrance animation
+=========================== */
+
+.my-posts-list>* {
+    animation: fadeInUp 0.45s ease;
+}
+
+@keyframes fadeInUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 768px) {
+
+    .my-posts-page {
+        padding: 24px 16px 40px;
+    }
+
+    .my-posts-header {
+        margin-bottom: 28px;
+    }
+
+    .my-posts-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .my-posts-header p {
+        font-size: 0.95rem;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .my-posts-page {
+        padding: 18px 14px 30px;
+    }
+
+    .my-posts-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .my-posts-header p {
+        font-size: 0.9rem;
+    }
+
+}
