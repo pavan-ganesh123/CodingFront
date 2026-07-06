@@ -1,0 +1,166 @@
+.login-container{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+}
+
+.login-title{
+    margin:0;
+
+    font-family:"Space Grotesk",sans-serif;
+    font-size:32px;
+    font-weight:700;
+
+    color:#ffffff;
+}
+
+.login-subtitle{
+    margin:10px 0 32px;
+
+    color:#8b93a7;
+
+    font-size:14px;
+    line-height:1.6;
+}
+
+.login-form{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.login-input{
+    width:100%;
+
+    padding:15px 18px;
+
+    background:#171B24;
+    color:#E9E7E2;
+
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+
+    font-size:15px;
+
+    transition:
+        border-color .25s,
+        box-shadow .25s,
+        background .25s;
+}
+
+.login-input::placeholder{
+    color:#7f8797;
+}
+
+.login-input:focus{
+    outline:none;
+
+    background:#1b1f29;
+
+    border-color:#5FB8F0;
+
+    box-shadow:
+        0 0 0 3px rgba(95,184,240,.18);
+}
+
+.login-button{
+    margin-top:12px;
+
+    padding:15px;
+
+    border:none;
+    border-radius:14px;
+
+    cursor:pointer;
+
+    color:#ffffff;
+    font-size:15px;
+    font-weight:600;
+
+    background:linear-gradient(
+        135deg,
+        #31698b,
+        #6242ad
+    );
+
+    transition:
+        transform .25s,
+        box-shadow .25s;
+}
+
+.login-button:hover{
+    transform:translateY(-2px);
+}
+
+.login-button:active{
+    transform:translateY(0);
+}
+
+.login-button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.login-forgot{
+    margin-top:18px;
+
+    text-align:right;
+}
+
+.login-forgot a{
+    color:#5FB8F0;
+    text-decoration:none;
+    font-size:14px;
+
+    transition:color .2s;
+}
+
+.login-forgot a:hover{
+    color:#82ccff;
+}
+
+.password-wrapper{
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-wrapper .login-input{
+    width: 100%;
+    padding-right: 52px;
+}
+
+.password-toggle{
+    position:absolute;
+    top:35%;
+    right:16px;
+
+    transform:translateY(-50%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:none;
+    border:none;
+
+    color:#8b93a7;
+    cursor:pointer;
+
+    padding:0;
+
+    transition:color .2s;
+}
+
+.password-toggle:hover{
+    color:#ffffff;
+}
+
+.password-toggle:focus{
+    outline:none;
+}
+
+.password-toggle svg{
+    pointer-events:none;
+}

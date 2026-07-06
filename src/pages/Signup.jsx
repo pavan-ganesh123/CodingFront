@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastProvider, useToast } from "../notifications/ToastContext";
+import "./Signup.css";
+import { Eye, EyeOff } from "lucide-react";
 
 function Signup() {
   const [userName, setUserName] = useState("");
@@ -8,7 +10,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { showToast } = useToast();
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleSignup = async () => {
     const query = `
       mutation AddUser($userName: String!, $email: String!, $password: String!) {
@@ -64,32 +66,57 @@ function Signup() {
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
+      <div className="signup-container">
+          <h2 className="signup-title">Create Account</h2>
 
-      <input
-        type="text"
-        placeholder="Username"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-      />
+          <p className="signup-subtitle">
+              One step away..
+          </p>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+          <div className="signup-form">
+              <input
+                  className="signup-input"
+                  type="text"
+                  placeholder="Username"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+              />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+              <input
+                  className="signup-input"
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+              />
+              <div className="password-wrapper">
+                <input
+                  className="signup-input"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
 
-      <button onClick={handleSignup}>Signup</button>
-    </div>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              
+
+              <button
+                  className="signup-button"
+                  onClick={handleSignup}
+              >
+                  Create Account
+              </button>
+          </div>
+      </div>
   );
 }
 
