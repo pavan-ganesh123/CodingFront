@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "../notifications/ToastContext";
+import "./Login.css";
+import { Eye, EyeOff } from "lucide-react";
+
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { showToast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async () => {
     const query = `
         mutation ($email: String!, $password: String!) {
@@ -41,13 +45,49 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="login-container">
+      <h2 className="login-title">Welcome Back</h2>
 
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+      <p className="login-subtitle">
+        Login to continue to Code Cache.
+      </p>
 
-      <button onClick={handleLogin}>Login</button>
+      <div className="login-form">
+        <input
+          className="login-input"
+          type="email"
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <div className="password-wrapper">
+          <input
+            className="login-input"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+
+        <button
+          className="login-button"
+          onClick={handleLogin}
+        >
+          Sign In
+        </button>
+
+      </div>
     </div>
   );
 }
