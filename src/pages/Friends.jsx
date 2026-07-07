@@ -200,8 +200,9 @@ function Friends() {
           }
         >
           <IoNotifications className="icon" />
-          {requests.length > 0 &&
-            `(${requests.length})`}
+            {requests.length > 0 && (
+              <span className="badge">{requests.length}</span>
+            )}
         </button>
 
         <button
@@ -228,25 +229,16 @@ function Friends() {
             {friendsLoading ? (
               <p>Loading...</p>
             ) : friends.length === 0 ? (
-              <p className="empty">
-                No friends yet
-              </p>
-            ) : (
-              friends.map(friend => (
-                <div
-                  key={friend.id}
-                  className="friend-card clickable"
-                  onClick={() =>
-                    console.log(
-                      "Open chat with",
-                      friend
-                    )
-                  }
-                >
-                  {friend.userName}
-                </div>
-              ))
-            )}
+                  <p className="empty">No friends yet</p>
+                ) : (
+                  <div className="friends-list">
+                    {friends.map(friend => (
+                      <div key={friend.id} className="friend-card clickable" onClick={() => console.log("Open chat with", friend)}>
+                        {friend.userName}
+                      </div>
+                    ))}
+                  </div>
+                )}
           </>
         )}
 

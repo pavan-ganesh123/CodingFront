@@ -172,41 +172,43 @@ const GET_MESSAGES = gql`
     const socket = socketRef.current;
 
       const handleMessage = (event) => {
+        const msg = JSON.parse(event.data);
 
-          const msg = JSON.parse(event.data);
+        if (msg.type === "private" || msg.type === "share_post") {
+          setChat(prev => {
+            // Replace the optimistic temp entry once the server confirms it,
+            // instead of appending a second copy
+            const tempIndex = prev.findIndex(
+              m =>
+                typeof m.messageId === "string" &&
+                m.messageId.startsWith("temp-") &&
+                String(m.fromUserId) === String(msg.fromUserId) &&
+                String(m.to) === String(msg.to) &&
+                m.message === msg.message
+            );
 
-          if (
-              msg.type === "private" ||
-              msg.type === "share_post"
-          ) {
+            if (tempIndex !== -1) {
+              const updated = [...prev];
+              updated[tempIndex] = msg;
+              return updated;
+            }
 
-              setChat(prev => {
+            const exists = prev.some(m => m.messageId === msg.messageId);
+            if (exists) return prev;
 
-                  const exists = prev.some(
-                      m => m.messageId === msg.messageId
-                  );
+            return [...prev, msg];
+          });
+        }
 
-                  if (exists) {
-                      return prev;
-                  }
-
-                  return [...prev, msg];
-              });
-          }
-
-          if (msg.type === "delete") {
-
-              setChat(prev =>
-                  prev.map(m =>
-                      m.messageId === msg.messageId
-                          ? {
-                              ...m,
-                              deletedForEveryone: true
-                          }
-                          : m
-                  )
-              );
-          }
+        if (msg.type === "delete") {
+          setChat(prev =>
+            prev.map(m =>
+              m.messageId === msg.messageId
+                ? { ...m, deletedForEveryone: true }
+                : m
+            )
+          );
+        }
       };
 
       socket.addEventListener(
@@ -228,52 +230,69 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   const sendMessage = () => {
-
     if (!selectedFriend) return;
-
     if (!message.trim()) return;
-
-    if (
-        !socketRef.current ||
-        socketRef.current.readyState !== WebSocket.OPEN
-    ) {
-        console.log("WebSocket not connected");
-        return;
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+      console.log("WebSocket not connected");
+      return;
     }
 
+    const tempId = `temp-${Date.now()}`;
+
     const payload = {
-        type: "private",
-        to: String(selectedFriend.id),
-        message,
-        replyToMessageId:
-            replyingTo?.messageId || null
+      type: "private",
+      to: String(selectedFriend.id),
+      message,
+      replyToMessageId: replyingTo?.messageId || null
     };
 
-    socketRef.current.send(
-        JSON.stringify(payload)
-    );
+    socketRef.current.send(JSON.stringify(payload));
+
+    // Optimistically add to local state so the sender sees it immediately
+    setChat(prev => [
+      ...prev,
+      {
+        type: "private",
+        messageId: tempId,
+        fromUserId: String(userId),
+        to: String(selectedFriend.id),
+        message,
+        replyToMessageId: replyingTo?.messageId || null,
+        starred: false,
+        createdAt: new Date().toISOString()
+      }
+    ]);
 
     setMessage("");
     setReplyingTo(null);
-};
+  };
 
   const deleteForEveryone = (msg) => {
-
     if (
-        !socketRef.current ||
-        socketRef.current.readyState !== WebSocket.OPEN
+      !socketRef.current ||
+      socketRef.current.readyState !== WebSocket.OPEN
     ) {
-        return;
+      return;
     }
 
     socketRef.current.send(
-        JSON.stringify({
-            type: "delete",
-            messageId: msg.messageId,
-            to: msg.to
-        })
+      JSON.stringify({
+        type: "delete",
+        messageId: msg.messageId,
+        to: msg.to
+      })
     );
-};
+
+    // Update locally right away instead of waiting on a socket echo
+    // that may never be sent back to this same connection
+    setChat(prev =>
+      prev.map(m =>
+        m.messageId === msg.messageId
+          ? { ...m, deletedForEveryone: true }
+          : m
+      )
+    );
+  };
 
   // =====================================================
   // FILTER CHAT
