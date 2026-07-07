@@ -11,11 +11,7 @@
 
 * { box-sizing: border-box; }
 
-html, body, #root {
-  height: 100%;
-  margin: 0;
-  overflow: hidden; /* belt-and-suspenders: nothing on this page should ever scroll */
-}
+
 
 .page {
   font-family: 'Inter', sans-serif;
@@ -26,7 +22,7 @@ html, body, #root {
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0,58%) minmax(340px,42%);
-  overflow: hidden; /* nothing inside is allowed to push past the viewport */
+   /* nothing inside is allowed to push past the viewport */
 }
 
 @media (max-width: 900px) {
@@ -124,7 +120,7 @@ html, body, #root {
 .bottom-cluster{
     position:absolute;
 
-    bottom:-35%;
+    bottom:-55%;
     right:8%;
 
     width:360px;
@@ -149,10 +145,11 @@ html, body, #root {
     animation:drift 7s ease-in-out infinite;
     animation-delay:var(--delay);
 
+    /* SLOW — used when leaving hover, since this is the destination state */
     transition:
-        border-color .35s,
-        transform .35s,
-        box-shadow .35s;
+        border-color 2.2s,
+        transform 2.2s,
+        box-shadow 2.2s;
 }
 
 .diamond:hover,
@@ -167,6 +164,12 @@ html, body, #root {
     z-index:2;
 
     animation-play-state:paused;
+
+    /* FAST — used when entering hover, since this is the destination state */
+    transition:
+        border-color .15s,
+        transform .15s,
+        box-shadow .15s;
 }
 
 .diamond-facet {
@@ -174,12 +177,13 @@ html, body, #root {
   inset: -2px;
   background: linear-gradient(135deg, var(--hue-a), var(--hue-b));
   clip-path: inset(0 0 100% 0);
-  transition: clip-path 0.55s cubic-bezier(0.65, 0.05, 0.2, 1);
+  transition: clip-path 1.2s cubic-bezier(0.65, 0.05, 0.2, 1);
 }
 
 .diamond:hover .diamond-facet,
 .diamond:focus-visible .diamond-facet {
   clip-path: inset(0 0 0 0);
+  transition: clip-path 0.25s cubic-bezier(0.65, 0.05, 0.2, 1);
 }
 
 .diamond-glyph {
@@ -191,12 +195,13 @@ html, body, #root {
   transform: rotate(-45deg);
   color: var(--ink);
   opacity: 0;
-  transition: opacity 0.25s ease 0.2s;
+  transition: opacity 1s ease;
 }
 
 .diamond:hover .diamond-glyph,
 .diamond:focus-visible .diamond-glyph {
   opacity: 1;
+  transition: opacity 0.15s ease 0.05s;
 }
 
 
@@ -221,7 +226,7 @@ html, body, #root {
 
     position:absolute;
 
-    left:30%;
+    left:35%;
     top:50%;
 
     transform:translate(-50%,-50%);
@@ -357,7 +362,7 @@ html, body, #root {
     position:absolute;
     aspect-ratio:1;
     z-index:100;
-    border:1px solid rgba(255,255,255,.08);
+    border:2px solid rgba(255,255,255,.08);
     border-radius:4px;
     transform:rotate(45deg);
     animation:float 8s ease-in-out infinite;

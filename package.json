@@ -12,6 +12,7 @@
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.19.4",
     "@lottiefiles/dotlottie-web": "^0.74.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-query": "^5.101.2",
     "axios": "^1.17.0",
     "chart.js": "^4.5.1",
