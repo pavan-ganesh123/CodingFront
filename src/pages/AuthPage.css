@@ -362,7 +362,7 @@
     position:absolute;
     aspect-ratio:1;
     z-index:100;
-    border:2px solid rgba(255,255,255,.08);
+    border:1.5px solid rgba(255,255,255,.08);
     border-radius:4px;
     transform:rotate(45deg);
     animation:float 8s ease-in-out infinite;
