@@ -84,7 +84,7 @@ function Login() {
           className="login-button"
           onClick={handleLogin}
         >
-          Sign In
+          Log In
         </button>
 
       </div>

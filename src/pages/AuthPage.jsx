@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { Eye, Aperture, Share2, Sparkles, Heart, Star, Camera, Layers } from "lucide-react";
+import {
+  Eye,
+  Camera,
+  ShareNetwork,
+  Sparkle,
+  Heart,
+  Star,
+  Aperture,
+  Stack
+} from "@phosphor-icons/react";
+
 import Login from "./Login";
 import Signup from "./Signup";
 import "./AuthPage.css";
@@ -25,7 +35,7 @@ const SPECTRUM = [
   ["#F59E0B", "#F27CC0"],
 ];
 
-const ICONS = [Eye, Aperture, Share2, Sparkles, Heart, Star, Camera, Layers];
+const ICONS = [Eye, Aperture, ShareNetwork, Sparkle, Heart, Star, Camera, Stack];
 
 const FIELD_W = 620;
 const FIELD_H = 700;
@@ -98,7 +108,7 @@ function Diamond({ index, top, left, delay }) {
   );
 }
 
-function Floater({ top, left, size, opacity, delay }) {
+function Floater({ top, left, size, opacity, delay , borderAlpha = 0.1}) {
   return (
     <div
       className="floater"
@@ -108,6 +118,7 @@ function Floater({ top, left, size, opacity, delay }) {
         width: `${size}%`,
         opacity,
         "--delay": `${delay}s`,
+        "--floater-border": `1px solid rgba(255,255,255,${borderAlpha})`,
       }}
     />
   );
