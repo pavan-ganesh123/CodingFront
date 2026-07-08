@@ -45,23 +45,36 @@ function Signup() {
     
 
       // Check for GraphQL errors (even if HTTP status is 200)
-      if (data.errors) {
-        console.error("GraphQL errors:", data.errors);
+      if (data.errors && data.errors.length > 0) {
         const errorMsg = data.errors[0]?.message || "Signup failed";
+
+        console.error("GraphQL error:", errorMsg);
+
         showToast(errorMsg, "error");
         return;
       }
 
+      // Successful signup
       if (data.data?.addUser) {
         showToast("Signup successful!", "success");
+
+        // optional: clear fields
+        setUserName("");
+        setEmail("");
+        setPassword("");
+
         navigate("/");
-      } else {
-        console.warn("Signup failed: no data returned");
-        showToast("Signup failed", "error");
+        return;
       }
+
+      showToast("Signup failed. Please try again.", "error");
+
     } catch (err) {
-      console.error("Network or parsing error:", err);
-      showToast("Error occurred", "error");
+      console.error("Network error:", err);
+      showToast(
+        "Unable to connect to server. Please try again.",
+        "error"
+      );
     }
   };
 
