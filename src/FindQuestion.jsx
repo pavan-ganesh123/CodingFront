@@ -52,7 +52,6 @@ function FindQuestion() {
 
         const data = await res.json();
 
-        console.log("GraphQL Response:", data); // 🔍 debug
 
         if (data.errors) {
           console.error("GraphQL Errors:", data.errors);

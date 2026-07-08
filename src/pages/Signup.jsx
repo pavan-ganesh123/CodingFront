@@ -93,6 +93,11 @@ function Signup() {
                   placeholder="Username"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSignup();
+                    }
+                  }}
               />
 
               <input
