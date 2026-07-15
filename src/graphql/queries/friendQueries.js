@@ -9,12 +9,12 @@ export const GET_FRIENDS = gql`
             user {
                 id
                 userName
-                email
+                profilePicture
             }
             friend {
                 id
                 userName
-                email
+                profilePicture
             }
         }
     }

@@ -17,7 +17,17 @@
 .codechef-main-heading > *:not(.filters) {
   flex: 1;
 }
-
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(88, 166, 255, 0.06), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(199, 146, 234, 0.05), transparent 50%),
+    var(--bg-deep);
+  background-attachment: fixed; /* keeps gradient stable while scrolling */
+}
+:root {
+  --bg-deep: #ffffff;
+}
 /* Filters container */
 .filters {
   position: absolute;

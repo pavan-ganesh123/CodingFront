@@ -13,7 +13,7 @@ import {
 } from "../context/WebSocketContext";
 import { FaRegThumbsDown, FaRegComment, FaShareNodes } from "react-icons/fa6";
 
-const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
+const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState("");
@@ -38,7 +38,7 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
             setLoadingComments(true);
 
             const response = await axios.get(
-                `https://codecache-13ic.onrender.com/api/posts/${post.id}/comments`,
+                `http://localhost:8080/api/posts/${post.id}/comments`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -57,15 +57,17 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
     const handleUnlike = async () => {
         try {
             await axios.delete(
-                `https://codecache-13ic.onrender.com/api/posts/${post.id}/like`,
+                `http://localhost:8080/api/posts/${post.id}/like`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 }
             );
-
-            refreshFeed();
+            updatePost(post.id, p => ({
+                ...p,
+                likesCount: Math.max(0, p.likesCount - 1)
+            }));
         } catch (error) {
             console.error(error);
         }
@@ -78,7 +80,7 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
 
         try {
             await axios.post(
-                `https://codecache-13ic.onrender.com/api/posts/${post.id}/comments`,
+                `http://localhost:8080/api/posts/${post.id}/comments`,
                 {
                     comment: commentText
                 },
@@ -91,7 +93,6 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
 
             setCommentText("");
             fetchComments();
-            refreshFeed();
         } catch (error) {
             console.error(error);
         }
@@ -138,7 +139,7 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
             const endpoint = isUpdate ? "updateimages" : "images";
 
             await axios.post(
-                `https://codecache-13ic.onrender.com/api/posts/${post.id}/${endpoint}`,
+                `http://localhost:8080/api/posts/${post.id}/${endpoint}`,
                 formData,
                 {
                     headers: {
@@ -155,7 +156,6 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                     : "Image uploaded successfully. It is pending approval."
             );
 
-            refreshFeed();
         } catch (error) {
             console.error(error);
             setUploadMessage(
@@ -316,7 +316,9 @@ const PostCard = ({ post, refreshFeed, profilePicture, currentUser }) => {
                 <LikeButton
                     postId={post.id}
                     initialCount={post.likesCount}
-                    refreshFeed={refreshFeed}
+                    onLiked={() =>
+                        updatePost(post.id, p => ({ ...p, likesCount: p.likesCount + 1 }))
+                    }
                 />
 
                 <button className="action-btn" onClick={handleUnlike}>

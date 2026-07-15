@@ -30,7 +30,12 @@ const FeedPage = () => {
     const token = localStorage.getItem("token");
     const pageRef = useRef(0);
     const navigate = useNavigate();
-    const [feedSeed, setFeedSeed] = useState(() => {
+    const updatePost = (postId, updater) => {
+        setPosts(prev =>
+            prev.map(p => (p.id === postId ? updater(p) : p))
+        );
+    };
+    const [feedSeed] = useState(() => {
     const savedSeed =
         sessionStorage.getItem(
             "feedSeed"
@@ -61,7 +66,7 @@ const FeedPage = () => {
             }
 
             const response = await axios.get(
-                `https://codecache-13ic.onrender.com/api/posts/feed?page=${pageNumber}&size=${PAGE_SIZE}&seed=${seed}`,
+                `http://localhost:8080/api/posts/feed?page=${pageNumber}&size=${PAGE_SIZE}&seed=${seed}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -91,36 +96,7 @@ const FeedPage = () => {
         }
     };
 
-    const refreshFeed = async () => {
-
-        const newSeed =
-            Math.floor(
-                Math.random() * 1000000000
-            );
-
-        setFeedSeed(newSeed);
-
-        sessionStorage.setItem(
-            "feedSeed",
-            newSeed
-        );
-
-        sessionStorage.removeItem("feedPosts");
-        sessionStorage.removeItem("feedPage");
-        sessionStorage.removeItem("feedHasMore");
-        sessionStorage.removeItem("feedScrollY");
-
-        pageRef.current = 0;
-
-        setPage(0);
-
-        setHasMore(true);
-
-        await fetchFeed(
-            0,
-            newSeed
-        );
-    };
+    
 
     const loadMore = async () => {
 
@@ -208,7 +184,7 @@ const FeedPage = () => {
             try {
 
                 const userRes = await axios.get(
-                    "https://codecache-13ic.onrender.com/api/users/me",
+                    "http://localhost:8080/api/users/me",
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -361,7 +337,7 @@ const FeedPage = () => {
                                 >
                                     <PostCard
                                         post={post}
-                                        refreshFeed={refreshFeed}
+                                        updatePost={updatePost}
                                         profilePicture={
                                             post.profilePicture
                                         }

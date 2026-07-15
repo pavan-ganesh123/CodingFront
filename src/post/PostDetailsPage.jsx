@@ -38,7 +38,7 @@ const PostDetailsPage = () => {
 
             const response =
                 await axios.get(
-                    `https://codecache-13ic.onrender.com/api/posts/${postId}`,
+                    `http://localhost:8080/api/posts/${postId}`,
                     {
                         headers: {
                             Authorization:
@@ -62,7 +62,7 @@ const PostDetailsPage = () => {
 
             const response =
                 await axios.get(
-                    `https://codecache-13ic.onrender.com/api/posts/${postId}/comments`,
+                    `http://localhost:8080/api/posts/${postId}/comments`,
                     {
                         headers: {
                             Authorization:
@@ -88,7 +88,7 @@ const PostDetailsPage = () => {
         try {
 
             await axios.post(
-                `https://codecache-13ic.onrender.com/api/posts/${postId}/comments`,
+                `http://localhost:8080/api/posts/${postId}/comments`,
                 {
                     comment: commentText
                 },
@@ -118,7 +118,7 @@ const PostDetailsPage = () => {
         }
         try {
             const response = await axios.get(
-                `https://codecache-13ic.onrender.com/api/problems/${postUserId}/${questionId}`,
+                `http://localhost:8080/api/problems/${postUserId}/${questionId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -134,7 +134,7 @@ const PostDetailsPage = () => {
     const loadCurrentUser = async () => {
         try {
             const response = await axios.get(
-                `https://codecache-13ic.onrender.com/api/users/me`,
+                `http://localhost:8080/api/users/me`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -193,7 +193,7 @@ const PostDetailsPage = () => {
         setSaveError("");
         try {
             const response = await axios.put(
-                `https://codecache-13ic.onrender.com/api/problems/${post.questionId}`,
+                `http://localhost:8080/api/problems/${post.questionId}`,
                 {
                     intuition: editForm.intuition,
                     timeComplexity: editForm.timeComplexity,
@@ -373,7 +373,9 @@ const PostDetailsPage = () => {
                     <LikeButton
                         postId={post.id}
                         initialCount={post.likesCount}
-                        refreshFeed={loadPost}
+                        onLiked={() =>
+                            setPost(prev => ({ ...prev, likesCount: prev.likesCount + 1 }))
+                        }
                     />
 
                 </div>

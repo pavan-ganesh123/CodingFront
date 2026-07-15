@@ -108,25 +108,18 @@ function Leetcode() {
                   <div>
 
                     <h2 className="title">
-                      {p.problem.questionId}. {p.problem.questionName}
+                      {p.problemId}. {p.questionName}
                     </h2>
 
-                    <span
-                      className={`difficulty ${p.problem.difficulty.toLowerCase()}`}
-                    >
-                      {p.problem.difficulty}
+                    <span className={`difficulty ${p.difficulty.toLowerCase()}`}>
+                      {p.difficulty}
                     </span>
 
                   </div>
 
                   <div className="actions">
 
-                    <a
-                      href={p.problem.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="button"
-                    >
+                    <a href={p.link} target="_blank" rel="noreferrer" className="button">
                       View Problem
                     </a>
 
