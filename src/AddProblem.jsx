@@ -19,7 +19,7 @@ function AddProblem() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:8080/api/problems/my/solve",
+        "https://codecache-13ic.onrender.com/api/problems/my/solve",
         {
           method: "POST",
           headers: {
