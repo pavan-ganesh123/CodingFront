@@ -10,7 +10,7 @@ const LikeButton = ({ postId, initialCount = 0, onLiked }) => {
         try {
             setLoading(true);
             await axios.post(
-                `http://localhost:8080/api/posts/${postId}/like`,
+                `https://codecache-13ic.onrender.com/api/posts/${postId}/like`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

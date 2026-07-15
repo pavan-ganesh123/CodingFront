@@ -38,7 +38,7 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
             setLoadingComments(true);
 
             const response = await axios.get(
-                `http://localhost:8080/api/posts/${post.id}/comments`,
+                `https://codecache-13ic.onrender.com/api/posts/${post.id}/comments`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -57,7 +57,7 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
     const handleUnlike = async () => {
         try {
             await axios.delete(
-                `http://localhost:8080/api/posts/${post.id}/like`,
+                `https://codecache-13ic.onrender.com/api/posts/${post.id}/like`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -80,7 +80,7 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
 
         try {
             await axios.post(
-                `http://localhost:8080/api/posts/${post.id}/comments`,
+                `https://codecache-13ic.onrender.com/api/posts/${post.id}/comments`,
                 {
                     comment: commentText
                 },
@@ -139,7 +139,7 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
             const endpoint = isUpdate ? "updateimages" : "images";
 
             await axios.post(
-                `http://localhost:8080/api/posts/${post.id}/${endpoint}`,
+                `https://codecache-13ic.onrender.com/api/posts/${post.id}/${endpoint}`,
                 formData,
                 {
                     headers: {

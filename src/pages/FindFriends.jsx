@@ -43,7 +43,7 @@ function FindFriends() {
     try {
       const token = localStorage.getItem("token");
       
-      const url = `http://localhost:8080/api/users/search?query=${query}`;
+      const url = `https://codecache-13ic.onrender.com/api/users/search?query=${query}`;
       
       const usersRes = await fetch(url, {
         headers: {
