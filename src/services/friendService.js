@@ -2,13 +2,13 @@ import { getClient } from "../api/graphqlClient";
 import { GET_FRIENDS } from "../graphql/queries/friendQueries";
 
 export const fetchFriends = async (userId) => {
-    console.log("fetchFriends called:", userId);
+    // console.log("fetchFriends called:", userId);
 
     try {
         const data = await getClient().request(GET_FRIENDS, { userId });
 
-        console.log("GraphQL response:", data);
-        console.log("Friends:", data.getAllFriends);
+        // console.log("GraphQL response:", data);
+        // console.log("Friends:", data.getAllFriends);
 
         const friends = data.getAllFriends
             .filter(f => f.status === "ACCEPTED")
@@ -26,7 +26,7 @@ export const fetchFriends = async (userId) => {
                 };
             });
 
-        console.log("Mapped Friends:", friends);
+        // console.log("Mapped Friends:", friends);
 
         return friends;
     } catch (err) {

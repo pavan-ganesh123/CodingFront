@@ -73,7 +73,7 @@ function FindFriends() {
         friendId: String(friendId)
       });
 
-      console.log("Friend request sent!");
+      // console.log("Friend request sent!");
       showToast("Friend request sent", "info");
       
       // Optional: Clear search or remove user from list

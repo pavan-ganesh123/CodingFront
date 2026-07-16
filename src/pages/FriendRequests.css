@@ -41,7 +41,9 @@
   padding: 60px 40px;
   overflow-x: hidden;
 }
-
+.friends-container h2 {
+  color: white;
+}
 .friends-container::before {
   content: "";
   position: absolute;

@@ -54,24 +54,6 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
         }
     };
 
-    const handleUnlike = async () => {
-        try {
-            await axios.delete(
-                `https://codecache-13ic.onrender.com/api/posts/${post.id}/like`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-            updatePost(post.id, p => ({
-                ...p,
-                likesCount: Math.max(0, p.likesCount - 1)
-            }));
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     const handleCommentSubmit = async () => {
         if (!commentText.trim()) {
@@ -316,14 +298,15 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
                 <LikeButton
                     postId={post.id}
                     initialCount={post.likesCount}
-                    onLiked={() =>
-                        updatePost(post.id, p => ({ ...p, likesCount: p.likesCount + 1 }))
+                    initiallyLiked={post.likedByCurrentUser}
+                    onToggle={(nowLiked) =>
+                        updatePost(post.id, p => ({
+                            ...p,
+                            likesCount: p.likesCount + (nowLiked ? 1 : -1)
+                        }))
                     }
                 />
-
-                <button className="action-btn" onClick={handleUnlike}>
-                    <FaRegThumbsDown /> 
-                </button>
+ 
 
                 <button className="action-btn" onClick={toggleComments}>
                     <FaRegComment /> 

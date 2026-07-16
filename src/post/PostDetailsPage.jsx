@@ -373,8 +373,12 @@ const PostDetailsPage = () => {
                     <LikeButton
                         postId={post.id}
                         initialCount={post.likesCount}
-                        onLiked={() =>
-                            setPost(prev => ({ ...prev, likesCount: prev.likesCount + 1 }))
+                        initiallyLiked={post.likedByCurrentUser}
+                        onToggle={(nowLiked) =>
+                            setPost(prev => ({
+                                ...prev,
+                                likesCount: prev.likesCount + (nowLiked ? 1 : -1)
+                            }))
                         }
                     />
 

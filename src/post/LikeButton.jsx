@@ -2,29 +2,41 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaRegThumbsUp } from "react-icons/fa6";
 
-const LikeButton = ({ postId, initialCount = 0, onLiked }) => {
+const LikeButton = ({ postId, initialCount = 0, initiallyLiked = false, onToggle }) => {
+    const [liked, setLiked] = useState(initiallyLiked);
     const [loading, setLoading] = useState(false);
     const token = localStorage.getItem("token");
 
-    const handleLike = async () => {
+    const handleToggle = async () => {
+        if (loading) return;
+        const nextLiked = !liked;
+        setLoading(true);
         try {
-            setLoading(true);
-            await axios.post(
-                `https://codecache-13ic.onrender.com/api/posts/${postId}/like`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            onLiked();
+            if (nextLiked) {
+                await axios.post(
+                    `https://codecache-13ic.onrender.com/api/posts/${postId}/like`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            } else {
+                await axios.delete(
+                    `https://codecache-13ic.onrender.com/api/posts/${postId}/like`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            }
+            setLiked(nextLiked);
+            onToggle(nextLiked); // tell parent to inc/dec count
         } catch (error) {
             console.error(error);
+            // optionally surface "already liked" / "not liked yet" state sync issues here
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <button className="like-btn" disabled={loading} onClick={handleLike}>
-            <FaRegThumbsUp className="like-icon" size={18} />
+        <button className="like-btn" disabled={loading} onClick={handleToggle}>
+            <FaRegThumbsUp className={liked ? "liked" : ""} size={18} />
             <span>{initialCount}</span>
         </button>
     );
