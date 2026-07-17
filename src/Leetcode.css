@@ -1,313 +1,440 @@
-/* ================= MAIN ================= */
+/* =====================================================
+   TOKENS
+   ===================================================== */
+
+:root {
+  --bg-deep: #0a0d12;
+  --bg-deep-2: #0d1117;
+
+  --surface: #12161d;
+  --surface-hover: #161b24;
+  --surface-raised: #171c25;
+
+  --border: #212836;
+  --border-strong: #2c3648;
+
+  --text-primary: #e7ebf1;
+  --text-secondary: #8b96a8;
+  --text-faint: #59627a;
+
+  --accent: #7dd3fc;
+  --accent-dim: rgba(125, 211, 252, 0.12);
+  --accent-strong: #38bdf8;
+
+  --violet: #c084fc;
+  --violet-dim: rgba(192, 132, 252, 0.12);
+
+  --easy: #34d399;
+  --easy-dim: rgba(52, 211, 153, 0.12);
+  --medium: #fbbf24;
+  --medium-dim: rgba(251, 191, 36, 0.12);
+  --hard: #fb7185;
+  --hard-dim: rgba(251, 113, 133, 0.12);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 7px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   PAGE
+   ===================================================== */
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(125, 211, 252, 0.05), transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(192, 132, 252, 0.045), transparent 50%),
+    var(--bg-deep);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* =====================================================
+   MAIN HEADING
+   ===================================================== */
 
 .leetcode-main-heading {
   position: relative;
-  display: block; /* or keep block, no need for flex here */
+  display: block;
   text-align: center;
-  color: #e6e6e6;
-  padding: 1rem 3rem 1rem 3rem; /* extra padding on sides for filters */
-  border-radius: 10px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
-  font-size: 1.9rem;
+  color: var(--text-primary);
+  padding: 1.75rem 3rem;
+  font-family: var(--font-mono);
+  font-size: 1.85rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
-/* Optional: if you want the text part only to be the heading */
-.leetcode-main-heading > *:not(.filters) {
-  flex: 1;
+.leetcode-main-heading::before {
+  content: "";
+  position: absolute;
+  bottom: 0.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--violet));
 }
 
 /* Filters container */
 .filters {
   position: absolute;
   top: 50%;
-  right: 1.25rem;
+  right: 1.5rem;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-body {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 20% 15%, rgba(88, 166, 255, 0.06), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(199, 146, 234, 0.05), transparent 50%),
-    var(--bg-deep);
-  background-attachment: fixed; /* keeps gradient stable while scrolling */
-}
-:root {
-  --bg-deep: #ffffff;
-}
 /* Select dropdown styling */
 .filters select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
 
-  background: #161a20;
-  color: #e6e6e6;
-  border: 1px solid #2a303c;
-  border-radius: 8px;
-  padding: 0.55rem 2.2rem 0.55rem 0.75rem;
-  font-size: 0.95rem;
-  font-family: inherit;
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 2.2rem 0.55rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 
-  /* Custom arrow using background gradient */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='%239aa3b2'%3E%3Cpath d='M5 7.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='%238b96a8'%3E%3Cpath d='M5 7.5l5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.6rem center;
-  background-size: 14px;
+  background-position: right 0.65rem center;
+  background-size: 12px;
 }
 
 .filters select:hover {
-  border-color: #3d4655;
-  background-color: #1a1f26;
+  border-color: var(--border-strong);
+  background-color: var(--surface-hover);
 }
 
 .filters select:focus {
-  border-color: #5c67f2;
-  box-shadow: 0 0 0 3px rgba(92, 103, 242, 0.25);
-  background-color: #1a1f26;
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
-/* Option styling (limited support, but works in many browsers) */
 .filters select option {
-  background: #0f1115;
-  color: #e6e6e6;
+  background: var(--bg-deep-2);
+  color: var(--text-primary);
   padding: 0.4rem;
 }
 
 .leetcode_container {
   width: 100%;
   max-width: 1300px;
-
   margin: auto;
-
   padding: 20px;
 }
 
-/* ================= GRID ================= */
+/* =====================================================
+   GRID
+   ===================================================== */
 
 .grid {
   display: flex;
   flex-direction: column;
-
-  gap: 24px;
+  gap: 16px;
 }
 
-/* ================= CARD ================= */
+/* =====================================================
+   CARD
+   ===================================================== */
 
 .leetcode_card {
-
-  background: rgba(255,255,255,0.05);
-
-  backdrop-filter: blur(12px);
-
-  border-radius: 18px;
-
-  padding: 16px 18px;
-
-  border: 1px solid rgba(255,255,255,0.08);
-
-  transition: 0.35s ease;
-
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 18px 22px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
   overflow: hidden;
 }
 
 .leetcode_card:hover {
-  transform: translateY(-4px);
-
-  background: rgba(255,255,255,0.08);
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
 }
 
-/* ================= CARD TOP ================= */
+.leetcode_card.expanded {
+  border-left-color: var(--accent-strong);
+  background: var(--surface-raised);
+}
+
+/* =====================================================
+   CARD TOP
+   ===================================================== */
 
 .card-top {
   display: flex;
-
   justify-content: space-between;
   align-items: center;
-
   gap: 12px;
 }
 
-/* ================= TITLE ================= */
+/* =====================================================
+   TITLE
+   ===================================================== */
 
 .title {
-  font-size: 22px;
-  font-weight: 700;
-
-  margin-bottom: 12px;
-
-  color: white;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--text-primary);
 }
 
-/* ================= DIFFICULTY ================= */
+/* =====================================================
+   DIFFICULTY
+   ===================================================== */
 
 .difficulty {
-  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
 
-  border-radius: 12px;
-
-  font-size: 12px;
-  font-weight: 700;
+.difficulty::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
 }
 
 .difficulty.easy {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  background: var(--easy-dim);
+  color: var(--easy);
+}
+.difficulty.easy::before {
+  background: var(--easy);
 }
 
 .difficulty.medium {
-  background: rgba(250, 204, 21, 0.15);
-  color: #facc15;
+  background: var(--medium-dim);
+  color: var(--medium);
+}
+.difficulty.medium::before {
+  background: var(--medium);
 }
 
 .difficulty.hard {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: var(--hard-dim);
+  color: var(--hard);
+}
+.difficulty.hard::before {
+  background: var(--hard);
 }
 
-/* ================= ACTIONS ================= */
+/* =====================================================
+   ACTIONS
+   ===================================================== */
 
 .actions {
   display: flex;
   align-items: center;
-
-  gap: 14px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-/* ================= BUTTON ================= */
+/* =====================================================
+   BUTTONS
+   ===================================================== */
 
 .button,
 .expand-btn {
-
-  padding: 10px 16px;
-
-  border-radius: 12px;
-
-  border: none;
-
-  background: rgba(255,255,255,0.08);
-
-  color: white;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-
   text-decoration: none;
-
-  transition: 0.25s ease;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
-.button:hover,
+.button:hover {
+  border-color: var(--accent-strong);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.expand-btn {
+  width: 34px;
+  padding: 9px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
 .expand-btn:hover {
-
-  background: rgba(255,255,255,0.16);
-
-  transform: scale(1.05);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: var(--surface-raised);
 }
 
-/* ================= EXPANDED ================= */
+/* =====================================================
+   EXPANDED
+   ===================================================== */
 
 .expanded-content {
-  margin-top: 24px;
-
-  border-top: 1px solid rgba(255,255,255,0.08);
-
-  padding-top: 24px;
-
-  animation: fadeIn 0.3s ease;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  animation: fadeIn 0.25s ease;
 }
 
-/* ================= SECTION ================= */
+/* =====================================================
+   SECTION
+   ===================================================== */
 
 .section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--violet);
+}
 
-  font-size: 18px;
-  font-weight: 700;
-
-  margin-bottom: 12px;
-
-  color: #c084fc;
+.section-title::before {
+  content: "";
+  width: 12px;
+  height: 1px;
+  background: var(--violet);
+  opacity: 0.6;
 }
 
 .section-content p {
-
-  color: #d1d5db;
-
+  color: var(--text-secondary);
+  font-size: 14px;
   line-height: 1.7;
-
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-/* ================= CODE ================= */
+/* =====================================================
+   CODE
+   ===================================================== */
 
 pre {
-  background: #1e1e2e;
-
-  border-radius: 16px;
-
-  padding: 18px;
-
+  position: relative;
+  background: var(--bg-deep-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 16px 16px;
+  margin-top: 6px;
   overflow-x: auto;
+  font-size: 13px;
+}
 
-  font-size: 14px;
-
-  color: #f8fafc;
+pre::before {
+  content: "\25CF  \25CF  \25CF";
+  display: block;
+  margin-bottom: 12px;
+  font-size: 9px;
+  letter-spacing: 6px;
+  color: var(--border-strong);
 }
 
 code {
   white-space: pre-wrap;
+  font-family: var(--font-mono);
+  color: #d7dee8;
+  line-height: 1.65;
 }
 
-/* ================= TAGS ================= */
+/* =====================================================
+   TAGS / COMPLEXITY
+   ===================================================== */
 
 .complexities {
   display: flex;
-
-  gap: 12px;
-
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .tag {
-  padding: 8px 14px;
-
-  border-radius: 12px;
-
-  background: rgba(168, 85, 247, 0.15);
-
-  color: #c084fc;
-
-  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--violet-dim);
+  color: var(--violet);
+  border: 1px solid rgba(192, 132, 252, 0.18);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-/* ================= ANIMATION ================= */
+/* =====================================================
+   ANIMATION
+   ===================================================== */
 
 @keyframes fadeIn {
-
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-6px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* ================= MOBILE ================= */
+/* =====================================================
+   MOBILE
+   ===================================================== */
 
 @media (max-width: 768px) {
+  .leetcode-main-heading {
+    font-size: 1.4rem;
+    padding: 4.5rem 1.25rem 1.25rem;
+  }
+
+  .filters {
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+    transform: none;
+    justify-content: center;
+  }
 
   .card-top {
     flex-direction: column;
@@ -320,6 +447,6 @@ code {
   }
 
   .title {
-    font-size: 18px;
+    font-size: 15px;
   }
 }
