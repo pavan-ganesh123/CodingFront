@@ -79,21 +79,21 @@ function Profile() {
     try {
       const token = localStorage.getItem("token");
 
-      const profileResponse = await fetch("http://localhost:8080/api/users/profile", {
+      const profileResponse = await fetch("https://codecache-13ic.onrender.com/api/users/profile", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!profileResponse.ok) throw new Error("Failed to load profile");
       const profileData = await profileResponse.json();
 
-      const friendResponse = await fetch("http://localhost:8080/api/users/countFriends", {
+      const friendResponse = await fetch("https://codecache-13ic.onrender.com/api/users/countFriends", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!friendResponse.ok) throw new Error("Failed to load friend count");
       const count = await friendResponse.json();
 
-      const statsResponse = await fetch("http://localhost:8080/api/users/my-stats", {
+      const statsResponse = await fetch("https://codecache-13ic.onrender.com/api/users/my-stats", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -106,7 +106,7 @@ function Profile() {
       }
 
       const submissionsResponse = await fetch(
-        "http://localhost:8080/api/users/my-yearly-submissions",
+        "https://codecache-13ic.onrender.com/api/users/my-yearly-submissions",
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -158,7 +158,7 @@ function Profile() {
       setUploading(true);
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8080/api/users/my-profile-picture",
+        "https://codecache-13ic.onrender.com/api/users/my-profile-picture",
         {
           method: "POST",
           headers: {

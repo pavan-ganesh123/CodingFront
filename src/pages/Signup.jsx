@@ -29,7 +29,7 @@ function Signup() {
     };
 
     try {
-      const res = await fetch("http://localhost:8080/graphql", {
+      const res = await fetch("https://codecache-13ic.onrender.com/graphql", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
