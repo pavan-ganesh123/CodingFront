@@ -1,117 +1,139 @@
-.signup-container{
-    width:100%;
-    display:flex;
-    flex-direction:column;
+.signup-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.signup-title{
-    margin:0;
-    font-family:"Space Grotesk",sans-serif;
-    font-size:32px;
-    font-weight:700;
-    color:#ffffff;
+.signup-title {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-h);
 }
 
-.signup-subtitle{
-    margin:10px 0 32px;
-    color:#8b93a7;
-    font-size:14px;
-    line-height:1.6;
+.signup-subtitle {
+  margin: 10px 0 32px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-.signup-form{
-    display:flex;
-    flex-direction:column;
-    gap:18px;
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.signup-input{
-    width:100%;
-    padding:15px 18px;
-
-    background:#171B24;
-
-    color:#E9E7E2;
-
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-
-    font-size:15px;
-
-    transition:
-        border-color .25s,
-        box-shadow .25s,
-        background .25s;
+.signup-input {
+  width: 100%;
+  padding: 15px 18px;
+  background: var(--code-bg);
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-family: var(--sans);
+  font-size: 15px;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
 }
 
-.signup-input::placeholder{
-    color:#7f8797;
+.signup-input::placeholder {
+  color: var(--text-faint);
 }
 
-.signup-input:focus{
-    outline:none;
-    border-color:#5FB8F0;
-
-    box-shadow:
-        0 0 0 3px rgba(95,184,240,.18);
-
-    background:#1b1f29;
+.signup-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+  background: var(--bg-elevated);
 }
 
-.signup-button{
-    margin-top:12px;
-    padding:15px;
-
-    border:none;
-    border-radius:14px;
-
-    background:linear-gradient(
-        135deg,
-        #31698b,
-        #6242ad
-    );
-
-    color:white;
-
-    font-size:15px;
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:
-        transform .25s,
-        box-shadow .25s,
-        opacity .25s;
+.signup-button {
+  margin-top: 12px;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent));
+  color: #0B0D12;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s, opacity 0.25s;
 }
 
-.signup-button:hover{
-    transform:translateY(-2px);
+.signup-button:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--accent) 88%, black);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
-.signup-button:active{
-    transform:translateY(0);
+.signup-button:active {
+  transform: translateY(0);
 }
 
-.signup-button:disabled{
-    opacity:.6;
-    cursor:not-allowed;
+.signup-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.signup-divider{
-    display:flex;
-    align-items:center;
-    gap:12px;
-
-    margin:24px 0;
-
-    color:#70798d;
-    font-size:13px;
+.signup-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: var(--text-faint);
+  font-family: var(--sans);
+  font-size: 13px;
 }
 
 .signup-divider::before,
-.signup-divider::after{
-    content:"";
-    flex:1;
-    height:1px;
-    background:rgba(255,255,255,.08);
+.signup-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper .signup-input {
+  width: 100%;
+  padding-right: 52px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 35%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: var(--text-h);
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
+.password-toggle svg {
+  pointer-events: none;
 }

@@ -1,4 +1,12 @@
-/* From Uiverse.io by Nawsome */ 
+/* Adapted from a Uiverse.io component by Nawsome — original used a fixed
+   cyan/yellow palette (#00FFFF / #ff0) that's illegible on a light
+   background. Recolored using the same three-hue family as the AuthPage
+   diamond mosaic (violet/green/pink) instead of a single accent + tints,
+   so this reads as part of that system rather than its own palette.
+   Violet is the only theme-reactive one (tied to --accent, the brand
+   color); green and pink are fixed, same as the diamonds' decorative
+   hues — they don't need to shift per theme, just stay vibrant on both. */
+
 .svg-frame {
   position: absolute;
   right: 50px;
@@ -12,20 +20,21 @@
 
 .svg-frame svg {
   position: absolute;
-  transition: .5s;
+  fill: none;
+  transition: transform 0.5s, filter 0.3s ease;
   z-index: calc(1 - (0.2 * var(--j)));
   transform-origin: center;
   width: 344px;
   height: 344px;
-  fill: none;
 }
 
 .svg-frame:hover svg {
   transform: rotate(-80deg) skew(30deg) translateX(calc(45px * var(--i))) translateY(calc(-35px * var(--i)));
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 35%, transparent));
 }
 
 .svg-frame svg #center {
-  transition: .5s;
+  transition: transform 0.5s;
   transform-origin: center;
 }
 
@@ -33,15 +42,38 @@
   transform: rotate(-30deg) translateX(45px) translateY(-3px);
 }
 
-#out2 {
+/* ---------- Color ---------- */
+/* Main rings + core: brand violet (theme-reactive) */
+#out1 path:nth-child(2) {
+  stroke: var(--accent);
+}
+
+#out2 path,
+#inner3 path,
+#inner1 path,
+#center {
+  fill: var(--accent);
+}
+
+/* Highlight ring: green */
+#out3 {
+  stroke: #22c55e;
+}
+
+/* Highlight core shape: pink */
+#center1 {
+  fill: #ec4899;
+}
+
+/* ---------- Motion ---------- */
+#out2,
+#out3 {
   animation: rotate16 7s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
 #out3 {
-  animation: rotate16 3s ease-in-out infinite alternate;
-  transform-origin: center;
-  stroke: #ff0;
+  animation-duration: 3s;
 }
 
 #inner3,
@@ -51,7 +83,6 @@
 }
 
 #center1 {
-  fill: #ff0;
   animation: rotate16 2s ease-in-out infinite alternate;
   transform-origin: center;
 }
@@ -59,5 +90,18 @@
 @keyframes rotate16 {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-frame svg,
+  .svg-frame svg #center,
+  #out2,
+  #out3,
+  #inner3,
+  #inner1,
+  #center1 {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

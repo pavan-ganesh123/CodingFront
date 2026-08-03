@@ -1,10 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
+  --text-faint: #8c8493;
   --bg: #fff;
   --bg-deep: #ffffff;
+  --bg-elevated: #fdfcfb;
 
   --border: #e5e4e7;
+  --border-strong: #d2d0d5;
   --code-bg: #f4f3ec;
 
   --accent: #aa3bff;
@@ -19,7 +24,7 @@
 
   --sans: system-ui, "Segoe UI", Roboto, sans-serif;
   --heading: system-ui, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
@@ -45,12 +50,22 @@
   }
 }
 
+/*
+  OS-level preference. Only applies when nothing has been chosen explicitly —
+  the :root[data-theme] blocks below always win over this, so a manual
+  toggle (see ThemeToggle in AuthPage.jsx, which sets
+  document.documentElement.dataset.theme) overrides the system setting
+  app-wide, not just on one screen.
+*/
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --text: #9ca3af;
     --text-h: #f3f4f6;
+    --text-faint: #6b7280;
     --bg: #16171d;
+    --bg-elevated: #1b1d24;
     --border: #2e303a;
+    --border-strong: #3a3c48;
     --code-bg: #1f2028;
     --accent: #c084fc;
     --accent-bg: rgba(192, 132, 252, 0.15);
@@ -60,9 +75,50 @@
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
 
-  #social .button-icon {
+  :root:not([data-theme]) #social .button-icon {
     filter: invert(1) brightness(2);
   }
+}
+
+/* Explicit user choice — same values as above, applied regardless of OS setting */
+:root[data-theme="dark"] {
+  --text: #9ca3af;
+  --text-h: #f3f4f6;
+  --text-faint: #6b7280;
+  --bg: #16171d;
+  --bg-elevated: #1b1d24;
+  --border: #2e303a;
+  --border-strong: #3a3c48;
+  --code-bg: #1f2028;
+  --accent: #c084fc;
+  --accent-bg: rgba(192, 132, 252, 0.15);
+  --accent-border: rgba(192, 132, 252, 0.5);
+  --social-bg: rgba(47, 48, 58, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+}
+
+:root[data-theme="dark"] #social .button-icon {
+  filter: invert(1) brightness(2);
+}
+
+:root[data-theme="light"] {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --text-faint: #8c8493;
+  --bg: #fff;
+  --bg-deep: #fff;
+  --bg-elevated: #fdfcfb;
+  --border: #e5e4e7;
+  --border-strong: #d2d0d5;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 }
 
 body {
@@ -121,4 +177,5 @@ code {
   font-size: 15px;
   line-height: 135%;
   padding: 4px 8px;
+  background: var(--code-bg);
 }
