@@ -12,6 +12,7 @@ import {
 
 import Login from "./Login";
 import Signup from "./Signup";
+import ThemeToggle from "../components/ThemeToggle";
 import "./AuthPage.css";
 
 /**
@@ -24,27 +25,21 @@ import "./AuthPage.css";
  * whole composition scales together at any screen size.
  */
 
+// A restrained, purposeful palette instead of a rainbow spread: each pair is
+// a tonal (same-hue) gradient, and the hue families echo syntax-highlighting
+// token types — fitting for a code-sharing tool, and "keyword" ties directly
+// back to the site's real --accent purple instead of introducing a new brand
+// color.
 const SPECTRUM = [
-  ["#7DF9C5", "#22C1A6"],
-  ["#5FB8F0", "#3B82F6"],
-  ["#B18CF2", "#8B5CF6"],
-  ["#F27CC0", "#EC4899"],
-  ["#F2A65A", "#F59E0B"],
-  ["#7DF9C5", "#3B82F6"],
-  ["#B18CF2", "#EC4899"],
-  ["#F59E0B", "#F27CC0"],
+  ["#C4B5FD", "#8B5CF6"], // keyword — violet, matches --accent family
+  ["#5EEAD4", "#0D9488"], // string  — teal
+  ["#FCD34D", "#D97706"], // number  — amber
+  ["#FDA4C0", "#E11D48"], // tag     — rose
 ];
 
 const ICONS = [Eye, Aperture, ShareNetwork, Sparkle, Heart, Star, Camera, Stack];
 
-const FIELD_W = 620;
-const FIELD_H = 700;
 const GAP = 72;
-
-const DIAMOND_PX = 104;
-const HALF_DIAG = DIAMOND_PX / Math.SQRT2;
-const STEP_X = (HALF_DIAG / FIELD_W) * 100;
-const STEP_Y = (HALF_DIAG / FIELD_H) * 100;
 
 function cell(baseTop, baseLeft, col, row) {
   return {
@@ -73,14 +68,16 @@ const BOTTOM_DIAMONDS = [
 
 // Loose floating accent diamonds — faint, no icon reveal needed, just depth.
 const FLOATERS = [
-  { top: 8,  left: 10, size: 5, opacity: .85 },
-  { top: 18, left: 22, size: 6, opacity: .82 },
-  { top: 32, left: 14, size: 5, opacity: .86 },
-  { top: 46, left: 30, size: 7, opacity: .84 },
-  { top: 62, left: 18, size: 5, opacity: .85 },
-  { top: 78, left: 32, size: 6, opacity: .82 },
-  { top: 92, left: 14, size: 5, opacity: .85 },
+  { top: 8, left: 10, size: 5, opacity: 0.85 },
+  { top: 18, left: 22, size: 6, opacity: 0.82 },
+  { top: 32, left: 14, size: 5, opacity: 0.86 },
+  { top: 46, left: 30, size: 7, opacity: 0.84 },
+  { top: 62, left: 18, size: 5, opacity: 0.85 },
+  { top: 78, left: 32, size: 6, opacity: 0.82 },
+  { top: 92, left: 14, size: 5, opacity: 0.85 },
 ];
+
+const DIAMOND_PX = 104;
 
 function Diamond({ index, top, left, delay }) {
   const [a, b] = SPECTRUM[index % SPECTRUM.length];
@@ -89,13 +86,13 @@ function Diamond({ index, top, left, delay }) {
     <div
       className="diamond"
       style={{
-          top: `${top}px`,
-          left: `${left}px`,
-          width: `${DIAMOND_PX}px`,
-          height: `${DIAMOND_PX}px`,
-          "--hue-a": a,
-          "--hue-b": b,
-          "--delay": `${delay}s`,
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${DIAMOND_PX}px`,
+        height: `${DIAMOND_PX}px`,
+        "--hue-a": a,
+        "--hue-b": b,
+        "--delay": `${delay}s`,
       }}
       tabIndex={0}
       aria-label="Reveal a moment"
@@ -108,7 +105,7 @@ function Diamond({ index, top, left, delay }) {
   );
 }
 
-function Floater({ top, left, size, opacity, delay , borderAlpha = 0.1}) {
+function Floater({ top, left, size, opacity, delay }) {
   return (
     <div
       className="floater"
@@ -118,7 +115,6 @@ function Floater({ top, left, size, opacity, delay , borderAlpha = 0.1}) {
         width: `${size}%`,
         opacity,
         "--delay": `${delay}s`,
-        "--floater-border": `1px solid rgba(255,255,255,${borderAlpha})`,
       }}
     />
   );
@@ -127,51 +123,44 @@ function Floater({ top, left, size, opacity, delay , borderAlpha = 0.1}) {
 function AuthPage() {
   const [flipped, setFlipped] = useState(false);
 
-
   return (
     <div className="page">
+      <ThemeToggle floating />
+
       <div className="left-panel">
         <div className="brand">
-        <h2>Code Cache</h2>
-        <p>Powering Your Code Journey</p>
+          <p className="brand-prompt">
+            <span className="brand-chevron">&gt;</span> code_cache
+            <span className="brand-cursor" aria-hidden="true" />
+          </p>
+          <p className="brand-tag">Powering Your Code Journey</p>
         </div>
 
         <div className="diamond-field">
           <div className="diamond-canvas">
             {FLOATERS.map((f, i) => (
-                <Floater key={i} {...f} delay={i * 0.6} />
+              <Floater key={i} {...f} delay={i * 0.6} />
             ))}
 
             <div className="diamond-cluster top-cluster">
-                {TOP_DIAMONDS.map((pos, i) => (
-                    <Diamond
-                        key={i}
-                        index={i}
-                        {...pos}
-                        delay={i * 0.15}
-                    />
-                ))}
+              {TOP_DIAMONDS.map((pos, i) => (
+                <Diamond key={i} index={i} {...pos} delay={i * 0.15} />
+              ))}
             </div>
 
             <div className="tagline-card">
-              <h3 className="tagline-main">Code & Note..</h3>
+              <h3 className="tagline-main">Code &amp; Note..</h3>
               <p className="tagline-sub">Share and</p>
               <h3 className="tagline-main accent">Learn together</h3>
             </div>
 
             <div className="diamond-cluster bottom-cluster">
-                {BOTTOM_DIAMONDS.map((pos, i) => (
-                    <Diamond
-                        key={i}
-                        index={i + TOP_DIAMONDS.length}
-                        {...pos}
-                        delay={i * 0.15}
-                    />
-                ))}
+              {BOTTOM_DIAMONDS.map((pos, i) => (
+                <Diamond key={i} index={i + TOP_DIAMONDS.length} {...pos} delay={i * 0.15} />
+              ))}
             </div>
-
-        </div>
           </div>
+        </div>
       </div>
 
       <div className="right-panel">

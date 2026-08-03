@@ -8,111 +8,52 @@
   flex-direction: column;
   align-items: center;
 
-  background: var(--bg-gradient);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
   position: relative;
+  overflow: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-
-.content-layout {
-  width: 100%;
-  max-width: 1400px;
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 80px;
+.page-container::before,
+.page-container::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
 }
 
-
-.cards-container {
-  display: grid;
-  margin-top: 120px;
-  grid-template-columns: repeat(2, 1fr); /* 2 per row */
-  gap: 40px;
+/* Straight --accent tint, tuned separately per theme rather than derived
+   from one formula: mixing toward --text-h (near-white in dark mode)
+   was diluting the purple into a muddy gray instead of a glow. */
+.page-container::before {
+  width: 560px;
+  height: 560px;
+  top: -200px;
+  left: -160px;
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
-
-.image-card {
-  width: 220px;
-  padding: 16px;
-  border-radius: 20px;
-
-  background: var(--bg-card);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--border);
-
-  box-shadow: var(--shadow);
-  cursor: pointer;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-
-  transition: all 0.3s ease;
+.page-container::after {
+  width: 520px;
+  height: 520px;
+  bottom: -220px;
+  right: -140px;
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
-.image-card:hover {
-  transform: translateY(-8px) scale(1.05);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8),
-              0 0 25px rgba(168, 85, 247, 0.4);
+[data-theme="light"] .page-container::before {
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
 }
 
-.image-card img {
-  width: 100%;
-  height: 120px;
-  object-fit: contain;
-
-  border-radius: 12px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.04);
+[data-theme="light"] .page-container::after {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-.image-card p {
-  margin: 0;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-
-
-.animation-container {
-  margin-left: auto;   /* THIS now works */
-  display: flex;
-  align-items: center;
-}
-
-
-.search-input,
-.addProblem-button{
-  padding: 10px 14px;
-  border: none;
-  outline: none;
-
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  backdrop-filter: blur(8px);
-
-  transition: 0.3s;
-}
-
-.search-input {
-  width: 220px;
-  border-radius: 10px;
-}
-
-.addProblem-button {
-  width: 40px;               /* match height → perfect square */
-  padding: 5;                /* remove extra padding */
-  font-size: 14px;           /* center the + nicely */
-  border-radius: 10px;
-}
-
-.search-input:focus {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(0,255,255,0.5);
-}
-
+/* ---------- Navbar ---------- */
 .navbar {
   width: 100%;
   max-width: 1400px;
@@ -121,32 +62,229 @@
   justify-content: space-between;
   align-items: center;
 
-  padding: 10px 20px;
+  padding: 14px 22px;
   margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
 }
 
-.nav-left h2 {
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(90deg, #6c63ff, #00c6ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.brand-prompt {
+  margin: 0;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--text-h);
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-chevron {
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.brand-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 18px;
+  margin-left: 6px;
+  background: var(--accent);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
 }
 
 .nav-icon {
-  font-size: 22px;
-  color: white;
+  font-size: 19px;
+  color: var(--text);
   cursor: pointer;
-  transition: 0.2s;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.nav-icon:hover {
+.nav-icon:hover,
+.nav-icon.active-icon {
+  color: var(--accent);
   transform: scale(1.1);
-  color: #00ffcc;
+}
+
+/* ---------- Search / add button ---------- */
+.problem-search-input,
+.addProblem-button {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+
+  background: var(--code-bg);
+  color: var(--text-h);
+  font-family: var(--sans);
+  font-size: 14px;
+
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.problem-search-input::placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}
+
+.problem-search-input::-webkit-input-placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}
+
+.problem-search-input::-moz-placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}
+.problem-search-input {
+  width: 220px;
+}
+
+.problem-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.addProblem-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ---------- Main layout ---------- */
+/* space-between keeps the cards and the animation panel pinned to their
+   natural size instead of stretching a dead gap between them. */
+.content-layout {
+  width: 100%;
+  max-width: 1400px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+/* ---------- Platform cards ---------- */
+.image-card {
+  width: 220px;
+  padding: 18px;
+  border-radius: 18px;
+
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+/* A flat gray card reads as disconnected from the rest of the (violet)
+   brand — add a whisper of accent tint so it feels like part of the system. */
+[data-theme="light"] .image-card {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 4%, transparent), transparent 60%),
+    color-mix(in srgb, var(--code-bg) 55%, var(--border-strong) 45%);
+  border-color: var(--border-strong);
+}
+
+.image-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  border-color: var(--accent);
+  box-shadow:
+    var(--shadow),
+    0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 0 24px -6px color-mix(in srgb, var(--accent) 65%, white);
+}
+
+.platform-logo {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--code-bg);
+}
+
+[data-theme="light"] .platform-logo {
+  background: var(--bg-elevated);
+}
+
+/* Two <img> per card; CSS picks which one shows based on the active theme.
+   platform.imageLight falls back to platform.image in Home.jsx, so this is
+   a no-op visually until a real light-variant asset is supplied. */
+.platform-logo--light {
+  display: none;
+}
+
+[data-theme="light"] .platform-logo--dark {
+  display: none;
+}
+
+[data-theme="light"] .platform-logo--light {
+  display: block;
+}
+
+.image-card p {
+  margin: 0;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+/* ---------- Animation panel ---------- */
+.animation-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 300px;
+}
+
+.navbar,
+.content-layout {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .content-layout {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .animation-container {
+    min-width: 0;
+  }
 }

@@ -1,0 +1,103 @@
+/* Styled like a CLI flag: `--theme dark|light`. Self-contained — includes
+   its own reduced-motion and small-screen rules so it looks right no
+   matter which page renders it (AuthPage, Home, ...). */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-elevated);   
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--border-strong);
+  color: var(--text-h);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--text-h) 10%, transparent);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle--floating {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 50;
+}
+
+.theme-toggle-flag {
+  opacity: 0.7;
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  /* recessed look, so the thumb reads as sitting "in" the track */
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--text-h) 12%, transparent);
+  transition: border-color 0.25s ease;
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-h) 25%, transparent);
+  transition: transform 0.25s cubic-bezier(0.4, 0.15, 0.2, 1), box-shadow 0.25s ease;
+}
+
+.theme-toggle-thumb.is-dark {
+  transform: translateX(16px);
+  /* soft accent glow behind the thumb in dark mode — same glow language
+     used on the diamonds/cards elsewhere, not a new effect */
+  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.theme-toggle-value {
+  width: 5ch;
+  text-align: left;
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle,
+  .theme-toggle-track,
+  .theme-toggle-thumb {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .theme-toggle--floating {
+    top: 12px;
+    right: 12px;
+  }
+}
