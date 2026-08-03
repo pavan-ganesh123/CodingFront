@@ -41,29 +41,22 @@ const ICONS = [Eye, Aperture, ShareNetwork, Sparkle, Heart, Star, Camera, Stack]
 
 const GAP = 72;
 
-function cell(baseTop, baseLeft, col, row) {
-  return {
-    top: (row - col) * GAP,
-    left: (row + col) * GAP,
-  };
+function cell(col, row) {
+  return { top: (row - col) * GAP, left: (row + col) * GAP };
 }
 
-const TOP_DIAMONDS = [
-  cell(0, 0, 0, 0),
-  cell(0, 0, 1, 0),
-  cell(0, 0, 2, 0),
-  cell(0, 0, 3, 0),
-  cell(0, 0, 3, 1),
-  cell(0, 0, 2, 1),
-];
-
-const BOTTOM_DIAMONDS = [
-  cell(0, 0, 0, 0),
-  cell(0, 0, 1, 0),
-  cell(0, 0, 2, 0),
-  cell(0, 0, 3, 0),
-  cell(0, 0, 3, 1),
-  cell(0, 0, 2, 1),
+const CELLS = [
+  cell(0, 0),
+  cell(1, 0),
+  cell(2, 0),
+  cell(3, 0),
+  cell(3, 1),
+  cell(2, 1), // joint — where the hook turns
+  cell(2, 2),
+  cell(1, 3),
+  cell(0, 3),
+  cell(0, 2),
+  cell(0,1),
 ];
 
 // Loose floating accent diamonds — faint, no icon reveal needed, just depth.
@@ -142,23 +135,22 @@ function AuthPage() {
               <Floater key={i} {...f} delay={i * 0.6} />
             ))}
 
-            <div className="diamond-cluster top-cluster">
-              {TOP_DIAMONDS.map((pos, i) => (
-                <Diamond key={i} index={i} {...pos} delay={i * 0.15} />
-              ))}
+            <div className="diamond-connector">
+              <div className="diamond-cluster">
+                {CELLS.map((pos, i) => (
+                  <Diamond key={i} index={i} {...pos} delay={i * 0.15} />
+                ))}
+              </div>
             </div>
-
             <div className="tagline-card">
-              <h3 className="tagline-main">Code &amp; Note..</h3>
-              <p className="tagline-sub">Share and</p>
-              <h3 className="tagline-main accent">Learn together</h3>
+              <h3 className="tagline-main">Cache Every Insight</h3>
+              <p className="tagline-sub">
+                Capture intuitions • Organize notes
+              </p>
+              <h3 className="tagline-main accent">Solve With Confidence</h3>
             </div>
 
-            <div className="diamond-cluster bottom-cluster">
-              {BOTTOM_DIAMONDS.map((pos, i) => (
-                <Diamond key={i} index={i + TOP_DIAMONDS.length} {...pos} delay={i * 0.15} />
-              ))}
-            </div>
+            
           </div>
         </div>
       </div>

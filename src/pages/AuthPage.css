@@ -100,9 +100,18 @@
 
 .diamond-cluster {
   position: absolute;
-  width: 34%;
-  height: 34%;
-  z-index: 5;
+  top: 0;
+  left: 0;
+  width: 360px;
+  height: 480px; /* taller now — one grid, not two overlapping boxes */
+}
+
+.diamond-connector {
+  position: absolute;
+  top: 25%;
+  right: 55%;
+  transform: scale(clamp(0.55, 0.75vw + 0.45, 1));
+  transform-origin: top right;
 }
 
 .top-cluster,
@@ -110,19 +119,19 @@
   position: absolute;
   width: 360px;
   height: 320px;
-  transform-origin: top right;
-  scale: clamp(0.55, 0.75vw + 0.45, 1);
 }
 
 .top-cluster {
-  top: 30%;
-  right: 5%;
+  top: 0;
+  left: 0;
 }
 
+/* Derived, not guessed: bottom-cluster's local (3,1) tile must land
+   exactly one grid-step from top-cluster's local (2,1) tile. Solving
+   that gives left: 0 (same column as top-cluster) and top: -144px. */
 .bottom-cluster {
-  bottom: -55%;
-  right: 8%;
-  transform-origin: bottom right;
+  top: -144px;
+  left: 0;
 }
 
 .diamond {
@@ -212,8 +221,8 @@
 
 .tagline-card {
   position: absolute;
-  left: 35%;
-  top: 50%;
+  left: 40%;
+  top: 40%;
   transform: translate(-50%, -50%);
   width: 500px;
   padding: 28px;
