@@ -1,18 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "../notifications/ToastContext";
-import "./Login.css";
-import { Eye, EyeOff } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
+import { Field, Button } from "./AuthFormElements";
+import "./AuthPage.css";
 
-function Login() {
+function Login({ onSwitchToSignup }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { showToast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const handleLogin = async () => {
-    const query = `
+    setLoading(true);
+    try {
+      const query = `
         mutation ($email: String!, $password: String!) {
             login(email: $email, password: $password) {
             token
@@ -20,80 +24,77 @@ function Login() {
         }
         `;
 
-    const res = await fetch("https://codecache-13ic.onrender.com/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        variables: { email, password },
-      }),
-    });
+      const res = await fetch("http://localhost:8080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          variables: { email, password },
+        }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.data && data.data.login) {
-      const token = data.data.login.token;
-      localStorage.setItem("token", token);
-      window.dispatchEvent(new Event("auth-changed"));
-      showToast("Login Successful!", "success");
-      navigate("/home");   // ✅ go to home
-    } else {
-      showToast("Invalid Credentials!", "error");
+      if (data.data && data.data.login) {
+        const token = data.data.login.token;
+        localStorage.setItem("token", token);
+        window.dispatchEvent(new Event("auth-changed"));
+        showToast("Login Successful!", "success");
+        navigate("/home"); // ✅ go to home
+      } else {
+        showToast("Invalid Credentials!", "error");
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      showToast("Unable to connect to server. Please try again.", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   return (
-    <div className="login-container">
-      <h2 className="login-title">Welcome Back</h2>
+    <>
+      <h2 className="auth-heading">Welcome Back</h2>
+      <p className="auth-subheading">Login to continue to Code Cache.</p>
 
-      <p className="login-subtitle">
-        Login to continue to Code Cache.
-      </p>
-
-      <div className="login-form">
-        <input
-          className="login-input"
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
+        <Field
+          label="Email Address"
           type="email"
-          placeholder="Email Address"
+          name="email"
+          autoComplete="email"
+          icon={<Mail size={18} />}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <div className="password-wrapper">
-          <input
-            className="login-input"
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleLogin();
-              }
-            }}
-          />
+        <Field
+          label="Password"
+          type="password"
+          name="password"
+          autoComplete="current-password"
+          icon={<Lock size={18} />}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <button
-            type="button"
-            className="password-toggle"
-            onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-        </div>
+        <Button loading={loading}>Log In</Button>
+      </form>
 
-        <button
-          className="login-button"
-          onClick={handleLogin}
-        >
-          Log In
+      <p className="auth-footer">
+        No account?{" "}
+        <button type="button" className="text-link" onClick={onSwitchToSignup}>
+          Sign up
         </button>
-
-      </div>
-    </div>
+      </p>
+    </>
   );
 }
 

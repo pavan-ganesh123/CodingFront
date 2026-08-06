@@ -1,137 +1,113 @@
 .login-container {
-  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .login-title {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: 32px;
+  font-family: var(--font-display);
+  font-size: 26px;
   font-weight: 700;
-  color: var(--text-h);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 6px;
 }
 
 .login-subtitle {
-  margin: 10px 0 32px;
-  color: var(--text);
-  font-family: var(--sans);
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0 0 28px;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .login-input {
   width: 100%;
-  padding: 15px 18px;
-  background: var(--code-bg);
-  color: var(--text-h);
+  padding: 13px 16px;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  font-family: var(--sans);
-  font-size: 15px;
-  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .login-input::placeholder {
-  color: var(--text-faint);
+  color: var(--text-muted);
 }
 
 .login-input:focus {
-  outline: none;
-  background: var(--bg-elevated);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
-}
-
-.login-button {
-  margin-top: 12px;
-  padding: 15px;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  color: #fff;
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  background: var(--accent);
-  transition: transform 0.25s, box-shadow 0.25s;
-}
-
-.login-button:hover {
-  transform: translateY(-2px);
-  background: color-mix(in srgb, var(--accent) 88%, black);
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 30%, transparent);
-}
-
-.login-button:active {
-  transform: translateY(0);
-}
-
-.login-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.login-forgot {
-  margin-top: 18px;
-  text-align: right;
-}
-
-.login-forgot a {
-  color: var(--accent);
-  text-decoration: none;
-  font-family: var(--sans);
-  font-size: 14px;
-  transition: color 0.2s;
-}
-
-.login-forgot a:hover {
-  color: color-mix(in srgb, var(--accent) 80%, black);
+  border-color: var(--accent-0);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-0) 18%, transparent);
 }
 
 .password-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
 }
 
 .password-wrapper .login-input {
-  width: 100%;
-  padding-right: 52px;
+  padding-right: 44px;
 }
 
 .password-toggle {
   position: absolute;
-  top: 35%;
-  right: 16px;
-  transform: translateY(-50%);
+  right: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 6px;
   background: none;
   border: none;
-  color: var(--text);
+  border-radius: 6px;
+  color: var(--text-muted);
   cursor: pointer;
-  padding: 0;
-  transition: color 0.2s;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .password-toggle:hover {
-  color: var(--text-h);
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 
-.password-toggle:focus {
-  outline: none;
+.password-toggle:focus-visible {
+  outline: 2px solid var(--accent-0);
+  outline-offset: 2px;
 }
 
-.password-toggle svg {
-  pointer-events: none;
+.login-button {
+  margin-top: 6px;
+  padding: 13px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-0), var(--accent-1));
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14.5px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--accent-0) 60%, transparent);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+.login-button:focus-visible {
+  outline: 2px solid var(--accent-0);
+  outline-offset: 3px;
 }

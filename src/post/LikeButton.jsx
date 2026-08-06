@@ -14,13 +14,13 @@ const LikeButton = ({ postId, initialCount = 0, initiallyLiked = false, onToggle
         try {
             if (nextLiked) {
                 await axios.post(
-                    `https://codecache-13ic.onrender.com/api/posts/${postId}/like`,
+                    `http://localhost:8080/api/posts/${postId}/like`,
                     {},
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
                 await axios.delete(
-                    `https://codecache-13ic.onrender.com/api/posts/${postId}/like`,
+                    `http://localhost:8080/api/posts/${postId}/like`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             }

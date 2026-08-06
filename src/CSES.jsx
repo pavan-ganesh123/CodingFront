@@ -25,7 +25,7 @@ function CSES() {
       }
 
       const response = await fetch(
-        `https://codecache-13ic.onrender.com/api/problems/my/problems?${params.toString()}`,
+        `http://localhost:8080/api/problems/my/problems?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

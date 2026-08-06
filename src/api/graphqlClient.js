@@ -1,6 +1,6 @@
 import { GraphQLClient } from "graphql-request";
 
-const endpoint = "https://codecache-13ic.onrender.com/graphql";
+const endpoint = "http://localhost:8080/graphql";
 
 export const getClient = () => {
   const token = localStorage.getItem("token");

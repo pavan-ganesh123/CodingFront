@@ -62,7 +62,7 @@ export const WebSocketProvider = ({ children }) => {
             manualCloseRef.current = false;
 
             const ws = new WebSocket(
-                `wss://chatloop-j8fz.onrender.com/ws?token=${token}`
+                `ws://localhost:8081/ws?token=${token}`
             );
 
             socketRef.current = ws;

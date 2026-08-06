@@ -66,7 +66,7 @@ const FeedPage = () => {
             }
 
             const response = await axios.get(
-                `https://codecache-13ic.onrender.com/api/posts/feed?page=${pageNumber}&size=${PAGE_SIZE}&seed=${seed}`,
+                `http://localhost:8080/api/posts/feed?page=${pageNumber}&size=${PAGE_SIZE}&seed=${seed}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -184,7 +184,7 @@ const FeedPage = () => {
             try {
 
                 const userRes = await axios.get(
-                    "https://codecache-13ic.onrender.com/api/users/me",
+                    "http://localhost:8080/api/users/me",
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
