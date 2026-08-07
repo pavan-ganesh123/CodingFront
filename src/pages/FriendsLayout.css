@@ -1,145 +1,322 @@
-.friends-layout {
-  display: flex;
-  min-height: 100vh;
-  color: white;
-  background: #0b0b0f;
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ======================================================================
+   DESIGN TOKENS — same system as the rest of the app.
+   ====================================================================== */
+:root {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --bg: #f7f7f9;
+  --surface: rgba(20, 19, 26, 0.035);
+  --surface-hover: rgba(20, 19, 26, 0.06);
+  --surface-solid: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.72);
+
+  --textColor: #14131a;
+  --textColor-muted: #625f6d;
+  --textColor-faint: #767480;
+  --on-primary: #ffffff;
+
+  --border: rgba(20, 19, 26, 0.09);
+  --border-strong: rgba(20, 19, 26, 0.18);
+  --focus-ring: rgba(124, 92, 252, 0.22);
+
+  --primary: #7c5cfc;
+  --primary-strong: #6a3ffb;
+  --primary-soft: rgba(124, 92, 252, 0.12);
+  --primary-fg: #5b3ce8;
+  --teal: #0f9c8c;
+  --rose: #d63d72;
+
+  --shadow-color: 220 30% 12%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06);
+  --shadow-md: 0 12px 28px -12px hsl(var(--shadow-color) / 0.22);
+  --shadow-lg: 0 30px 70px -28px hsl(var(--shadow-color) / 0.32);
+
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --radius-full: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur-med: 280ms;
+  --dur-slow: 520ms;
+
+  color-scheme: light;
 }
 
-/* 🔹 Sidebar */
-.sidebar {
-  width: 90px;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #07070b;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.075);
+    --surface-solid: #131319;
+    --surface-glass: rgba(19, 19, 25, 0.68);
 
+    --textColor: #f4f3f8;
+    --textColor-muted: #a3a1ad;
+    --textColor-faint: #6c6a76;
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --focus-ring: rgba(167, 139, 250, 0.3);
+
+    --primary: #a78bfa;
+    --primary-strong: #8f6bf7;
+    --primary-soft: rgba(167, 139, 250, 0.16);
+    --primary-fg: #a78bfa;
+    --teal: #2dd4bf;
+    --rose: #fb7185;
+
+    --shadow-color: 260 60% 2%;
+
+    color-scheme: dark;
+  }
+}
+
+/* ======================================================================
+   PAGE SHELL — owned here, once, since every /friends/* route renders
+   inside this layout. Child pages (FindFriends, FriendRequests) don't
+   need their own background, card, or full-viewport wrapper.
+   ====================================================================== */
+.fr-shell {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--textColor);
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.page-mesh {
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 45%),
+    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--teal) 10%, transparent), transparent 42%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--rose) 9%, transparent), transparent 48%);
+  filter: blur(80px);
+  animation: mesh-drift 34s ease-in-out infinite alternate;
+}
+
+.page-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.035;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+@keyframes mesh-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(3%, -2%) rotate(4deg); }
+}
+
+/* ======================================================================
+   BODY
+   ====================================================================== */
+.fr-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-
-  padding-top: 28px;
-
-  background: rgba(255, 255, 255, 0.03);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  position: sticky;
-  top: 0;
-  height: 100vh;
-
-  z-index: 10;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 48px) var(--space-4) clamp(48px, 8vw, 80px);
 }
 
-.sidebar button {
-  width: 54px;
-  height: 54px;
+/* ======================================================================
+   TOPBAR — back link + a sliding segmented control instead of a
+   floating sidebar. Three-column grid keeps the tabs perfectly
+   centered regardless of the back button's width.
+   ====================================================================== */
+.fr-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  margin-bottom: var(--space-6);
+}
 
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+.fr-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-self: start;
+  padding: var(--space-2) var(--space-3);
+  margin-left: calc(var(--space-3) * -1);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--textColor-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
 
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.7);
+.fr-back:hover {
+  background: var(--surface-hover);
+  color: var(--textColor);
+  transform: translateX(-2px);
+}
 
-  display: flex;
+.fr-back:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.fr-topbar-spacer {
+  justify-self: end;
+}
+
+.fr-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 220px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+}
+
+.fr-tabs-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--primary) 60%, transparent);
+  transition: transform var(--dur-med) var(--ease-spring);
+}
+
+.fr-tabs--find .fr-tabs-indicator {
+  transform: translateX(100%);
+}
+
+.fr-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-
-  cursor: pointer;
-  position: relative;
-
-  transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    background 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.sidebar button:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.09);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.sidebar button:active {
-  transform: translateY(0) scale(0.96);
-}
-
-/* Active state — accent gradient instead of plain glass */
-.sidebar button.active {
-  background: linear-gradient(135deg, #282ab4, #331e63);
-  color: #fff;
-  border-color: transparent;
-
-  box-shadow:
-    0 6px 20px rgba(99, 102, 241, 0.45),
-    0 0 0 1px rgba(99, 102, 241, 0.2) inset;
-
-  transform: translateY(-1px);
-}
-
-/* subtle glow dot to reinforce active state */
-.sidebar button.active::after {
-  content: "";
-  position: absolute;
-  bottom: -10px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  
-}
-
-/* 🔹 Content Area */
-.content {
-  flex: 1;
-  padding: 32px 40px;
-  overflow-y: auto;
-}
-
-.content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.content::-webkit-scrollbar-track {
+  gap: 6px;
+  height: 34px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--textColor-muted);
   background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--dur-med) ease;
 }
 
-.content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
+.fr-tab svg {
+  font-size: 13px;
 }
 
-.content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+.fr-tab.fr-is-active {
+  color: var(--on-primary);
 }
 
-/* 🔹 Responsive */
-@media (max-width: 768px) {
-  .friends-layout {
-    flex-direction: column;
+.fr-tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .fr-topbar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: var(--space-4);
   }
 
-  .sidebar {
-    width: 100%;
-    height: 72px;
-    flex-direction: row;
-    justify-content: center;
-    gap: 20px;
-
-    padding-top: 0;
-
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-
-    position: sticky;
-    top: 0;
+  .fr-back {
+    justify-self: start;
   }
 
-  .sidebar button.active::after {
-    bottom: -8px;
+  .fr-topbar-spacer {
+    display: none;
+  }
+}
+
+/* ======================================================================
+   CARD — holds whatever the active tab renders. Its size responds to
+   content naturally; it's the same bordered-card language as the rest
+   of the app, so this page no longer looks unfinished next to them.
+   ====================================================================== */
+.fr-card {
+  position: relative;
+  width: 100%;
+  padding: clamp(28px, 4.5vw, 40px);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.fr-card-glow {
+  position: absolute;
+  inset: -30%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 55%),
+    radial-gradient(circle at 90% 100%, color-mix(in srgb, var(--teal) 9%, transparent), transparent 55%);
+  filter: blur(60px);
+}
+
+.fr-card-inner {
+  animation: fr-fade-in var(--dur-slow) var(--ease-out);
+}
+
+@keyframes fr-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-mesh,
+  .fr-tabs-indicator {
+    animation: none !important;
+    transition: none !important;
   }
 
-  .content {
-    padding: 20px;
+  .fr-card-inner {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .fr-back,
+  .fr-tab {
+    transition: none;
   }
 }
