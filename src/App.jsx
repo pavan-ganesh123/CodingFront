@@ -163,6 +163,18 @@ function App() {
                             }
                         />
 
+                        {/* Someone else's profile — Profile.jsx reads
+                            :username via useParams() and switches to
+                            view-only mode when it's present. */}
+                        <Route
+                            path="/profile/:username"
+                            element={
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            }
+                        />
+
                         <Route
                             path="/friends"
                             element={
@@ -205,8 +217,14 @@ function App() {
                             }
                         />
 
+                        {/* Was "/myposts" (lowercase) — FeedPage's "My
+                            Posts" button calls navigate("/myPosts"),
+                            and route paths are case-sensitive by
+                            default, so that click was falling through
+                            to the catch-all route below and bouncing
+                            to /home instead of opening this page. */}
                         <Route
-                            path="/myposts"
+                            path="/myPosts"
                             element={
                                 <ProtectedRoute>
                                     <MyPostsPage />

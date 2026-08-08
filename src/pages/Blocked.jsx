@@ -1,16 +1,28 @@
 /* eslint-disable react-hooks/immutability */
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { gql } from "graphql-request";
 import { getClient } from "../api/graphqlClient";
 import { getUserFromToken } from "../utils/auth";
-import { ToastProvider, useToast } from "../notifications/ToastContext";
+import { useToast } from "../notifications/ToastContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { FaArrowLeft, FaUserSlash, FaSpinner } from "react-icons/fa";
 
 import "./Blocked.css";
 
+const AVATAR_ACCENTS = ["primary", "teal", "rose"];
+
+function accentFor(name) {
+  const code = (name || "?").charCodeAt(0) || 0;
+  return AVATAR_ACCENTS[code % AVATAR_ACCENTS.length];
+}
+
 function Blocked() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [blockedUsers, setBlockedUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [unblockingId, setUnblockingId] = useState(null);
 
   const client = getClient();
 
@@ -40,14 +52,8 @@ function Blocked() {
   `;
 
   const UNBLOCK_USER = gql`
-    mutation(
-      $userId: ID!,
-      $targetUserId: ID!
-    ) {
-      unblockUser(
-        userId: $userId,
-        targetUserId: $targetUserId
-      ) {
+    mutation($userId: ID!, $targetUserId: ID!) {
+      unblockUser(userId: $userId, targetUserId: $targetUserId) {
         id
         status
       }
@@ -59,165 +65,146 @@ function Blocked() {
   }, []);
 
   const fetchBlockedUsers = async () => {
-
+    setIsLoading(true);
     try {
-
-      const data = await client.request(
-        GET_RELATIONS,
-        { userId }
-      );
+      const data = await client.request(GET_RELATIONS, { userId });
 
       const blocked = data.getBlockedFriends;
       setBlockedUsers(blocked);
-
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleUnblock = async (targetId) => {
-
-  try {
-
-    await client.request(
-      UNBLOCK_USER,
-      {
+    setUnblockingId(targetId);
+    try {
+      await client.request(UNBLOCK_USER, {
         userId,
-        targetUserId: targetId
-      }
-    );
+        targetUserId: targetId,
+      });
 
-    const unblockedRelation = blockedUsers.find(
-      relation => {
-
+      const unblockedRelation = blockedUsers.find((relation) => {
         const blockedPerson =
-          String(relation.user.id) === String(userId)
-            ? relation.friend
-            : relation.user;
+          String(relation.user.id) === String(userId) ? relation.friend : relation.user;
 
         return String(blockedPerson.id) === String(targetId);
-      }
-    );
+      });
 
-    const unblockedFriend =
-      String(unblockedRelation.user.id) === String(userId)
-        ? unblockedRelation.friend
-        : unblockedRelation.user;
+      const unblockedFriend =
+        String(unblockedRelation.user.id) === String(userId)
+          ? unblockedRelation.friend
+          : unblockedRelation.user;
 
-    // Remove from blocked page UI
-    setBlockedUsers(prev =>
-      prev.filter(relation => {
+      // Remove from blocked page UI
+      setBlockedUsers((prev) =>
+        prev.filter((relation) => {
+          const blockedPerson =
+            String(relation.user.id) === String(userId) ? relation.friend : relation.user;
 
-        const blockedPerson =
-          String(relation.user.id) === String(userId)
-            ? relation.friend
-            : relation.user;
+          return String(blockedPerson.id) !== String(targetId);
+        })
+      );
 
-        return String(blockedPerson.id) !== String(targetId);
-      })
-    );
-
-    // Add back to friends cache
-    queryClient.setQueryData(
-      ["friends", userId],
-      (oldFriends = []) => {
-
-        const alreadyExists =
-          oldFriends.some(
-            f => String(f.id) === String(unblockedFriend.id)
-          );
+      // Add back to friends cache
+      queryClient.setQueryData(["friends", userId], (oldFriends = []) => {
+        const alreadyExists = oldFriends.some((f) => String(f.id) === String(unblockedFriend.id));
 
         if (alreadyExists) {
           return oldFriends;
         }
 
-        return [
-          ...oldFriends,
-          unblockedFriend
-        ];
-      }
-    );
+        return [...oldFriends, unblockedFriend];
+      });
 
-    showToast(
-      "User unblocked",
-      "info"
-    );
+      showToast("User unblocked", "info");
+    } catch (err) {
+      console.error(err);
 
-  } catch (err) {
+      showToast("Failed to unblock", "error");
+    } finally {
+      setUnblockingId(null);
+    }
+  };
 
-    console.error(err);
-
-    showToast(
-      "Failed to unblock",
-      "error"
-    );
-  }
-};
+  const showEmpty = !isLoading && blockedUsers.length === 0;
 
   return (
+    <div className="bl-page">
+      <div className="page-mesh" aria-hidden="true" />
+      <div className="page-grain" aria-hidden="true" />
 
-    <div className="blocked-page">
-
-      <div className="blocked-header">
-
-        <h2>Blocked Users</h2>
-
-        <button
-          className="back-btn"
-          onClick={() => {
-            window.location.href = "/chat";
-          }}
-        >
+      <div className="bl-shell">
+        <button className="bl-back" onClick={() => navigate("/chat")}>
+          <FaArrowLeft />
           Back
         </button>
 
-      </div>
+        <div className="bl-card">
+          <div className="bl-card-glow" aria-hidden="true" />
 
-      <div className="blocked-list">
+          <span className="bl-kicker">$ users --blocked</span>
+          <h1 className="bl-title">Blocked users</h1>
 
-        {blockedUsers.length === 0 ? (
-
-          <div className="empty-blocked">
-            No blocked users
-          </div>
-
-        ) : (
-
-          blockedUsers.map(relation => {
-
-            const blockedPerson =
-              String(relation.user.id) === String(userId)
-                ? relation.friend
-                : relation.user;
-
-            return (
-              <div
-                key={relation.id}
-                className="blocked-user-card"
-              >
-                <div>
-                  <div className="blocked-name">
-                    {blockedPerson.userName}
+          <div className="bl-list">
+            {isLoading && (
+              <div className="bl-skeleton-list" aria-hidden="true">
+                {[0, 1].map((i) => (
+                  <div className="bl-skeleton" key={i} style={{ animationDelay: `${i * 90}ms` }}>
+                    <div className="bl-skeleton-avatar" />
+                    <div className="bl-skeleton-lines">
+                      <div className="bl-skeleton-bar bl-skeleton-bar--name" />
+                      <div className="bl-skeleton-bar bl-skeleton-bar--email" />
+                    </div>
+                    <div className="bl-skeleton-btn" />
                   </div>
-
-                  <div className="blocked-email">
-                    {blockedPerson.email}
-                  </div>
-                </div>
-
-                <button
-                  className="unblock-btn"
-                  onClick={() => handleUnblock(blockedPerson.id)}
-                >
-                  Unblock
-                </button>
+                ))}
               </div>
-            );
-          })
-        )}
+            )}
 
+            {showEmpty && (
+              <div className="bl-state">
+                <FaUserSlash className="bl-state-icon" />
+                <p className="bl-state-title">No blocked users</p>
+                <p className="bl-state-copy">Anyone you block will show up here.</p>
+              </div>
+            )}
+
+            {!isLoading &&
+              blockedUsers.map((relation, i) => {
+                const blockedPerson =
+                  String(relation.user.id) === String(userId) ? relation.friend : relation.user;
+
+                return (
+                  <div className="bl-user-card" key={relation.id} style={{ animationDelay: `${i * 45}ms` }}>
+                    <span className={`bl-avatar bl-avatar--${accentFor(blockedPerson.userName)}`}>
+                      {(blockedPerson.userName || "?").charAt(0).toUpperCase()}
+                    </span>
+
+                    <div className="bl-user-info">
+                      <span className="bl-user-name">{blockedPerson.userName}</span>
+                      <span className="bl-user-email">{blockedPerson.email}</span>
+                    </div>
+
+                    <button
+                      className="bl-unblock-btn"
+                      onClick={() => handleUnblock(blockedPerson.id)}
+                      disabled={unblockingId === blockedPerson.id}
+                    >
+                      {unblockingId === blockedPerson.id ? (
+                        <FaSpinner className="bl-unblock-spinner" />
+                      ) : (
+                        "Unblock"
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
       </div>
-
     </div>
   );
 }

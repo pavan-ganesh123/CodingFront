@@ -4,6 +4,7 @@ import axios from "axios";
 import PostCard from "./PostCard";
 import "./FeedPage.css";
 import { useNavigate } from "react-router-dom";
+import { FaRegNewspaper, FaExclamationTriangle } from "react-icons/fa";
 
 const PAGE_SIZE = 10;
 let hasHandledReload = false;
@@ -281,9 +282,26 @@ const FeedPage = () => {
 
     if (loading || !currentUser) {
         return (
-            <div className="feed-page">
-                <div className="feed-loading">
-                    Loading feed...
+            <div className="fd-page">
+                <div className="fd-shell">
+                    <div className="fd-header">
+                        <h1 className="fd-title">Posts</h1>
+                    </div>
+                    <div className="fd-skeleton-list" aria-hidden="true">
+                        {[0, 1, 2].map((i) => (
+                            <div className="fd-skeleton-card" key={i} style={{ animationDelay: `${i * 90}ms` }}>
+                                <div className="fd-skeleton-header">
+                                    <div className="fd-skeleton-avatar" />
+                                    <div className="fd-skeleton-lines">
+                                        <div className="fd-skeleton-bar fd-skeleton-bar--name" />
+                                        <div className="fd-skeleton-bar fd-skeleton-bar--time" />
+                                    </div>
+                                </div>
+                                <div className="fd-skeleton-bar fd-skeleton-bar--title" />
+                                <div className="fd-skeleton-image" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         );
@@ -291,70 +309,85 @@ const FeedPage = () => {
 
     if (error) {
         return (
-            <div className="feed-page">
-                <div className="feed-error">
-                    {error}
+            <div className="fd-page">
+                <div className="fd-shell">
+                    <div className="fd-state">
+                        <FaExclamationTriangle className="fd-state-icon" />
+                        <p className="fd-state-title">{error}</p>
+                        <button className="fd-retry-btn" onClick={() => fetchFeed(0)}>
+                            Try again
+                        </button>
+                    </div>
                 </div>
             </div>
         );
     }
     return (
-        <div className="feed-page">
-            <div className="feed-header">
-                <div className="feed-header-top">
-                    <h4>Posts</h4>
-                <button
-                    className="my-posts-btn"
-                    onClick={() => navigate("/myPosts")}
-                >
-                    My Posts
-                </button>
+        <div className="fd-page">
+            <div className="fd-shell">
+                <div className="fd-header">
+                    <h1 className="fd-title">Posts</h1>
+                    <button
+                        className="fd-my-posts-btn"
+                        onClick={() => navigate("/myPosts")}
+                    >
+                        My Posts
+                    </button>
+                </div>
 
-            </div>
+                <div className="fd-content">
+                    {posts.length === 0 ? (
+                        <div className="fd-state">
+                            <FaRegNewspaper className="fd-state-icon" />
+                            <p className="fd-state-title">No posts available</p>
+                            <p className="fd-state-copy">Check back later, or follow more friends.</p>
+                        </div>
+                    ) : (
+                        <>
+                            {posts.map((post, index) => {
 
-            </div>
+                                const isLastPost =
+                                    index === posts.length - 1;
 
-            <div className="feed-content">
-                {posts.length === 0 ? (
-                    <div className="empty-feed">
-                        No posts available.
-                    </div>
-                ) : (
-                    <>
-                        {posts.map((post, index) => {
-
-                            const isLastPost =
-                                index === posts.length - 1;
-
-                            return (
-                                <div
-                                    key={post.id}
-                                    ref={
-                                        isLastPost
-                                            ? lastPostRef
-                                            : null
-                                    }
-                                >
-                                    <PostCard
-                                        post={post}
-                                        updatePost={updatePost}
-                                        profilePicture={
-                                            post.profilePicture
+                                return (
+                                    <div
+                                        key={post.id}
+                                        ref={
+                                            isLastPost
+                                                ? lastPostRef
+                                                : null
                                         }
-                                        currentUser={currentUser}
-                                    />
-                                </div>
-                            );
-                        })}
+                                    >
+                                        <PostCard
+                                            post={post}
+                                            updatePost={updatePost}
+                                            profilePicture={
+                                                post.profilePicture
+                                            }
+                                            currentUser={currentUser}
+                                        />
+                                    </div>
+                                );
+                            })}
 
-                        {loadingMore && (
-                            <div className="feed-loading-more">
-                                Loading more posts...
-                            </div>
-                        )}
-                        
-                    </>
-                )}
+                            {loadingMore && (
+                                <div className="fd-skeleton-list" aria-hidden="true">
+                                    <div className="fd-skeleton-card">
+                                        <div className="fd-skeleton-header">
+                                            <div className="fd-skeleton-avatar" />
+                                            <div className="fd-skeleton-lines">
+                                                <div className="fd-skeleton-bar fd-skeleton-bar--name" />
+                                                <div className="fd-skeleton-bar fd-skeleton-bar--time" />
+                                            </div>
+                                        </div>
+                                        <div className="fd-skeleton-bar fd-skeleton-bar--title" />
+                                    </div>
+                                </div>
+                            )}
+                            
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );

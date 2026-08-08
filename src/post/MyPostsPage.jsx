@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import PostCard from "./PostCard";
 import "./MyPosts.css";
+import { FaArrowLeft, FaRegNewspaper, FaExclamationTriangle } from "react-icons/fa";
 
 const MyPostsPage = () => {
+    const navigate = useNavigate();
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -53,6 +56,14 @@ const MyPostsPage = () => {
         }
     };
 
+    // Same update-in-place pattern FeedPage uses — PostCard's LikeButton
+    // calls this unconditionally, so it has to exist here too.
+    const updatePost = (postId, updater) => {
+        setPosts((prev) =>
+            prev.map((p) => (p.id === postId ? updater(p) : p))
+        );
+    };
+
     useEffect(() => {
 
         fetchMyPosts();
@@ -60,69 +71,89 @@ const MyPostsPage = () => {
     }, []);
 
     if (loading) {
-
         return (
-            <div className="my-posts-page">
-                <div className="my-posts-status">
-                    Loading your posts...
+            <div className="mp-page">
+                <div className="mp-header">
+                    <button className="mp-back" onClick={() => navigate(-1)}>
+                        <FaArrowLeft />
+                        Back
+                    </button>
+                    <span className="mp-kicker">$ posts --mine</span>
+                    <h1 className="mp-title">My posts</h1>
+                    <p className="mp-subtitle">Problems solved</p>
+                </div>
+
+                <div className="mp-skeleton-list" aria-hidden="true">
+                    {[0, 1, 2].map((i) => (
+                        <div className="mp-skeleton-card" key={i} style={{ animationDelay: `${i * 90}ms` }}>
+                            <div className="mp-skeleton-header">
+                                <div className="mp-skeleton-avatar" />
+                                <div className="mp-skeleton-lines">
+                                    <div className="mp-skeleton-bar mp-skeleton-bar--name" />
+                                    <div className="mp-skeleton-bar mp-skeleton-bar--time" />
+                                </div>
+                            </div>
+                            <div className="mp-skeleton-bar mp-skeleton-bar--title" />
+                        </div>
+                    ))}
                 </div>
             </div>
         );
     }
 
     if (error) {
-
         return (
-            <div className="my-posts-page">
-                <div className="my-posts-status error">
-                    {error}
+            <div className="mp-page">
+                <div className="mp-header">
+                    <button className="mp-back" onClick={() => navigate(-1)}>
+                        <FaArrowLeft />
+                        Back
+                    </button>
+                </div>
+                <div className="mp-state">
+                    <FaExclamationTriangle className="mp-state-icon" />
+                    <p className="mp-state-title">{error}</p>
+                    <button className="mp-retry-btn" onClick={fetchMyPosts}>
+                        Try again
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-
-        <div className="my-posts-page">
-
-            <div className="my-posts-header">
-
-                <h2>My Posts</h2>
-
-                <p>
-                    Problems solved
-                </p>
-
+        <div className="mp-page">
+            <div className="mp-header">
+                <button className="mp-back" onClick={() => navigate(-1)}>
+                    <FaArrowLeft />
+                    Back
+                </button>
+                <span className="mp-kicker">$ posts --mine</span>
+                <h1 className="mp-title">My posts</h1>
+                <p className="mp-subtitle">Problems solved</p>
             </div>
 
             {posts.length === 0 ? (
-
-                <div className="my-posts-empty">
-                    You haven't created any posts yet.
+                <div className="mp-state">
+                    <FaRegNewspaper className="mp-state-icon" />
+                    <p className="mp-state-title">You haven't created any posts yet</p>
+                    <p className="mp-state-copy">Log a problem and share it to see it here.</p>
                 </div>
-
             ) : (
-
-                <div className="my-posts-list">
-
+                <div className="mp-list">
                     {posts.map((post) => (
-
                         <PostCard
                             key={post.id}
                             post={post}
+                            updatePost={updatePost}
                             refreshFeed={fetchMyPosts}
                             profilePicture={post.profilePicture}
                             currentUser={currentUser}
                         />
-
                     ))}
-
                 </div>
-
             )}
-
         </div>
-
     );
 };
 
