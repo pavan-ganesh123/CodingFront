@@ -22,6 +22,7 @@ import FriendRequests from "./pages/FriendRequests";
 import FindFriends from "./pages/FindFriends";
 import ChatPage from "./pages/ChatPage";
 import Blocked from "./pages/Blocked";
+import Notifications from "./pages/Notifications";
 
 import { ToastProvider } from "./notifications/ToastContext";
 
@@ -163,6 +164,18 @@ function App() {
                             }
                         />
 
+                        {/* Someone else's profile — Profile.jsx reads
+                            :username via useParams() and switches to
+                            view-only mode when it's present. */}
+                        <Route
+                            path="/profile/:username"
+                            element={
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            }
+                        />
+
                         <Route
                             path="/friends"
                             element={
@@ -197,6 +210,15 @@ function App() {
                         />
 
                         <Route
+                            path="/notifications"
+                            element={
+                                <ProtectedRoute>
+                                    <Notifications />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
                             path="/blocked-users"
                             element={
                                 <ProtectedRoute>
@@ -205,8 +227,14 @@ function App() {
                             }
                         />
 
+                        {/* Was "/myposts" (lowercase) — FeedPage's "My
+                            Posts" button calls navigate("/myPosts"),
+                            and route paths are case-sensitive by
+                            default, so that click was falling through
+                            to the catch-all route below and bouncing
+                            to /home instead of opening this page. */}
                         <Route
-                            path="/myposts"
+                            path="/myPosts"
                             element={
                                 <ProtectedRoute>
                                     <MyPostsPage />

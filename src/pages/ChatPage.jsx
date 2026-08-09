@@ -6,19 +6,32 @@ import { gql } from "graphql-request";
 
 import { getClient } from "../api/graphqlClient";
 import { getUserFromToken } from "../utils/auth";
-import { FaTrashAlt } from "react-icons/fa";
+import {
+  FaTrashAlt,
+  FaStar,
+  FaRegStar,
+  FaEllipsisV,
+  FaTimes,
+  FaPaperPlane,
+  FaArrowLeft,
+  FaComments,
+} from "react-icons/fa";
 import { MdReply } from "react-icons/md";
 import "./ChatPage.css";
-import { useWebSocket }
-from "../context/WebSocketContext";
+import { useWebSocket } from "../context/WebSocketContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFriends } from "../hooks/useFriends";
 
-function ChatPage() {
+const AVATAR_ACCENTS = ["primary", "teal", "rose"];
 
+function accentFor(name) {
+  const code = (name || "?").charCodeAt(0) || 0;
+  return AVATAR_ACCENTS[code % AVATAR_ACCENTS.length];
+}
+
+function ChatPage() {
   const queryClient = useQueryClient();
   const [selectedFriend, setSelectedFriend] = useState(null);
-
 
   const [message, setMessage] = useState("");
 
@@ -29,6 +42,10 @@ function ChatPage() {
   const [showChatMenu, setShowChatMenu] = useState(false);
 
   const [showSidebarMenu, setShowSidebarMenu] = useState(false);
+
+  // 🔹 New: profile picture zoom — holds the person currently shown in
+  // the lightbox, or null when closed.
+  const [zoomedProfile, setZoomedProfile] = useState(null);
 
   const messagesEndRef = useRef(null);
 
@@ -41,34 +58,29 @@ function ChatPage() {
   // =====================================================
   // GRAPHQL
   // =====================================================
-  const {
-      data: friends = []
-  } = useFriends(userId);
+  const { data: friends = [] } = useFriends(userId);
 
-const GET_MESSAGES = gql`
-  query($senderId: ID!, $receiverId: ID!) {
-    messages(
-      senderId: $senderId,
-      receiverId: $receiverId
-    ) {
-      messageId
-      senderId
-      receiverId
-      content
-      messageType
-      sharedPostId
-      sharedPost {
-        id
-        questionTitle
-        primaryImageUrl
+  const GET_MESSAGES = gql`
+    query($senderId: ID!, $receiverId: ID!) {
+      messages(senderId: $senderId, receiverId: $receiverId) {
+        messageId
+        senderId
+        receiverId
+        content
+        messageType
+        sharedPostId
+        sharedPost {
+          id
+          questionTitle
+          primaryImageUrl
+        }
+        deletedForEveryone
+        replyToMessageId
+        starred
+        createdAt
       }
-      deletedForEveryone
-      replyToMessageId
-      starred
-      createdAt
     }
-  }
-`;
+  `;
 
   const STAR_MESSAGE = gql`
     mutation($messageId: String!) {
@@ -90,50 +102,31 @@ const GET_MESSAGES = gql`
 
   const BLOCK_USER = gql`
     mutation($userId: ID!, $targetUserId: ID!) {
-      blockUser(
-        userId: $userId,
-        targetUserId: $targetUserId
-      ) {
+      blockUser(userId: $userId, targetUserId: $targetUserId) {
         id
       }
     }
   `;
 
   // =====================================================
-  // FETCH FRIENDS
-  // =====================================================
-
-  
-
-  // =====================================================
   // FETCH SAVED MESSAGES
   // =====================================================
 
   useEffect(() => {
-
     if (!selectedFriend) return;
 
     fetchMessages();
-
   }, [selectedFriend]);
 
   const fetchMessages = async () => {
-
     try {
+      const data = await client.request(GET_MESSAGES, {
+        senderId: Number(userId),
+        receiverId: Number(selectedFriend.id),
+      });
 
-      const data = await client.request(
-        GET_MESSAGES,
-        {
-          senderId: Number(userId),
-          receiverId: Number(selectedFriend.id)
-        }
-      );
-
-      const formatted = data.messages.map(msg => ({
-        type:
-          msg.messageType === "POST_SHARE"
-            ? "share_post"
-            : "private",
+      const formatted = data.messages.map((msg) => ({
+        type: msg.messageType === "POST_SHARE" ? "share_post" : "private",
 
         messageId: msg.messageId,
         fromUserId: String(msg.senderId),
@@ -149,11 +142,10 @@ const GET_MESSAGES = gql`
         deletedForEveryone: msg.deletedForEveryone,
         replyToMessageId: msg.replyToMessageId,
         starred: msg.starred,
-        createdAt: msg.createdAt
+        createdAt: msg.createdAt,
       }));
 
       setChat(formatted);
-
     } catch (err) {
       console.error(err);
     }
@@ -164,65 +156,55 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   useEffect(() => {
-
     if (!socketRef.current) {
-        return;
+      return;
     }
 
     const socket = socketRef.current;
 
-      const handleMessage = (event) => {
-        const msg = JSON.parse(event.data);
+    const handleMessage = (event) => {
+      const msg = JSON.parse(event.data);
 
-        if (msg.type === "private" || msg.type === "share_post") {
-          setChat(prev => {
-            // Replace the optimistic temp entry once the server confirms it,
-            // instead of appending a second copy
-            const tempIndex = prev.findIndex(
-              m =>
-                typeof m.messageId === "string" &&
-                m.messageId.startsWith("temp-") &&
-                String(m.fromUserId) === String(msg.fromUserId) &&
-                String(m.to) === String(msg.to) &&
-                m.message === msg.message
-            );
-
-            if (tempIndex !== -1) {
-              const updated = [...prev];
-              updated[tempIndex] = msg;
-              return updated;
-            }
-
-            const exists = prev.some(m => m.messageId === msg.messageId);
-            if (exists) return prev;
-
-            return [...prev, msg];
-          });
-        }
-
-        if (msg.type === "delete") {
-          setChat(prev =>
-            prev.map(m =>
-              m.messageId === msg.messageId
-                ? { ...m, deletedForEveryone: true }
-                : m
-            )
+      if (msg.type === "private" || msg.type === "share_post") {
+        setChat((prev) => {
+          // Replace the optimistic temp entry once the server confirms it,
+          // instead of appending a second copy
+          const tempIndex = prev.findIndex(
+            (m) =>
+              typeof m.messageId === "string" &&
+              m.messageId.startsWith("temp-") &&
+              String(m.fromUserId) === String(msg.fromUserId) &&
+              String(m.to) === String(msg.to) &&
+              m.message === msg.message
           );
-        }
-      };
 
-      socket.addEventListener(
-          "message",
-          handleMessage
-      );
+          if (tempIndex !== -1) {
+            const updated = [...prev];
+            updated[tempIndex] = msg;
+            return updated;
+          }
 
-      return () => {
-          socket.removeEventListener(
-              "message",
-              handleMessage
-          );
-      };
+          const exists = prev.some((m) => m.messageId === msg.messageId);
+          if (exists) return prev;
 
+          return [...prev, msg];
+        });
+      }
+
+      if (msg.type === "delete") {
+        setChat((prev) =>
+          prev.map((m) =>
+            m.messageId === msg.messageId ? { ...m, deletedForEveryone: true } : m
+          )
+        );
+      }
+    };
+
+    socket.addEventListener("message", handleMessage);
+
+    return () => {
+      socket.removeEventListener("message", handleMessage);
+    };
   }, [socketRef]);
 
   // =====================================================
@@ -243,13 +225,13 @@ const GET_MESSAGES = gql`
       type: "private",
       to: String(selectedFriend.id),
       message,
-      replyToMessageId: replyingTo?.messageId || null
+      replyToMessageId: replyingTo?.messageId || null,
     };
 
     socketRef.current.send(JSON.stringify(payload));
 
     // Optimistically add to local state so the sender sees it immediately
-    setChat(prev => [
+    setChat((prev) => [
       ...prev,
       {
         type: "private",
@@ -259,8 +241,8 @@ const GET_MESSAGES = gql`
         message,
         replyToMessageId: replyingTo?.messageId || null,
         starred: false,
-        createdAt: new Date().toISOString()
-      }
+        createdAt: new Date().toISOString(),
+      },
     ]);
 
     setMessage("");
@@ -268,10 +250,7 @@ const GET_MESSAGES = gql`
   };
 
   const deleteForEveryone = (msg) => {
-    if (
-      !socketRef.current ||
-      socketRef.current.readyState !== WebSocket.OPEN
-    ) {
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       return;
     }
 
@@ -279,18 +258,14 @@ const GET_MESSAGES = gql`
       JSON.stringify({
         type: "delete",
         messageId: msg.messageId,
-        to: msg.to
+        to: msg.to,
       })
     );
 
     // Update locally right away instead of waiting on a socket echo
     // that may never be sent back to this same connection
-    setChat(prev =>
-      prev.map(m =>
-        m.messageId === msg.messageId
-          ? { ...m, deletedForEveryone: true }
-          : m
-      )
+    setChat((prev) =>
+      prev.map((m) => (m.messageId === msg.messageId ? { ...m, deletedForEveryone: true } : m))
     );
   };
 
@@ -299,23 +274,16 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   const filteredChat = useMemo(() => {
-
     if (!selectedFriend) return [];
 
-    return chat.filter(msg => {
-
+    return chat.filter((msg) => {
       const sentByMe =
-        String(msg.fromUserId) === String(userId) &&
-        String(msg.to) === String(selectedFriend.id);
+        String(msg.fromUserId) === String(userId) && String(msg.to) === String(selectedFriend.id);
 
-      const receivedFromFriend =
-        String(msg.fromUserId) ===
-        String(selectedFriend.id);
+      const receivedFromFriend = String(msg.fromUserId) === String(selectedFriend.id);
 
       return sentByMe || receivedFromFriend;
-
     });
-
   }, [chat, selectedFriend, userId]);
 
   // =====================================================
@@ -323,11 +291,9 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   useEffect(() => {
-
     messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth"
+      behavior: "smooth",
     });
-
   }, [filteredChat]);
 
   // =====================================================
@@ -335,7 +301,6 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   const handleKeyDown = (e) => {
-
     if (e.key === "Enter") {
       sendMessage();
     }
@@ -346,39 +311,22 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   const toggleStar = async (msg) => {
-
     try {
-
       if (msg.starred) {
-
-        await client.request(
-          UNSTAR_MESSAGE,
-          {
-            messageId: msg.messageId
-          }
-        );
-
+        await client.request(UNSTAR_MESSAGE, {
+          messageId: msg.messageId,
+        });
       } else {
-
-        await client.request(
-          STAR_MESSAGE,
-          {
-            messageId: msg.messageId
-          }
-        );
+        await client.request(STAR_MESSAGE, {
+          messageId: msg.messageId,
+        });
       }
 
-      setChat(prev =>
-        prev.map(m =>
-          m.messageId === msg.messageId
-            ? {
-                ...m,
-                starred: !m.starred
-              }
-            : m
+      setChat((prev) =>
+        prev.map((m) =>
+          m.messageId === msg.messageId ? { ...m, starred: !m.starred } : m
         )
       );
-
     } catch (err) {
       console.error(err);
     }
@@ -389,36 +337,27 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   const handleBlockUser = async () => {
-
     if (!selectedFriend) return;
 
-    const confirmBlock = window.confirm(
-      `Block ${selectedFriend.userName}?`
-    );
+    const confirmBlock = window.confirm(`Block ${selectedFriend.userName}?`);
 
     if (!confirmBlock) return;
 
     try {
-
       await client.request(BLOCK_USER, {
         userId,
-        targetUserId: selectedFriend.id
+        targetUserId: selectedFriend.id,
       });
 
-      queryClient.setQueryData(
-            ["friends", userId],
-            (oldFriends = []) =>
-                oldFriends.filter(
-                    f => String(f.id) !== String(selectedFriend.id)
-                )
-        );
+      queryClient.setQueryData(["friends", userId], (oldFriends = []) =>
+        oldFriends.filter((f) => String(f.id) !== String(selectedFriend.id))
+      );
 
       setSelectedFriend(null);
 
       setShowChatMenu(false);
 
       alert("User blocked");
-
     } catch (err) {
       console.error(err);
     }
@@ -429,331 +368,283 @@ const GET_MESSAGES = gql`
   // =====================================================
 
   const findReplyMessage = (replyId) => {
-
-    return chat.find(
-      m => m.messageId === replyId
-    );
+    return chat.find((m) => m.messageId === replyId);
   };
+
+  // =====================================================
+  // PROFILE ZOOM — new. Opens a lightbox for the given person; closes
+  // on Escape, backdrop click, or the close button.
+  // =====================================================
+
+  const openProfileZoom = (person, e) => {
+    e?.stopPropagation();
+    setZoomedProfile(person);
+  };
+
+  const closeProfileZoom = () => setZoomedProfile(null);
+
+  useEffect(() => {
+    if (!zoomedProfile) return;
+
+    const handleKey = (e) => {
+      if (e.key === "Escape") closeProfileZoom();
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [zoomedProfile]);
 
   // =====================================================
   // UI
   // =====================================================
 
   return (
-
-    <div className="chat-layout">
-
+    <div className={`cp-layout ${selectedFriend ? "cp-has-selection" : ""}`}>
       {/* SIDEBAR */}
 
-      <div className="chat-sidebar">
+      <div className="cp-sidebar">
+        <div className="cp-sidebar-header">
+          <span className="cp-sidebar-title">Messages</span>
 
-        <div className="sidebar-header">
-
-          <span>Messages</span>
-
-          <div className="sidebar-top-menu">
-
+          <div className="cp-menu-wrap">
             <button
-              className="sidebar-menu-button"
-              onClick={() =>
-                setShowSidebarMenu(prev => !prev)
-              }
+              className="cp-icon-btn"
+              onClick={() => setShowSidebarMenu((prev) => !prev)}
+              aria-label="More options"
             >
-              ⋮
+              <FaEllipsisV />
             </button>
 
             {showSidebarMenu && (
-
-              <div className="sidebar-dropdown">
-
-                <div
-                  className="sidebar-dropdown-item"
+              <div className="cp-dropdown">
+                <button
+                  className="cp-dropdown-item"
                   onClick={() => {
-                    window.location.href =
-                      "/blocked-users";
+                    window.location.href = "/blocked-users";
                   }}
                 >
                   Blocked Users
-                </div>
-
+                </button>
               </div>
             )}
-
           </div>
-
         </div>
 
-        <div className="friends-list">
-
-          {friends.map(friend => (
-
-            <div
+        <div className="cp-friends-list">
+          {friends.map((friend) => (
+            <button
               key={friend.id}
-              className={`chat-user ${
-                selectedFriend?.id === friend.id
-                  ? "selected"
-                  : ""
-              }`}
-              onClick={() =>
-                setSelectedFriend(friend)
-              }
+              className={`cp-friend ${selectedFriend?.id === friend.id ? "cp-is-selected" : ""}`}
+              onClick={() => setSelectedFriend(friend)}
             >
-
-              <div className="friend-name">
+              <span
+                className="cp-avatar-btn"
+                role="button"
+                tabIndex={0}
+                aria-label={`View ${friend.userName}'s photo`}
+                onClick={(e) => openProfileZoom(friend, e)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") openProfileZoom(friend, e);
+                }}
+              >
                 {friend.profileImage ? (
-                  <img 
-                    src={friend.profileImage} 
-                    alt={friend.userName}
-                    className="friend-profile-image"
-                  />
+                  <img src={friend.profileImage} alt={friend.userName} className="cp-avatar-img" />
                 ) : (
-                  <div className="friend-profile-image-placeholder">
+                  <span className={`cp-avatar-placeholder cp-avatar--${accentFor(friend.userName)}`}>
                     {friend.userName.charAt(0).toUpperCase()}
-                  </div>
+                  </span>
                 )}
-                
-                {friend.userName}
-              </div>
+              </span>
 
-            </div>
+              <span className="cp-friend-name">{friend.userName}</span>
+            </button>
           ))}
-
         </div>
-
       </div>
 
       {/* MAIN */}
 
-      <div className="chat-main">
-
+      <div className="cp-main">
         {!selectedFriend ? (
-
-          <div className="empty-chat">
-
-            <h2>Select a friend</h2>
-
+          <div className="cp-empty">
+            <FaComments className="cp-empty-icon" />
+            <p className="cp-empty-title">Select a friend</p>
+            <p className="cp-empty-copy">Pick someone from the list to start chatting.</p>
           </div>
-
         ) : (
-
           <>
-
             {/* HEADER */}
 
-            <div className="chat-header">
-
-              <div className="chat-friend-name">
-                {selectedFriend.userName}
-              </div>
-
-              <button
-                className="menu-button"
-                onClick={() =>
-                  setShowChatMenu(prev => !prev)
-                }
-              >
-                ⋮
+            <div className="cp-chat-header">
+              <button className="cp-header-back" onClick={() => setSelectedFriend(null)} aria-label="Back to friends">
+                <FaArrowLeft />
               </button>
 
-              {showChatMenu && (
+              <span
+                className="cp-avatar-btn cp-avatar-btn--md"
+                role="button"
+                tabIndex={0}
+                aria-label={`View ${selectedFriend.userName}'s photo`}
+                onClick={(e) => openProfileZoom(selectedFriend, e)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") openProfileZoom(selectedFriend, e);
+                }}
+              >
+                {selectedFriend.profileImage ? (
+                  <img
+                    src={selectedFriend.profileImage}
+                    alt={selectedFriend.userName}
+                    className="cp-avatar-img"
+                  />
+                ) : (
+                  <span className={`cp-avatar-placeholder cp-avatar--${accentFor(selectedFriend.userName)}`}>
+                    {selectedFriend.userName.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </span>
 
-                <div className="chat-menu">
+              <span className="cp-chat-friend-name">{selectedFriend.userName}</span>
 
-                  <div
-                    className="chat-menu-item danger"
-                    onClick={handleBlockUser}
-                  >
-                    Block
+              <div className="cp-menu-wrap cp-menu-wrap--end">
+                <button
+                  className="cp-icon-btn"
+                  onClick={() => setShowChatMenu((prev) => !prev)}
+                  aria-label="Chat options"
+                >
+                  <FaEllipsisV />
+                </button>
+
+                {showChatMenu && (
+                  <div className="cp-dropdown cp-dropdown--right">
+                    <button className="cp-dropdown-item cp-dropdown-item--danger" onClick={handleBlockUser}>
+                      Block
+                    </button>
                   </div>
-
-                </div>
-              )}
-
+                )}
+              </div>
             </div>
 
             {/* MESSAGES */}
 
-            <div className="chat-messages">
+            <div className="cp-messages">
+              {filteredChat.map((msg) => {
+                const isMe = String(msg.fromUserId) === String(userId);
 
-              {filteredChat.map(msg => {
-
-                const isMe =
-                  String(msg.fromUserId)
-                  === String(userId);
-
-                const replyMessage =
-                  findReplyMessage(
-                    msg.replyToMessageId
-                  );
+                const replyMessage = findReplyMessage(msg.replyToMessageId);
 
                 return (
-
-                  <div
-                    key={msg.messageId}
-                    className={`message-row ${
-                      isMe ? "me" : "other"
-                    }`}
-                  >
-                    <div className="message-bubble">
-
+                  <div key={msg.messageId} className={`cp-message-row ${isMe ? "cp-me" : "cp-other"}`}>
+                    <div className="cp-message-bubble">
                       {/* REPLY PREVIEW */}
 
-                      {replyMessage && (
-
-                        <div className="reply-preview">
-
-                          {replyMessage.message}
-
-                        </div>
-                      )}
+                      {replyMessage && <div className="cp-reply-preview">{replyMessage.message}</div>}
 
                       {/* MESSAGE */}
 
-                      {
-                          msg.deletedForEveryone ? (
-                          <span
-                              style={{
-                                  fontStyle: "italic",
-                                  color: "#888"
-                              }}
-                          >
-                              This message was deleted
-                          </span>
+                      {msg.deletedForEveryone ? (
+                        <span className="cp-deleted-text">This message was deleted</span>
                       ) : msg.type === "share_post" ? (
+                        <div className="cp-shared-post">
+                          <div className="cp-shared-post-header">Shared a post</div>
+                          <div className="cp-shared-post-title">{msg.postTitle}</div>
 
-                          <div className="shared-post-card">
+                          {msg.postImage && (
+                            <img src={msg.postImage} alt={msg.postTitle} className="cp-shared-post-image" />
+                          )}
 
-                              <div className="shared-post-header">
-                                  Shared a post
-                              </div>
-
-                              <div className="shared-post-title">
-                                  {msg.postTitle}
-                              </div>
-
-                              {
-                                  msg.postImage && (
-                                      <img
-                                          src={msg.postImage}
-                                          alt={msg.postTitle}
-                                          className="shared-post-image"
-                                      />
-                                  )
-                              }
-
-                              <button
-                                  onClick={() =>
-                                      window.location.href =
-                                          `/post/${msg.postId}`
-                                  }
-                              >
-                                  View Post
-                              </button>
-
-                          </div>
-
+                          <button
+                            className="cp-shared-post-btn"
+                            onClick={() => (window.location.href = `/post/${msg.postId}`)}
+                          >
+                            View Post
+                          </button>
+                        </div>
                       ) : (
-                          msg.message
-                      )
-                      }
+                        <span className="cp-message-text">{msg.message}</span>
+                      )}
 
                       {/* ACTIONS */}
 
-                      <div className="message-actions">
+                      <div className="cp-message-actions">
+                        {!msg.deletedForEveryone && (
+                          <>
+                            <button onClick={() => setReplyingTo(msg)} aria-label="Reply">
+                              <MdReply />
+                            </button>
 
-                          {
-                            !msg.deletedForEveryone && (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    setReplyingTo(msg)
-                                  }
-                                >
-                                  <MdReply />
-                                </button>
+                            <button onClick={() => toggleStar(msg)} aria-label="Star">
+                              {msg.starred ? <FaStar className="cp-star-filled" /> : <FaRegStar />}
+                            </button>
+                          </>
+                        )}
 
-                                <button
-                                  onClick={() =>
-                                    toggleStar(msg)
-                                  }
-                                >
-                                  {msg.starred ? "⭐" : "☆"}
-                                </button>
-                              </>
-                            )
-                          }
-
-                          {
-                            isMe && !msg.deletedForEveryone && (
-
-                              <button
-                                onClick={() => deleteForEveryone(msg)}
-                              >
-                                <FaTrashAlt />
-                              </button>
-
-                            )
-                          }
-
-                        </div>
-
+                        {isMe && !msg.deletedForEveryone && (
+                          <button onClick={() => deleteForEveryone(msg)} aria-label="Delete for everyone">
+                            <FaTrashAlt />
+                          </button>
+                        )}
+                      </div>
                     </div>
-
                   </div>
                 );
               })}
 
               <div ref={messagesEndRef} />
-
             </div>
 
             {/* REPLY BAR */}
 
             {replyingTo && (
-
-              <div className="replying-bar">
-
-                Replying to:
-                {" "}
-                {replyingTo.message}
-
-                <button
-                  onClick={() =>
-                    setReplyingTo(null)
-                  }
-                >
-                  ✕
+              <div className="cp-replying-bar">
+                <span className="cp-replying-label">Replying to</span>
+                <span className="cp-replying-text">{replyingTo.message}</span>
+                <button onClick={() => setReplyingTo(null)} aria-label="Cancel reply">
+                  <FaTimes />
                 </button>
-
               </div>
             )}
 
-            
             {/* INPUT */}
 
-            <div className="chat-input-area">
-
+            <div className="cp-input-area">
               <input
                 type="text"
                 value={message}
-                onChange={(e) =>
-                  setMessage(e.target.value)
-                }
+                onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message..."
+                className="cp-input"
               />
 
-              <button onClick={sendMessage}>
-                Send
+              <button className="cp-send-btn" onClick={sendMessage} aria-label="Send message">
+                <FaPaperPlane />
               </button>
-
             </div>
-
           </>
         )}
-
       </div>
 
+      {/* PROFILE ZOOM LIGHTBOX — new feature */}
+
+      {zoomedProfile && (
+        <div className="cp-lightbox" onClick={closeProfileZoom}>
+          <div className="cp-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+            <button className="cp-lightbox-close" onClick={closeProfileZoom} aria-label="Close">
+              <FaTimes />
+            </button>
+
+            {zoomedProfile.profileImage ? (
+              <img src={zoomedProfile.profileImage} alt={zoomedProfile.userName} className="cp-lightbox-img" />
+            ) : (
+              <span className={`cp-lightbox-placeholder cp-avatar--${accentFor(zoomedProfile.userName)}`}>
+                {zoomedProfile.userName.charAt(0).toUpperCase()}
+              </span>
+            )}
+
+            <p className="cp-lightbox-name">{zoomedProfile.userName}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,444 +1,671 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
-/* ==========================================================
-   TOKENS
-   A "code editor" identity: deep near-black canvas, a
-   syntax-highlight inspired accent set, monospace for anything
-   structural (labels, titlebar, gutter), Inter for things meant
-   to be typed/read as prose (placeholders, body copy).
-========================================================== */
+/* ======================================================================
+   DESIGN TOKENS — same system as Home.css / AuthPage.css. Re-declaring
+   is harmless (CSS custom properties are idempotent) and keeps this
+   file self-contained if it's the only stylesheet loaded on this route.
+   ====================================================================== */
 :root {
-  --bg-deep: #090c10;
-  --bg-panel: rgba(19, 23, 30, 0.72);
-  --bg-field: rgba(255, 255, 255, 0.035);
-  --border: rgba(148, 163, 184, 0.14);
-  --border-strong: rgba(148, 163, 184, 0.26);
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
-  --text: #e6edf3;
-  --text-dim: #7d8998;
-  --text-faint: #4b5563;
+  --bg: #f7f7f9;
+  --surface: rgba(20, 19, 26, 0.035);
+  --surface-hover: rgba(20, 19, 26, 0.06);
+  --surface-solid: #ffffff;
 
-  --blue: #58a6ff;   /* function / keyword */
-  --green: #7ee787;  /* string / success */
-  --purple: #c792ea; /* keyword accent */
-  --coral: #f47067;  /* error / warn */
+  --textColor: #14131a;
+  --textColor-muted: #625f6d;
+  --textColor-faint: #767480;
+  --on-primary: #ffffff;
 
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-  --font-sans: 'Inter', sans-serif;
+  --border: rgba(20, 19, 26, 0.09);
+  --border-strong: rgba(20, 19, 26, 0.18);
+  --focus-ring: rgba(124, 92, 252, 0.22);
+
+  --primary: #7c5cfc;
+  --primary-strong: #6a3ffb;
+  --primary-soft: rgba(124, 92, 252, 0.12);
+  --primary-fg: #5b3ce8;
+  --teal: #0f9c8c;
+  --rose: #d63d72;
+
+  --success: #1a9c6c;
+  --success-soft: rgba(26, 156, 108, 0.1);
+  --danger: #e5484d;
+  --danger-soft: rgba(229, 72, 77, 0.1);
+
+  --shadow-color: 220 30% 12%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06);
+  --shadow-md: 0 12px 28px -12px hsl(var(--shadow-color) / 0.22);
+  --shadow-lg: 0 30px 70px -28px hsl(var(--shadow-color) / 0.32);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --radius-full: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur-med: 280ms;
+  --dur-slow: 520ms;
+
+  color-scheme: light;
 }
 
-/* ================= PAGE ================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #07070b;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.075);
+    --surface-solid: #131319;
 
-.adding_container {
+    --textColor: #f4f3f8;
+    --textColor-muted: #a3a1ad;
+    --textColor-faint: #6c6a76;
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --focus-ring: rgba(167, 139, 250, 0.3);
+
+    --primary: #a78bfa;
+    --primary-strong: #8f6bf7;
+    --primary-soft: rgba(167, 139, 250, 0.16);
+    --primary-fg: #a78bfa;
+    --teal: #2dd4bf;
+    --rose: #fb7185;
+
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+
+    --shadow-color: 260 60% 2%;
+
+    color-scheme: dark;
+  }
+}
+
+/* ======================================================================
+   PAGE SHELL
+   ====================================================================== */
+.ap-page {
+  position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  position: relative;
-
-  background:
-    radial-gradient(circle at 20% 15%, rgba(88, 166, 255, 0.06), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(199, 146, 234, 0.05), transparent 50%),
-    var(--bg-deep);
-  background-attachment: fixed;
-
-  padding: 30px 20px;
-  overflow: hidden;
+  background: var(--bg);
+  color: var(--textColor);
+  overflow-x: hidden;
+  isolation: isolate;
+  padding: clamp(24px, 5vw, 56px) var(--space-4);
 }
 
-/* faint code-grid atmosphere */
-.adding_container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at 50% 40%, black 0%, transparent 70%);
+.page-mesh {
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
   pointer-events: none;
+  background: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 45%),
+    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--teal) 9%, transparent), transparent 42%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--rose) 8%, transparent), transparent 48%);
+  filter: blur(80px);
+  animation: mesh-drift 34s ease-in-out infinite alternate;
 }
 
-/* ================= TITLE ================= */
-
-.adding_container .title {
-  font-family: var(--font-mono);
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin-bottom: 25px;
-  color: var(--text);
-  text-align: center;
-  position: relative;
-  z-index: 1;
-
-  opacity: 0;
-  animation: rise 0.6s ease forwards;
-}
-
-.adding_container .title::after {
-  content: "";
-  display: inline-block;
-  width: 9px;
-  height: 22px;
-  margin-left: 8px;
-  background: var(--green);
-  vertical-align: -4px;
-  animation: blink 1.1s step-end infinite;
-}
-
-/* ================= CARD (terminal window) ================= */
-
-.adding_container .adding_card {
-  width: 100%;
-  max-width: 500px;
-  padding: 52px 28px 28px;
-  position: relative;
-  z-index: 1;
-
-  border-radius: 14px;
-  backdrop-filter: blur(20px);
-  background: var(--bg-panel);
-
-  border: 1px solid var(--border);
-  box-shadow:
-    0 25px 70px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  counter-reset: line;
-
-  opacity: 0;
-  transform: translateY(18px);
-  animation: rise 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s forwards;
-
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.adding_container .adding_card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-/* titlebar chrome, drawn without touching the JSX */
-.adding_container .adding_card::before {
-  content: "solved.js";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 38px;
-
-  display: flex;
-  align-items: center;
-  padding-left: 78px;
-
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-dim);
-
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid var(--border);
-  border-radius: 14px 14px 0 0;
-}
-
-/* traffic-light dots */
-.adding_container .adding_card::after {
-  content: "";
-  position: absolute;
-  top: 14px;
-  left: 20px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--coral);
-  box-shadow:
-    18px 0 0 #e3b341,
-    36px 0 0 var(--green);
-  opacity: 0.85;
-}
-
-/* staggered field entrance */
-.adding_container .input,
-.adding_container .visibility-section {
-  opacity: 0;
-  animation: rise 0.5s ease forwards;
-}
-.adding_container .input:nth-of-type(1) { animation-delay: 0.18s; }
-.adding_container .input:nth-of-type(2) { animation-delay: 0.24s; }
-.adding_container .input:nth-of-type(3) { animation-delay: 0.3s; }
-.adding_container .input:nth-of-type(4) { animation-delay: 0.36s; }
-.adding_container .visibility-section { animation-delay: 0.42s; }
-.adding_container .button { animation-delay: 0.48s; opacity: 0; animation-name: rise; animation-fill-mode: forwards; animation-duration: 0.5s; }
-
-/* ================= INPUT (editor field w/ gutter) ================= */
-
-.adding_container .input {
-  counter-increment: line;
-  position: relative;
-
-  width: 100%;
-  padding: 12px 14px 12px 40px;
-
-  border-radius: 8px;
-  border: 1px solid var(--border);
-
-  background: var(--bg-field);
-
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 14px;
-
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-/* line-number gutter, editor-style */
-.adding_container .input::before {
-  content: counter(line);
-  position: absolute;
-  left: 14px;
-  top: 13px;
-
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-faint);
-  pointer-events: none;
-}
-
-.adding_container .input::placeholder {
-  color: rgba(226, 232, 240, 0.4);
-}
-
-.adding_container .input:focus {
-  border-color: var(--blue);
-  background: rgba(88, 166, 255, 0.05);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.14);
-}
-
-.adding_container .input:focus::before {
-  color: var(--blue);
-}
-
-/* cycle accent color per field so the gutter reads like syntax highlighting */
-.adding_container .input:nth-of-type(2):focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(126, 231, 135, 0.14); background: rgba(126, 231, 135, 0.05); }
-.adding_container .input:nth-of-type(2):focus::before { color: var(--green); }
-
-.adding_container .input:nth-of-type(3):focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(199, 146, 234, 0.14); background: rgba(199, 146, 234, 0.05); }
-.adding_container .input:nth-of-type(3):focus::before { color: var(--purple); }
-
-.adding_container .input:nth-of-type(4):focus { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(244, 112, 103, 0.14); background: rgba(244, 112, 103, 0.05); }
-.adding_container .input:nth-of-type(4):focus::before { color: var(--coral); }
-
-/* ================= TEXTAREA ================= */
-
-.adding_container textarea.input {
-  resize: vertical;
-  min-height: 84px;
-  padding-top: 13px;
-}
-
-.adding_container textarea.input::before {
-  top: 13px;
-}
-
-/* ================= VISIBILITY ================= */
-
-.adding_container .visibility-section {
-  counter-increment: line;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.adding_container .visibility-label {
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-}
-
-.adding_container .visibility-label::before {
-  content: counter(line) "  ";
-  color: var(--text-faint);
-}
-
-.adding_container .visibility-input {
-  width: 100%;
-  padding: 12px 14px;
-
-  border-radius: 8px;
-  border: 1px solid var(--border);
-
-  background: var(--bg-field);
-  color: var(--text);
-  font-family: var(--font-sans);
-
-  font-size: 14px;
-  cursor: pointer;
-
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--blue) 50%),
-    linear-gradient(135deg, var(--blue) 50%, transparent 50%);
-  background-position:
-    calc(100% - 20px) calc(50% - 3px),
-    calc(100% - 14px) calc(50% - 3px);
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-}
-
-.adding_container .visibility-input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.14);
-}
-
-.adding_container .visibility-input option {
-  background: #12161d;
-  color: var(--text);
-}
-
-/* ================= BUTTON ================= */
-
-.adding_container .button {
-  margin-top: 10px;
-  padding: 14px;
-  position: relative;
-  overflow: hidden;
-
-  border-radius: 10px;
-  border: 1px solid rgba(88, 166, 255, 0.4);
-
-  cursor: pointer;
-
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-
-  color: var(--bg-deep);
-  background: linear-gradient(135deg, var(--green), var(--blue));
-
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
-}
-
-.adding_container .button::before {
-  content: "$ ";
-  opacity: 0.5;
-}
-
-/* shimmer sweep on hover, one clean pass rather than a looping effect */
-.adding_container .button::after {
-  content: "";
-  position: absolute;
+.page-grain {
+  position: fixed;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.6s ease;
+  z-index: -1;
+  opacity: 0.035;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
-.adding_container .button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(88, 166, 255, 0.35);
-}
-
-.adding_container .button:hover::after {
-  transform: translateX(120%);
-}
-
-.adding_container .button:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* ================= MESSAGE (terminal stdout) ================= */
-
-.adding_container .message {
-  margin-top: 6px;
-  padding: 10px 12px;
-  border-radius: 8px;
-
-  font-family: var(--font-mono);
-  font-size: 13px;
-  text-align: left;
-
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-
-  opacity: 0;
-  transform: translateY(6px);
-  animation: rise 0.35s ease forwards;
-}
-
-.adding_container .message.success {
-  color: var(--green);
-  border-color: rgba(126, 231, 135, 0.3);
-}
-
-.adding_container .message.success::before {
-  content: "✓ ";
-}
-
-.adding_container .message.error {
-  color: var(--coral);
-  border-color: rgba(244, 112, 103, 0.3);
-}
-
-.adding_container .message.error::before {
-  content: "✗ ";
-}
-
-/* ================= KEYFRAMES ================= */
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes mesh-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(3%, -2%) rotate(4deg); }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .adding_container .title,
-  .adding_container .adding_card,
-  .adding_container .input,
-  .adding_container .visibility-section,
-  .adding_container .button,
-  .adding_container .message,
-  .adding_container .title::after {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+/* ======================================================================
+   SHELL / LAYOUT / BACK LINK
+   ====================================================================== */
+.ap-shell {
+  width: 100%;
+  max-width: 1120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ap-layout {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: clamp(20px, 3vw, var(--space-6));
+  align-items: stretch;
+}
+
+@media (max-width: 860px) {
+  .ap-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ap-aside {
+    order: 2;
+    min-height: 240px;
+  }
+
+  .ap-card {
+    order: 1;
   }
 }
 
-/* ================= RESPONSIVE ================= */
+.ap-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-3);
+  margin-left: calc(var(--space-3) * -1);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--textColor-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
 
-@media (max-width: 768px) {
-  .adding_container .adding_card {
-    max-width: 95%;
-    padding: 46px 20px 22px;
+.ap-back:hover {
+  background: var(--surface-hover);
+  color: var(--textColor);
+  transform: translateX(-2px);
+}
+
+.ap-back:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ======================================================================
+   ASIDE — a continuously scrolling activity feed. Unlike a fixed-size
+   widget, a looping scroll fills whatever height the panel ends up at
+   (which depends on the form next to it) by design — there's no size
+   to get wrong, and no way for it to leave a gap.
+   ====================================================================== */
+.ap-aside {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 360px;
+  padding: clamp(22px, 3vw, 30px) 0 0;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: card-in var(--dur-slow) var(--ease-out) forwards;
+}
+
+.ap-aside-glow {
+  position: absolute;
+  inset: -35%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 24% 20%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 55%),
+    radial-gradient(circle at 82% 85%, color-mix(in srgb, var(--teal) 12%, transparent), transparent 55%);
+  filter: blur(50px);
+  animation: mesh-drift 26s ease-in-out infinite alternate;
+}
+
+.ap-aside-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 clamp(22px, 3vw, 30px) var(--space-4);
+}
+
+.ap-aside-kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  color: var(--primary-fg);
+}
+
+.ap-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--textColor-faint);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+}
+
+.ap-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--success) 70%, transparent);
+  animation: live-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Scrolling track — the entry list is rendered twice back-to-back in
+   the JSX, and this animates exactly halfway (-50%) before snapping
+   back to 0, which lines up perfectly with the duplicate so the loop
+   is seamless. A soft mask fades rows in/out at the panel's edges. */
+.ap-feed {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.ap-feed-track {
+  display: flex;
+  flex-direction: column;
+  animation: feed-scroll 26s linear infinite;
+}
+
+.ap-aside:hover .ap-feed-track {
+  animation-play-state: paused;
+}
+
+@keyframes feed-scroll {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+.ap-feed-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) clamp(22px, 3vw, 30px);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.ap-feed-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.ap-feed-dot--primary { background: var(--primary-fg); box-shadow: 0 0 8px color-mix(in srgb, var(--primary-fg) 70%, transparent); }
+.ap-feed-dot--teal { background: var(--teal); box-shadow: 0 0 8px color-mix(in srgb, var(--teal) 70%, transparent); }
+.ap-feed-dot--rose { background: var(--rose); box-shadow: 0 0 8px color-mix(in srgb, var(--rose) 70%, transparent); }
+
+.ap-feed-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--textColor);
+}
+
+.ap-feed-meta {
+  flex-shrink: 0;
+  color: var(--textColor-faint);
+}
+
+/* ======================================================================
+   CARD
+   ====================================================================== */
+.ap-card {
+  position: relative;
+  min-width: 0;
+  padding: clamp(28px, 4.5vw, 44px);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: card-in var(--dur-slow) var(--ease-out) forwards;
+  animation-delay: 90ms;
+}
+
+@keyframes card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ap-card-glow {
+  position: absolute;
+  inset: -30%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 55%),
+    radial-gradient(circle at 90% 100%, color-mix(in srgb, var(--teal) 9%, transparent), transparent 55%);
+  filter: blur(60px);
+}
+
+.ap-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: var(--primary-fg);
+  margin: 0 0 var(--space-3);
+}
+
+.ap-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 27px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--textColor);
+  margin: 0 0 8px;
+}
+
+.ap-subtitle {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--textColor-muted);
+  margin: 0 0 var(--space-6);
+  max-width: 42ch;
+}
+
+/* ======================================================================
+   FORM
+   ====================================================================== */
+.ap-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.ap-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ap-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 420px) {
+  .ap-field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--textColor-muted);
+}
+
+.ap-field-icon {
+  font-size: 12px;
+  color: var(--textColor-faint);
+}
+
+.ap-field-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--textColor);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+
+.ap-field-input::placeholder {
+  color: var(--textColor-faint);
+}
+
+.ap-field-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--surface-solid);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+.ap-field-textarea {
+  height: auto;
+  min-height: 108px;
+  padding: var(--space-3) var(--space-4);
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.ap-field-mono {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Visibility — a segmented control instead of a bare <select>, so the  */
+/* three states (and what each one means) are visible at a glance.      */
+/* ------------------------------------------------------------------ */
+.ap-visibility-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ap-visibility-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring);
+}
+
+.ap-visibility-option:hover {
+  background: var(--surface-hover);
+}
+
+.ap-visibility-option:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ap-visibility-option.ap-is-active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.ap-visibility-icon {
+  flex-shrink: 0;
+  font-size: 15px;
+  color: var(--textColor-faint);
+  transition: color var(--dur-fast) ease;
+}
+
+.ap-visibility-option.ap-is-active .ap-visibility-icon {
+  color: var(--primary-fg);
+}
+
+.ap-visibility-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ap-visibility-name {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--textColor);
+}
+
+.ap-visibility-hint {
+  font-size: 12px;
+  color: var(--textColor-faint);
+}
+
+/* ======================================================================
+   SUBMIT + MESSAGE
+   ====================================================================== */
+.ap-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 48px;
+  margin-top: var(--space-1);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--on-primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--primary) 65%, transparent);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast) ease, filter var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+
+.ap-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 32px -12px color-mix(in srgb, var(--primary) 70%, transparent);
+}
+
+.ap-submit-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.ap-submit-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ap-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.ap-submit-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.ap-form-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  animation: message-in var(--dur-med) var(--ease-out);
+}
+
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ap-form-message.ap-is-success {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.ap-form-message.ap-is-error {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* ======================================================================
+   MOTION PREFERENCE
+   ====================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .page-mesh,
+  .ap-aside-glow,
+  .ap-live-dot,
+  .ap-feed-track,
+  .ap-submit-spinner {
+    animation: none !important;
   }
 
-  .adding_container .title {
-    font-size: 24px;
+  .ap-feed {
+    overflow-y: auto;
   }
 
-  .adding_container .adding_card::before {
-    padding-left: 68px;
-    font-size: 11px;
+  .ap-card,
+  .ap-aside {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+
+  .ap-field-input,
+  .ap-submit-btn,
+  .ap-visibility-option,
+  .ap-back {
+    transition: none;
   }
 }

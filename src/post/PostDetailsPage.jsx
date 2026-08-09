@@ -1,22 +1,34 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FiEdit2, FiCheck, FiX, FiLoader } from "react-icons/fi";
+import { FaArrowLeft, FaPaperPlane } from "react-icons/fa";
 
 import CommentCard from "./CommentCard";
 import LikeButton from "./LikeButton";
+import { useUserAvatar } from "../hooks/useUserAvatar";
 
 import "./PostDetailsPage.css";
+
+const AVATAR_ACCENTS = ["primary", "teal", "rose"];
+
+function accentFor(name) {
+    const code = (name || "?").charCodeAt(0) || 0;
+    return AVATAR_ACCENTS[code % AVATAR_ACCENTS.length];
+}
 
 const PostDetailsPage = () => {
 
     const { postId } = useParams();
+    const navigate = useNavigate();
 
     const [post, setPost] = useState(null);
     const [Userproblem, setUserProblem] = useState(null);
     const [comments, setComments] = useState([]);
     const [commentText, setCommentText] = useState("");
+
+    const profilePicture = useUserAvatar(post?.userId);
 
     const [currentUser, setCurrentUser] = useState(null);
 
@@ -216,216 +228,213 @@ const PostDetailsPage = () => {
     };
 
     if (!post) {
-
         return (
-            <div className="post-details-loading">
-                Loading...
+            <div className="pd-page">
+                <div className="pd-shell">
+                    <div className="pd-skeleton-card">
+                        <div className="pd-skeleton-header">
+                            <div className="pd-skeleton-avatar" />
+                            <div className="pd-skeleton-bar pd-skeleton-bar--name" />
+                        </div>
+                        <div className="pd-skeleton-bar pd-skeleton-bar--title" />
+                        <div className="pd-skeleton-image" />
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
+        <div className="pd-page">
+            <div className="pd-shell">
+                <button className="pd-back" onClick={() => navigate(-1)}>
+                    <FaArrowLeft />
+                    Back
+                </button>
 
-        <div className="post-details-container">
-
-            <div className="post-details-card">
-
-                <h2>
-                    {post.userName}
-                </h2>
-
-                <div className="problem-title">
-                    {post.questionTitle}
-                </div>
-
-                {post.imageUrls && post.imageUrls.length > 0 && (
-                    <div className="post-images-gallery">
-                        {post.imageUrls.map((url, index) => (
-                            <img
-                                key={index}
-                                src={url}
-                                alt={`${post.questionTitle} - image ${index + 1}`}
-                                className="post-detail-image"
-                            />
-                        ))}
+                <div className="pd-card">
+                    <div className="pd-header">
+                        {profilePicture ? (
+                            <img src={profilePicture} alt={post.userName} className="pd-avatar-img" />
+                        ) : (
+                            <span className={`pd-avatar pd-avatar--${accentFor(post.userName)}`}>
+                                {post.userName?.charAt(0)?.toUpperCase()}
+                            </span>
+                        )}
+                        <h2 className="pd-username">{post.userName}</h2>
                     </div>
-                )}
 
-                {Userproblem && !isEditing && (
-                    <div className="problem-details">
-                        <div className="problem-details-header">
-                            <div className="problem-meta">
+                    <div className="pd-title">{post.questionTitle}</div>
+
+                    {post.imageUrls && post.imageUrls.length > 0 && (
+                        <div className="pd-gallery">
+                            {post.imageUrls.map((url, index) => (
+                                <img
+                                    key={index}
+                                    src={url}
+                                    alt={`${post.questionTitle} - image ${index + 1}`}
+                                    className="pd-gallery-image"
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {Userproblem && !isEditing && (
+                        <div className="pd-details">
+                            <div className="pd-details-header">
                                 {post.difficulty && (
-                                    <div className={`difficulty-badge difficulty-${post.difficulty.toLowerCase()}`}>
-                                        {Userproblem.intuition && (
-                                            <div className="problem-intuition">
-                                                {Userproblem.intuition}
-                                            </div>
-                                        )}
-                                    </div>
+                                    <span
+                                        className={`pd-difficulty pd-difficulty--${post.difficulty.toLowerCase()}`}
+                                    >
+                                        {post.difficulty}
+                                    </span>
+                                )}
+
+                                {isOwner && (
+                                    <button
+                                        className="pd-edit-btn"
+                                        onClick={startEditing}
+                                        title="Edit details"
+                                    >
+                                        <FiEdit2 size={13} />
+                                        <span>Edit</span>
+                                    </button>
                                 )}
                             </div>
 
-                            {isOwner && (
-                                <button
-                                    className="edit-problem-button"
-                                    onClick={startEditing}
-                                    title="Edit details"
-                                >
-                                    <FiEdit2 size={14} />
-                                    <span>Edit</span>
-                                </button>
+                            {Userproblem.intuition && (
+                                <div className="pd-intuition">{Userproblem.intuition}</div>
+                            )}
+
+                            {(Userproblem.timeComplexity || Userproblem.spaceComplexity) && (
+                                <div className="pd-complexity-row">
+                                    {Userproblem.timeComplexity && (
+                                        <span className="pd-complexity-pill pd-complexity-pill--time">
+                                            time {Userproblem.timeComplexity}
+                                        </span>
+                                    )}
+                                    {Userproblem.spaceComplexity && (
+                                        <span className="pd-complexity-pill pd-complexity-pill--space">
+                                            space {Userproblem.spaceComplexity}
+                                        </span>
+                                    )}
+                                </div>
                             )}
                         </div>
+                    )}
 
-                        {Userproblem.timeComplexity && (
-                            <div className="problem-complexity">
-                                <strong>Time Complexity:</strong> {Userproblem.timeComplexity}
-                            </div>
-                        )}
-
-                        {Userproblem.spaceComplexity && (
-                            <div className="problem-complexity">
-                                <strong>Space Complexity:</strong> {Userproblem.spaceComplexity}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {Userproblem && isEditing && (
-                    <div className="problem-details problem-edit-form">
-
-                        <label className="edit-field-label">
-                            Intuition
-                            <textarea
-                                className="edit-field-input"
-                                value={editForm.intuition}
-                                onChange={(e) =>
-                                    handleEditChange("intuition", e.target.value)
-                                }
-                                rows={4}
-                                placeholder="What's the key insight for this problem?"
-                            />
-                        </label>
-
-                        <div className="edit-field-row">
-                            <label className="edit-field-label">
-                                Time Complexity
-                                <input
-                                    className="edit-field-input"
-                                    type="text"
-                                    value={editForm.timeComplexity}
+                    {Userproblem && isEditing && (
+                        <div className="pd-details pd-edit-form">
+                            <label className="pd-edit-label">
+                                Intuition
+                                <textarea
+                                    className="pd-edit-input"
+                                    value={editForm.intuition}
                                     onChange={(e) =>
-                                        handleEditChange("timeComplexity", e.target.value)
+                                        handleEditChange("intuition", e.target.value)
                                     }
-                                    placeholder="e.g. O(n)"
+                                    rows={4}
+                                    placeholder="What's the key insight for this problem?"
                                 />
                             </label>
 
-                            <label className="edit-field-label">
-                                Space Complexity
-                                <input
-                                    className="edit-field-input"
-                                    type="text"
-                                    value={editForm.spaceComplexity}
-                                    onChange={(e) =>
-                                        handleEditChange("spaceComplexity", e.target.value)
-                                    }
-                                    placeholder="e.g. O(1)"
-                                />
-                            </label>
-                        </div>
+                            <div className="pd-edit-row">
+                                <label className="pd-edit-label">
+                                    Time Complexity
+                                    <input
+                                        className="pd-edit-input pd-edit-input--mono"
+                                        type="text"
+                                        value={editForm.timeComplexity}
+                                        onChange={(e) =>
+                                            handleEditChange("timeComplexity", e.target.value)
+                                        }
+                                        placeholder="e.g. O(n)"
+                                    />
+                                </label>
 
-                        {saveError && (
-                            <div className="edit-error">
-                                {saveError}
+                                <label className="pd-edit-label">
+                                    Space Complexity
+                                    <input
+                                        className="pd-edit-input pd-edit-input--mono"
+                                        type="text"
+                                        value={editForm.spaceComplexity}
+                                        onChange={(e) =>
+                                            handleEditChange("spaceComplexity", e.target.value)
+                                        }
+                                        placeholder="e.g. O(1)"
+                                    />
+                                </label>
                             </div>
-                        )}
 
-                        <div className="edit-form-actions">
-                            <button
-                                className="edit-save-button"
-                                onClick={saveProblem}
-                                disabled={saving}
-                            >
-                                {saving ? (
-                                    <FiLoader size={14} className="spin-icon" />
-                                ) : (
-                                    <FiCheck size={14} />
-                                )}
-                                <span>{saving ? "Saving..." : "Save"}</span>
-                            </button>
-                            <button
-                                className="edit-cancel-button"
-                                onClick={cancelEditing}
-                                disabled={saving}
-                            >
-                                <FiX size={14} />
-                                <span>Cancel</span>
-                            </button>
+                            {saveError && <div className="pd-edit-error">{saveError}</div>}
+
+                            <div className="pd-edit-actions">
+                                <button
+                                    className="pd-edit-save"
+                                    onClick={saveProblem}
+                                    disabled={saving}
+                                >
+                                    {saving ? (
+                                        <FiLoader size={14} className="pd-spin-icon" />
+                                    ) : (
+                                        <FiCheck size={14} />
+                                    )}
+                                    <span>{saving ? "Saving..." : "Save"}</span>
+                                </button>
+                                <button
+                                    className="pd-edit-cancel"
+                                    onClick={cancelEditing}
+                                    disabled={saving}
+                                >
+                                    <FiX size={14} />
+                                    <span>Cancel</span>
+                                </button>
+                            </div>
                         </div>
+                    )}
 
+                    <div className="pd-stats">
+                        <LikeButton
+                            postId={post.id}
+                            initialCount={post.likesCount}
+                            initiallyLiked={post.likedByCurrentUser}
+                            onToggle={(nowLiked) =>
+                                setPost((prev) => ({
+                                    ...prev,
+                                    likesCount: prev.likesCount + (nowLiked ? 1 : -1)
+                                }))
+                            }
+                        />
                     </div>
-                )}
-
-                <div className="post-stats">
-
-                    <LikeButton
-                        postId={post.id}
-                        initialCount={post.likesCount}
-                        initiallyLiked={post.likedByCurrentUser}
-                        onToggle={(nowLiked) =>
-                            setPost(prev => ({
-                                ...prev,
-                                likesCount: prev.likesCount + (nowLiked ? 1 : -1)
-                            }))
-                        }
-                    />
-
                 </div>
 
+                <div className="pd-comments-card">
+                    <h3 className="pd-comments-title">Comments</h3>
 
-            </div>
+                    <div className="pd-comment-input-row">
+                        <input
+                            className="pd-comment-input"
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") addComment();
+                            }}
+                            placeholder="Write a comment..."
+                        />
 
-            <div className="comments-section">
+                        <button className="pd-comment-send" onClick={addComment} aria-label="Post comment">
+                            <FaPaperPlane />
+                        </button>
+                    </div>
 
-                <h3>
-                    Comments
-                </h3>
-
-                <div className="comment-input">
-
-                    <input
-                        value={commentText}
-                        onChange={(e) =>
-                            setCommentText(
-                                e.target.value
-                            )
-                        }
-                        placeholder="Write a comment..."
-                    />
-
-                    <button
-                        onClick={addComment}
-                    >
-                        Post
-                    </button>
-
+                    {comments.length === 0 ? (
+                        <div className="pd-comments-empty">No comments yet — be the first.</div>
+                    ) : (
+                        comments.map((comment) => <CommentCard key={comment.id} comment={comment} />)
+                    )}
                 </div>
-
-                {comments.map((comment) => (
-
-                    <CommentCard
-                        key={comment.id}
-                        comment={comment}
-                    />
-
-                ))}
-
             </div>
-
         </div>
-
     );
 };
 

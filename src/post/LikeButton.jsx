@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FaRegThumbsUp } from "react-icons/fa6";
+import { FaThumbsUp, FaRegThumbsUp } from "react-icons/fa6";
+import "./LikeButton.css";
 
 const LikeButton = ({ postId, initialCount = 0, initiallyLiked = false, onToggle }) => {
     const [liked, setLiked] = useState(initiallyLiked);
@@ -35,9 +36,13 @@ const LikeButton = ({ postId, initialCount = 0, initiallyLiked = false, onToggle
     };
 
     return (
-        <button className="like-btn" disabled={loading} onClick={handleToggle}>
-            <FaRegThumbsUp className={liked ? "liked" : ""} size={18} />
-            <span>{initialCount}</span>
+        <button
+            className={`lb-btn ${liked ? "lb-is-liked" : ""}`}
+            disabled={loading}
+            onClick={handleToggle}
+        >
+            {liked ? <FaThumbsUp className="lb-icon" /> : <FaRegThumbsUp className="lb-icon" />}
+            <span className="lb-count">{initialCount}</span>
         </button>
     );
 };

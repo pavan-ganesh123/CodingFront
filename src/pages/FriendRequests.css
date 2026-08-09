@@ -1,317 +1,296 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+/* ======================================================================
+   Uses the same design tokens declared in FriendsLayout.css, which is
+   always mounted above this component (it's rendered inside the
+   layout's <Outlet />). No :root re-declaration needed here.
+   ====================================================================== */
 
-/* ==========================================================
-   TOKENS — shared with adding_container for a consistent
-   "code editor" identity across the app
-========================================================== */
-:root {
-  --bg-deep: #090c10;
-  --bg-panel: rgba(19, 23, 30, 0.72);
-  --bg-field: rgba(255, 255, 255, 0.035);
-  --border: rgba(148, 163, 184, 0.14);
-  --border-strong: rgba(148, 163, 184, 0.26);
-
-  --text: #e6edf3;
-  --text-dim: #7d8998;
-  --text-faint: #4b5563;
-
-  --blue: #58a6ff;
-  --green: #7ee787;
-  --purple: #c792ea;
-  --coral: #f47067;
-
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-  --font-sans: 'Inter', sans-serif;
+.frq-page {
+  width: 100%;
 }
 
-/* ================= PAGE ================= */
-
-.friends-container {
-  min-height: 100vh;
-  position: relative;
-
-  color: var(--text);
-
-  background:
-    radial-gradient(circle at 20% 15%, rgba(88, 166, 255, 0.06), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(199, 146, 234, 0.05), transparent 50%),
-    var(--bg-deep);
-  background-attachment: fixed;
-
-  padding: 60px 40px;
-  overflow-x: hidden;
-}
-.friends-container h2 {
-  color: white;
-}
-.friends-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at 50% 20%, black 0%, transparent 70%);
-  pointer-events: none;
+.frq-header {
+  margin-bottom: var(--space-5);
 }
 
-/* ================= TITLE ================= */
-
-.friends-container h2 {
+.frq-kicker {
+  display: block;
   font-family: var(--font-mono);
-  font-size: 28px;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: var(--primary-fg);
+  margin: 0 0 var(--space-3);
+}
+
+.frq-title {
+  font-family: var(--font-display);
+  font-size: clamp(21px, 2.8vw, 25px);
   font-weight: 600;
   letter-spacing: -0.01em;
-
-  margin-bottom: 28px;
-  position: relative;
-  z-index: 1;
-
-  opacity: 0;
-  animation: rise 0.5s ease forwards;
+  color: var(--textColor);
+  margin: 0;
 }
 
-.friends-container h2::before {
-  content: "// ";
-  color: var(--text-faint);
-  font-weight: 500;
-}
-
-/* ================= EMPTY STATE ================= */
-
-.empty {
-  margin-top: 20px;
-  padding: 16px 20px;
-
-  width: fit-content;
-  position: relative;
-  z-index: 1;
-
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: var(--text-dim);
-
-  border-radius: 10px;
-  border: 1px dashed var(--border-strong);
-  background: var(--bg-field);
-
-  opacity: 0;
-  animation: rise 0.5s ease 0.1s forwards;
-}
-
-.empty::before {
-  content: "null ";
-  color: var(--coral);
-}
-
-/* ================= LIST ================= */
-
-.requests-list {
+/* ======================================================================
+   LIST
+   ====================================================================== */
+.frq-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-
-  position: relative;
-  z-index: 1;
-
-  counter-reset: line;
+  gap: var(--space-3);
 }
 
-/* ================= CARD (editor line item) ================= */
+.frq-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: clamp(36px, 7vw, 56px) var(--space-4);
+  color: var(--textColor-faint);
+}
 
-.friend-card {
-  counter-increment: line;
-  position: relative;
+.frq-state-icon {
+  font-size: 22px;
+  margin-bottom: var(--space-2);
+  opacity: 0.6;
+  animation: frq-float 3s ease-in-out infinite;
+}
 
-  width: 100%;
-  max-width: 700px;
+@keyframes frq-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 
-  padding: 16px 20px 16px 52px;
+.frq-state-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--textColor-muted);
+}
 
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-panel);
-  backdrop-filter: blur(16px);
+.frq-state-copy {
+  margin: 0;
+  font-size: 13px;
+  max-width: 32ch;
+}
 
+.frq-state-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 var(--space-4);
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-primary, #fff);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong, var(--primary)));
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--primary) 65%, transparent);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring), filter var(--dur-fast) ease;
+}
+
+.frq-state-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.frq-state-cta:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Skeleton loading                                                     */
+/* ------------------------------------------------------------------ */
+.frq-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.frq-skeleton {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   opacity: 0;
-  transform: translateY(10px);
-  animation: rise 0.4s ease forwards;
-
-  transition: border-color 0.25s ease, background 0.25s ease,
-              transform 0.25s ease, box-shadow 0.25s ease;
+  animation: frq-fade-in var(--dur-med) var(--ease-out) forwards;
 }
 
-/* stagger the first several cards; later ones just inherit last delay */
-.friend-card:nth-child(1) { animation-delay: 0.06s; }
-.friend-card:nth-child(2) { animation-delay: 0.12s; }
-.friend-card:nth-child(3) { animation-delay: 0.18s; }
-.friend-card:nth-child(4) { animation-delay: 0.24s; }
-.friend-card:nth-child(n+5) { animation-delay: 0.3s; }
-
-/* line-number gutter, matching the input fields on the add page */
-.friend-card::before {
-  content: counter(line);
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-faint);
+@keyframes frq-fade-in {
+  to { opacity: 1; }
 }
 
-.friend-card:hover {
-  border-color: var(--border-strong);
-  background: rgba(19, 23, 30, 0.9);
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
-}
-
-.friend-card span {
-  font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: 0.2px;
-}
-
-/* ================= ACCEPT BUTTON ================= */
-
-.friend-card button {
-  padding: 9px 16px;
+.frq-skeleton-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-hover);
   position: relative;
   overflow: hidden;
-
-  border: 1px solid rgba(126, 231, 135, 0.4);
-  border-radius: 8px;
-
-  cursor: pointer;
-
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.01em;
-
-  color: var(--bg-deep);
-  background: linear-gradient(135deg, var(--green), var(--blue));
-
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
-.friend-card button::before {
-  content: "✓ ";
-  opacity: 0.7;
+.frq-skeleton-bar {
+  flex: 1;
+  height: 13px;
+  border-radius: var(--radius-full);
+  background: var(--surface-hover);
+  position: relative;
+  overflow: hidden;
 }
 
-.friend-card button::after {
+.frq-skeleton-btn {
+  flex-shrink: 0;
+  width: 86px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+  position: relative;
+  overflow: hidden;
+}
+
+.frq-skeleton-avatar::after,
+.frq-skeleton-bar::after,
+.frq-skeleton-btn::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.5s ease;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  animation: frq-shimmer 1.4s ease-in-out infinite;
 }
 
-.friend-card button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(126, 231, 135, 0.3);
+@keyframes frq-shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
 }
 
-.friend-card button:hover::after {
-  transform: translateX(120%);
-}
-
-.friend-card button:active {
-  transform: translateY(0) scale(0.97);
-}
-
-/* ================= BACK BUTTON ================= */
-
-.friendreq-back-btn {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  z-index: 2;
-
-  font-family: var(--font-mono);
-  font-size: 13px;
-
-  background: var(--bg-field);
-  color: var(--text-dim);
+/* ------------------------------------------------------------------ */
+/* Request cards                                                        */
+/* ------------------------------------------------------------------ */
+.frq-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-solid);
   border: 1px solid var(--border);
-  border-radius: 8px;
-
-  padding: 9px 16px;
-  cursor: pointer;
-
-  transition: border-color 0.2s ease, background 0.2s ease,
-              color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: frq-card-in var(--dur-med) var(--ease-out) forwards;
+  transition: border-color var(--dur-fast) ease;
 }
 
-.friendreq-back-btn::before {
-  content: "← ";
+@keyframes frq-card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.friendreq-back-btn:hover {
+.frq-card:hover {
   border-color: var(--border-strong);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
 }
 
-.friendreq-back-btn:focus-visible {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
-  outline: none;
+.frq-avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
 }
 
-/* ================= KEYFRAMES ================= */
+.frq-avatar--primary { color: var(--primary-fg); background: color-mix(in srgb, var(--primary) 16%, transparent); }
+.frq-avatar--teal { color: var(--teal); background: color-mix(in srgb, var(--teal) 16%, transparent); }
+.frq-avatar--rose { color: var(--rose); background: color-mix(in srgb, var(--rose) 16%, transparent); }
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+.frq-card-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--textColor);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.frq-accept-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--on-primary, #fff);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong, var(--primary)));
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: filter var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring), opacity var(--dur-fast) ease;
+}
+
+.frq-accept-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.frq-accept-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.frq-accept-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.frq-accept-spinner {
+  animation: frq-spin 0.8s linear infinite;
+}
+
+@keyframes frq-spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .friends-container h2,
-  .empty,
-  .friend-card {
+  .frq-skeleton-avatar::after,
+  .frq-skeleton-bar::after,
+  .frq-skeleton-btn::after,
+  .frq-accept-spinner,
+  .frq-state-icon {
     animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 768px) {
-  .friends-container {
-    padding: 90px 20px 40px;
   }
 
-  .friends-container h2 {
-    font-size: 24px;
+  .frq-card,
+  .frq-skeleton {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
   }
 
-  .friend-card {
-    padding: 14px 16px 14px 44px;
-  }
-
-  .friend-card::before {
-    left: 16px;
-  }
-
-  .friend-card span {
-    font-size: 15px;
-  }
-
-  .friend-card button {
-    padding: 8px 12px;
-    font-size: 12px;
+  .frq-accept-btn,
+  .frq-state-cta,
+  .frq-card {
+    transition: none;
   }
 }

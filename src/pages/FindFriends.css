@@ -1,391 +1,323 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+/* ======================================================================
+   Uses the same design tokens declared in FriendsLayout.css, which is
+   always mounted above this component (it's rendered inside the
+   layout's <Outlet />). No :root re-declaration needed here.
+   ====================================================================== */
 
-/* ==========================================================
-   TOKENS — shared across friends pages
-========================================================== */
-:root {
-  --bg-deep: #090c10;
-  --bg-panel: rgba(19, 23, 30, 0.72);
-  --bg-field: rgba(255, 255, 255, 0.035);
-  --border: rgba(148, 163, 184, 0.14);
-  --border-strong: rgba(148, 163, 184, 0.26);
-
-  --text: #e6edf3;
-  --text-dim: #7d8998;
-  --text-faint: #4b5563;
-
-  --blue: #58a6ff;
-  --green: #7ee787;
-  --purple: #c792ea;
-  --coral: #f47067;
-
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-  --font-sans: 'Inter', sans-serif;
+.ff-page {
+  width: 100%;
+  max-width: 560px;
 }
 
-/* ================= PAGE ================= */
+.ff-header {
+  margin-bottom: var(--space-5);
+}
 
-.friends-container {
-  min-height: 100vh;
+.ff-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: var(--primary-fg);
+  margin: 0 0 var(--space-3);
+}
+
+.ff-title {
+  font-family: var(--font-display);
+  font-size: clamp(21px, 2.8vw, 25px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--textColor);
+  margin: 0 0 8px;
+}
+
+.ff-subtitle {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--textColor-muted);
+  margin: 0;
+}
+
+/* ======================================================================
+   SEARCH
+   ====================================================================== */
+.ff-search-wrap {
   position: relative;
-
-  color: var(--text);
-
-  background:
-    radial-gradient(circle at 20% 15%, rgba(88, 166, 255, 0.06), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(199, 146, 234, 0.05), transparent 50%),
-    var(--bg-deep);
-  background-attachment: fixed;
-
-  padding: 60px 40px;
-  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-5);
 }
-.friends-container h2 {
-  color: white;
-}
-.friends-container::before {
-  content: "";
+
+.ff-search-icon {
   position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at 50% 20%, black 0%, transparent 70%);
+  left: 18px;
+  font-size: 14px;
+  color: var(--textColor-faint);
   pointer-events: none;
 }
 
-/* ================= TITLE ================= */
-
-.friends-container h2 {
-  font-family: var(--font-mono);
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-
-  margin-bottom: 26px;
-  position: relative;
-  z-index: 1;
-
-  opacity: 0;
-  animation: rise 0.5s ease forwards;
-}
-
-.friends-container h2::before {
-  content: "// ";
-  color: var(--text-faint);
-  font-weight: 500;
-}
-
-/* ================= SEARCH BAR ================= */
-
-.search-bar {
-  display: flex;
-  align-items: center;
-
+.ff-search-input {
   width: 100%;
-  max-width: 720px;
-  margin-bottom: 22px;
-  position: relative;
-  z-index: 1;
-
-  opacity: 0;
-  animation: rise 0.5s ease 0.08s forwards;
+  height: 50px;
+  padding: 0 var(--space-4) 0 46px;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  color: var(--textColor);
+  background: var(--surface-solid);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 
-.search-input {
-  flex: 1;
-  width: 100%;
+.ff-search-input::placeholder {
+  color: var(--textColor-faint);
+}
 
-  padding: 13px 16px 13px 38px;
-
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-field);
-
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 14px;
-
+.ff-search-input:focus {
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--focus-ring);
 }
 
-/* search glyph, editor-prompt style */
-.search-bar::before {
-  content: ">";
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-faint);
-
-  transition: color 0.2s ease;
+.ff-search-input:focus ~ .ff-search-icon {
+  color: var(--primary-fg);
 }
 
-.search-bar:focus-within::before {
-  color: var(--blue);
-}
-
-.search-input::placeholder {
-  color: rgba(230, 237, 243, 0.35);
-  font-family: var(--font-sans);
-}
-
-.search-input:focus {
-  border-color: var(--blue);
-  background: rgba(88, 166, 255, 0.05);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.14);
-}
-
-/* ================= LOADING ================= */
-
-.loading {
-  margin-top: 4px;
-  margin-bottom: 20px;
-
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--text-dim);
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  position: relative;
-  z-index: 1;
-}
-
-.loading::before {
-  content: "";
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid var(--border-strong);
-  border-top-color: var(--blue);
-  animation: spin 0.7s linear infinite;
-}
-
-/* ================= EMPTY STATE ================= */
-
-.empty {
-  margin-top: 20px;
-  padding: 16px 20px;
-
-  width: fit-content;
-  max-width: 100%;
-  position: relative;
-  z-index: 1;
-
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-dim);
-  text-align: left;
-
-  border-radius: 10px;
-  border: 1px dashed var(--border-strong);
-  background: var(--bg-field);
-
-  opacity: 0;
-  animation: rise 0.4s ease forwards;
-}
-
-.empty::before {
-  content: "null ";
-  color: var(--coral);
-}
-
-/* ================= USER LIST ================= */
-
-.user-list {
+/* ======================================================================
+   RESULTS
+   ====================================================================== */
+.ff-results {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-
-  width: 100%;
-  max-width: 720px;
-  position: relative;
-  z-index: 1;
-
-  counter-reset: line;
+  gap: var(--space-3);
 }
 
-/* ================= CARD ================= */
+.ff-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: clamp(36px, 7vw, 56px) var(--space-4);
+  color: var(--textColor-faint);
+}
 
-.friend-card {
-  counter-increment: line;
-  position: relative;
+.ff-state-icon {
+  font-size: 20px;
+  margin-bottom: var(--space-2);
+  opacity: 0.6;
+  animation: ff-float 3s ease-in-out infinite;
+}
 
-  width: 100%;
-  padding: 16px 20px 16px 52px;
+@keyframes ff-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-panel);
-  backdrop-filter: blur(16px);
+.ff-state-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--textColor-muted);
+}
 
+.ff-state-copy {
+  margin: 0;
+  font-size: 13px;
+  max-width: 32ch;
+}
+
+/* ------------------------------------------------------------------ */
+/* Skeleton loading                                                     */
+/* ------------------------------------------------------------------ */
+.ff-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ff-skeleton {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   opacity: 0;
-  transform: translateY(10px);
-  animation: rise 0.4s ease forwards;
-
-  transition: border-color 0.25s ease, background 0.25s ease,
-              transform 0.25s ease, box-shadow 0.25s ease;
+  animation: ff-fade-in var(--dur-med) var(--ease-out) forwards;
 }
 
-.friend-card:nth-child(1) { animation-delay: 0.06s; }
-.friend-card:nth-child(2) { animation-delay: 0.12s; }
-.friend-card:nth-child(3) { animation-delay: 0.18s; }
-.friend-card:nth-child(4) { animation-delay: 0.24s; }
-.friend-card:nth-child(n+5) { animation-delay: 0.3s; }
-
-.friend-card::before {
-  content: counter(line);
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-faint);
+@keyframes ff-fade-in {
+  to { opacity: 1; }
 }
 
-.friend-card:hover {
-  border-color: var(--border-strong);
-  background: rgba(19, 23, 30, 0.9);
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
-}
-
-.friend-card span {
-  font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: 0.2px;
-}
-
-/* ================= ADD FRIEND BUTTON ================= */
-
-.friend-card button {
-  padding: 9px 16px;
+.ff-skeleton-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-hover);
   position: relative;
   overflow: hidden;
-
-  border: 1px solid rgba(88, 166, 255, 0.4);
-  border-radius: 8px;
-
-  cursor: pointer;
-
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.01em;
-
-  color: var(--bg-deep);
-  background: linear-gradient(135deg, var(--blue), var(--purple));
-
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
-.friend-card button::before {
-  content: "+ ";
-  opacity: 0.75;
+.ff-skeleton-bar {
+  flex: 1;
+  height: 13px;
+  border-radius: var(--radius-full);
+  background: var(--surface-hover);
+  position: relative;
+  overflow: hidden;
 }
 
-.friend-card button::after {
+.ff-skeleton-btn {
+  flex-shrink: 0;
+  width: 76px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+  position: relative;
+  overflow: hidden;
+}
+
+.ff-skeleton-avatar::after,
+.ff-skeleton-bar::after,
+.ff-skeleton-btn::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.5s ease;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  animation: ff-shimmer 1.4s ease-in-out infinite;
 }
 
-.friend-card button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(88, 166, 255, 0.3);
+@keyframes ff-shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
 }
 
-.friend-card button:hover::after {
-  transform: translateX(120%);
+/* ------------------------------------------------------------------ */
+/* Friend cards                                                         */
+/* ------------------------------------------------------------------ */
+.ff-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: ff-card-in var(--dur-med) var(--ease-out) forwards;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-med) ease;
 }
 
-.friend-card button:active {
-  transform: translateY(0) scale(0.97);
+@keyframes ff-card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* ================= KEYFRAMES ================= */
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+.ff-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md, var(--shadow-sm));
 }
 
-@keyframes spin {
+.ff-avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ff-avatar--primary { color: var(--primary-fg); background: color-mix(in srgb, var(--primary) 16%, transparent); }
+.ff-avatar--teal { color: var(--teal); background: color-mix(in srgb, var(--teal) 16%, transparent); }
+.ff-avatar--rose { color: var(--rose); background: color-mix(in srgb, var(--rose) 16%, transparent); }
+
+.ff-card-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--textColor);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ff-add-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary-fg);
+  background: var(--primary-soft);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring), opacity var(--dur-fast) ease;
+}
+
+.ff-add-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.ff-add-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ff-add-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ff-add-spinner {
+  animation: ff-spin 0.8s linear infinite;
+}
+
+@keyframes ff-spin {
   to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .friends-container h2,
-  .search-bar,
-  .empty,
-  .friend-card {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .loading::before {
+  .ff-skeleton-avatar::after,
+  .ff-skeleton-bar::after,
+  .ff-skeleton-btn::after,
+  .ff-add-spinner,
+  .ff-state-icon {
     animation: none !important;
   }
-}
 
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 768px) {
-  .friends-container {
-    padding: 30px 20px;
+  .ff-card,
+  .ff-skeleton {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
   }
 
-  .friends-container h2 {
-    font-size: 24px;
-  }
-
-  .search-input {
-    padding: 12px 14px 12px 34px;
-    font-size: 14px;
-  }
-
-  .friend-card {
-    padding: 14px 16px 14px 44px;
-  }
-
-  .friend-card::before {
-    left: 16px;
-  }
-
-  .friend-card span {
-    font-size: 15px;
-  }
-
-  .friend-card button {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .empty {
-    padding: 14px 16px;
-    font-size: 13px;
+  .ff-search-input,
+  .ff-add-btn,
+  .ff-card {
+    transition: none;
   }
 }

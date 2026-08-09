@@ -1,427 +1,640 @@
-/* ================= MAIN LAYOUT ================= */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
-.profile-container {
-    min-height: 100vh;
-    display: flex;
-    gap: 30px;
-    padding: 30px;
-    align-items: flex-start;
-    color: white;
-    box-sizing: border-box;
-    overflow: hidden;
+/* ======================================================================
+   DESIGN TOKENS — same system as the rest of the app.
+   ====================================================================== */
+:root {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --bg: #f7f7f9;
+  --surface: rgba(20, 19, 26, 0.035);
+  --surface-hover: rgba(20, 19, 26, 0.06);
+  --surface-solid: #ffffff;
+
+  --textColor: #14131a;
+  --textColor-muted: #625f6d;
+  --textColor-faint: #767480;
+  --on-primary: #ffffff;
+
+  --border: rgba(20, 19, 26, 0.09);
+  --border-strong: rgba(20, 19, 26, 0.18);
+  --focus-ring: rgba(124, 92, 252, 0.22);
+
+  --primary: #7c5cfc;
+  --primary-strong: #6a3ffb;
+  --primary-soft: rgba(124, 92, 252, 0.12);
+  --primary-fg: #5b3ce8;
+  --teal: #0f9c8c;
+  --rose: #d63d72;
+
+  --shadow-color: 220 30% 12%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06);
+  --shadow-md: 0 12px 28px -12px hsl(var(--shadow-color) / 0.22);
+  --shadow-lg: 0 30px 70px -28px hsl(var(--shadow-color) / 0.32);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --radius-full: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur-med: 280ms;
+  --dur-slow: 520ms;
+
+  color-scheme: light;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #07070b;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.075);
+    --surface-solid: #131319;
 
-/* ================= LEFT SIDEBAR ================= */
+    --textColor: #f4f3f8;
+    --textColor-muted: #a3a1ad;
+    --textColor-faint: #6c6a76;
 
-.profile-sidebar {
-    width: 320px;
-    min-width: 260px;
-    position: sticky;
-    top: 25px;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --focus-ring: rgba(167, 139, 250, 0.3);
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.08),
-            rgba(255,255,255,.04)
-        );
+    --primary: #a78bfa;
+    --primary-strong: #8f6bf7;
+    --primary-soft: rgba(167, 139, 250, 0.16);
+    --primary-fg: #a78bfa;
+    --teal: #2dd4bf;
+    --rose: #fb7185;
 
-    border-radius: 25px;
-    padding: 28px 22px;
+    --shadow-color: 260 60% 2%;
 
-    box-shadow:
-        0 10px 40px rgba(0,0,0,.3);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    box-sizing: border-box;
+    color-scheme: dark;
+  }
 }
 
-.profile-details {
-    width: 100%;
-    margin-top: 18px;
-}
-.profile-username {
-    color: #f8fafc;
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-align: center;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
-}
-
-.profile-details p {
-    margin-bottom: 16px;
-    line-height: 1.5;
-    color: #d1d5db;
-    text-align: center;
-    font-size: 1rem;
+/* ======================================================================
+   PAGE SHELL
+   ====================================================================== */
+.pf-page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--textColor);
+  overflow-x: hidden;
+  isolation: isolate;
+  padding: clamp(24px, 5vw, 48px) var(--space-4) clamp(48px, 8vw, 80px);
 }
 
-
-/* ================= PROFILE IMAGE ================= */
-
-.profile-picture-wrapper {
-    position: relative;
-    width: 140px;
-    height: 140px;
-    margin-bottom: 18px;
-    cursor: pointer;
-    border-radius: 50%;
-    overflow: hidden;
+.page-mesh {
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 45%),
+    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--teal) 9%, transparent), transparent 42%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--rose) 8%, transparent), transparent 48%);
+  filter: blur(80px);
+  animation: mesh-drift 34s ease-in-out infinite alternate;
 }
 
-.profile-picture {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+.page-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.035;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
-.profile-picture-placeholder {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: white;
-    font-size: 3rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+@keyframes mesh-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(3%, -2%) rotate(4deg); }
 }
 
-.profile-picture-overlay {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: rgba(0,0,0,.6);
-    text-align: center;
-    padding: 6px 0;
-    font-size: .8rem;
-    opacity: 0;
-    transition: .3s;
+.pf-status-page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--textColor-muted);
+  font-family: var(--font-body);
 }
 
-.profile-picture-wrapper:hover .profile-picture-overlay {
-    opacity: 1;
+.pf-status-text {
+  font-size: 14px;
 }
 
-
-/* ================= STATS ================= */
-
-.user-stats {
-    width: 100%;
-    margin-top: 18px;
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
+/* ======================================================================
+   SHELL — sidebar + main, side by side on desktop
+   ====================================================================== */
+.pf-shell {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-5);
+  max-width: 1080px;
+  margin: 0 auto;
+  align-items: start;
 }
 
-.stat-card {
-    flex: 1;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.05);
-    border-radius: 15px;
-    padding: 18px 10px;
-    text-align: center;
-    transition: .3s;
+@media (max-width: 860px) {
+  .pf-shell {
+    grid-template-columns: 1fr;
+  }
 }
 
-.stat-card:hover {
-    transform: translateY(-5px);
+/* ======================================================================
+   SIDEBAR
+   ====================================================================== */
+.pf-sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(28px, 4vw, 36px) var(--space-5);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  isolation: isolate;
 }
 
-.stat-icon {
-    font-size: 1.7rem;
+.pf-sidebar-glow {
+  position: absolute;
+  inset: -30%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 30% 0%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 55%);
+  filter: blur(60px);
 }
 
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: bold;
+.pf-avatar-wrapper {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  margin-bottom: var(--space-4);
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 0 0 4px var(--surface), 0 0 0 5px var(--border);
+  transition: transform var(--dur-fast) var(--ease-spring);
 }
 
-.stat-label {
-    margin-top: 8px;
-    color: #94a3b8;
-    font-size: .82rem;
+.pf-avatar-wrapper--static {
+  cursor: default;
 }
 
-.profile-sidebar h2 {
-    text-align: center;
-    margin: 0 0 4px;
-    font-size: 1.2rem;
+.pf-avatar-wrapper--static:hover {
+  transform: none;
 }
 
-
-/* ================= RIGHT SECTION ================= */
-
-.profile-main {
-    flex: 1;
-    min-width: 0;
-
-    background: rgba(255,255,255,.05);
-    backdrop-filter: blur(20px);
-
-    border-radius: 25px;
-    padding: 30px;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 0;
-    box-sizing: border-box;
+.pf-avatar-wrapper:hover {
+  transform: scale(1.03);
 }
 
-
-/* ================= STREAK ================= */
-
-.streak-card {
-    width: fit-content;
-    margin-left: auto;
-
-    border-radius: 20px;
-    padding: 12px 20px;
-    align-self: flex-end;
-    margin-bottom: 20px;
-
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
+.pf-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.streak-number {
-    font-size: 1.9rem;
-    font-weight: bold;
+.pf-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--primary-fg);
+  background: var(--primary-soft);
 }
 
-
-
-/* ================= MONTH LABELS ================= */
-
-.months-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 0;
-    margin-bottom: 8px;
-    min-height: 20px;
-    color: #94a3b8;
-    font-size: .78rem;
+.pf-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--on-primary);
+  background: rgba(10, 8, 20, 0.55);
+  opacity: 0;
+  transition: opacity var(--dur-fast) ease;
 }
 
-.month-label {
-    white-space: nowrap;
-    overflow: visible;
-    flex-shrink: 0;
+.pf-avatar-overlay svg {
+  font-size: 16px;
 }
 
-.month-label.month-week {
-    width: 15px;
-    flex: 0 0 15px;
-    margin-right: 3px;
+.pf-avatar-wrapper:hover .pf-avatar-overlay {
+  opacity: 1;
 }
 
-.month-label.month-spacer {
-    width: 8px;
-    flex: 0 0 8px;
-    margin-right: 3px;
+.pf-avatar-spinner {
+  font-size: 18px;
+  animation: pf-spin 0.8s linear infinite;
 }
 
-
-/* ================= CONTRIBUTION GRID ================= */
-
-.contribution-grid {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
+@keyframes pf-spin {
+  to { transform: rotate(360deg); }
 }
 
-.week-column {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    width: 15px;
-    flex: 0 0 15px;
-    margin-right: 3px;
+.pf-username {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-4);
 }
 
-.spacer-column {
-    width: 8px;
-    flex: 0 0 8px;
-    margin-right: 3px;
+.pf-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin-bottom: var(--space-5);
 }
 
-.day-box {
-    width: 15px;
-    height: 15px;
-    border-radius: 3px;
-    transition: .2s;
+.pf-detail-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  text-align: left;
 }
 
-.day-box:hover {
-    transform: scale(1.3);
-    border: 1px solid white;
-    z-index: 2;
+.pf-detail-icon {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--textColor-faint);
 }
 
-.empty-box {
-    width: 15px;
-    height: 15px;
+.pf-detail-text {
+  font-size: 13px;
+  color: var(--textColor-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-
-/* ================= HEATMAP COLORS ================= */
-
-.level0 { background: #1e293b; }
-.level1 { background: #0e4429; }
-.level2 { background: #26a641; }
-.level3 { background: #39d353; }
-.level4 { background: #6eff8a; }
-
-
-/* ================= SUBMISSION CARD ================= */
-
-.submission-card {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.06),
-            rgba(255,255,255,.02)
-        );
-
-    border-radius: 25px;
-    padding: 35px;
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.2);
+.pf-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  width: 100%;
 }
 
-
-/* ================= CROP MODAL ================= */
-
-.crop-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.8);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    z-index: 9999;
+.pf-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.crop-container {
-    position: relative;
-    width: 380px;
-    height: 380px;
-    background: #222;
-    border-radius: 20px;
+/* Icon box — fixes the Lottie canvases overflowing their intended
+   footprint. overflow:hidden clips anything the canvas over-renders,
+   and forcing its CSS width/height (with !important, since the Lottie
+   library sets inline styles of its own) keeps it to the size we
+   actually want regardless of the animation's native composition size. */
+.pf-icon-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--surface-hover);
+  overflow: hidden;
 }
 
-.crop-controls {
-    margin-top: 28px;
-
-    display: flex;
-    gap: 15px;
-    align-items: center;
+.pf-icon-box--lg {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
 }
 
-.crop-controls input {
-    width: 220px;
+.pf-icon-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  display: block;
 }
 
-.save-crop-btn {
-    padding: 10px 20px;
-    background: #118c44;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: .95rem;
+.pf-stat-value {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--textColor);
 }
 
-.cancel-crop-btn {
-    padding: 10px 20px;
-    background: rgb(189,34,65);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: .95rem;
+.pf-stat-label {
+  font-size: 11px;
+  color: var(--textColor-faint);
 }
 
-
-/* ================= MOBILE ================= */
-
-@media (max-width: 900px) {
-
-    .profile-container {
-        flex-direction: column;
-        align-items: center;
-        padding: 16px;
-        gap: 16px;
-    }
-
-    .profile-sidebar {
-        width: 100%;
-        max-width: 500px;
-        position: static;
-    }
-
-    .user-stats {
-        flex-direction: row;
-    }
-
-    .profile-main {
-        width: 100%;
-    }
-
-    .streak-card {
-        position: static;
-        margin-bottom: 16px;
-        width: fit-content;
-    }
-
-    .crop-container {
-        width: 300px;
-        height: 300px;
-    }
-
-    .crop-controls input {
-        width: 160px;
-    }
+/* ======================================================================
+   MAIN
+   ====================================================================== */
+.pf-main {
+  position: relative;
+  padding: clamp(24px, 3.5vw, 34px);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  isolation: isolate;
 }
 
-.grid-scroll-wrapper {
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 8px; /* space for the scrollbar */
-
-    /* Custom scrollbar styling */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,.2) transparent;
+.pf-main-glow {
+  position: absolute;
+  inset: -30%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 90% 0%, color-mix(in srgb, var(--teal) 12%, transparent), transparent 55%);
+  filter: blur(60px);
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar {
-    height: 5px;
+/* Own-profile-only avatar wrapper already covers the "view-only for
+   others" case elsewhere in this file, so no separate locked-state
+   block is needed here now that stats are fetched for anyone. */
+
+.pf-streak-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: fit-content;
+  padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+  margin-bottom: var(--space-6);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 18%, transparent), transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 32%, var(--border));
+  border-radius: var(--radius-full);
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar-track {
-    background: transparent;
+.pf-streak-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,.2);
-    border-radius: 10px;
+.pf-streak-number {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
 }
 
-.grid-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,.4);
+.pf-streak-label {
+  font-size: 11.5px;
+  color: var(--textColor-faint);
+}
+
+.pf-heatmap-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.pf-heatmap-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pf-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--textColor-faint);
+}
+
+.pf-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Contribution heatmap                                                 */
+/* ------------------------------------------------------------------ */
+.pf-grid-scroll {
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.pf-months-row {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.pf-month-label {
+  width: 13px;
+  font-size: 10px;
+  color: var(--textColor-faint);
+  white-space: nowrap;
+}
+
+.pf-month-spacer {
+  width: 6px;
+}
+
+.pf-contribution-grid {
+  display: flex;
+  gap: 3px;
+}
+
+.pf-week-column {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pf-spacer-column {
+  width: 6px;
+}
+
+.pf-empty-box,
+.pf-day-box {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+}
+
+.pf-empty-box {
+  background: transparent;
+}
+
+.pf-day-box {
+  cursor: default;
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+
+.pf-day-box:hover {
+  transform: scale(1.2);
+}
+
+.pf-level0, .pf-legend-swatch.pf-level0 { background: var(--surface-hover); }
+.pf-level1, .pf-legend-swatch.pf-level1 { background: color-mix(in srgb, var(--primary) 30%, var(--surface-hover)); }
+.pf-level2, .pf-legend-swatch.pf-level2 { background: color-mix(in srgb, var(--primary) 55%, var(--surface-hover)); }
+.pf-level3, .pf-legend-swatch.pf-level3 { background: color-mix(in srgb, var(--primary) 78%, var(--surface-hover)); }
+.pf-level4, .pf-legend-swatch.pf-level4 { background: var(--primary); }
+
+/* ======================================================================
+   CROP MODAL
+   ====================================================================== */
+.pf-crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 5, 8, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: pf-fade-in var(--dur-fast) ease-out;
+  padding: var(--space-4);
+}
+
+@keyframes pf-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pf-crop-card {
+  width: 100%;
+  max-width: 380px;
+  padding: var(--space-5);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: pf-zoom-in var(--dur-med) var(--ease-spring);
+}
+
+@keyframes pf-zoom-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.pf-crop-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.pf-crop-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.pf-crop-zoom {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.pf-crop-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.pf-crop-cancel,
+.pf-crop-save {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring), filter var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+
+.pf-crop-cancel {
+  color: var(--textColor-muted);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+}
+
+.pf-crop-cancel:hover {
+  background: var(--surface-hover);
+}
+
+.pf-crop-save {
+  color: var(--on-primary);
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  border: none;
+  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--primary) 65%, transparent);
+}
+
+.pf-crop-save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.pf-crop-save:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.pf-crop-save-spinner {
+  animation: pf-spin 0.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-mesh,
+  .pf-crop-modal,
+  .pf-crop-card {
+    animation: none !important;
+  }
+
+  .pf-avatar-wrapper,
+  .pf-avatar-overlay,
+  .pf-day-box,
+  .pf-crop-cancel,
+  .pf-crop-save {
+    transition: none;
+  }
 }

@@ -11,7 +11,38 @@ import { FiCamera } from "react-icons/fi";
 import {
     useWebSocket
 } from "../context/WebSocketContext";
-import { FaRegThumbsDown, FaRegComment, FaShareNodes } from "react-icons/fa6";
+import { FaRegComment, FaShareNodes } from "react-icons/fa6";
+import { FaTimes, FaPaperPlane } from "react-icons/fa";
+
+const AVATAR_ACCENTS = ["primary", "teal", "rose"];
+
+function accentFor(name) {
+    const code = (name || "?").charCodeAt(0) || 0;
+    return AVATAR_ACCENTS[code % AVATAR_ACCENTS.length];
+}
+
+// Relative timestamp ("2h", "3d") like most feed UIs use, with the
+// exact date still available on hover via the title attribute.
+function timeAgo(dateString) {
+    if (!dateString) return "";
+
+    try {
+        const date = new Date(dateString);
+        const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+
+        if (seconds < 60) return "just now";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}d`;
+
+        return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    } catch {
+        return "";
+    }
+}
 
 const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
     const [comments, setComments] = useState([]);
@@ -85,14 +116,6 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
         setShowComments(nextState);
         if (nextState) {
             fetchComments();
-        }
-    };
-
-    const formatDate = (dateString) => {
-        try {
-            return new Date(dateString).toLocaleString();
-        } catch {
-            return "";
         }
     };
 
@@ -195,48 +218,37 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
     setShowShareModal(false);
 };
     return (
-        <div className="post-card">
-            <div className="post-header">
-                <div className="avatar">
+        <div className="pc-card">
+            <div className="pc-header">
+                <div className="pc-avatar">
                     {profilePicture ? (
-                        <img
-                            src={profilePicture}
-                            alt={post.userName}
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                borderRadius: "50%"
-                            }}
-                        />
+                        <img src={profilePicture} alt={post.userName} className="pc-avatar-img" />
                     ) : (
-                        post.userName?.charAt(0)?.toUpperCase()
+                        <span className={`pc-avatar-placeholder pc-avatar--${accentFor(post.userName)}`}>
+                            {post.userName?.charAt(0)?.toUpperCase()}
+                        </span>
                     )}
                 </div>
 
-                <div>
-                    <h3>{post.userName}</h3>
-                    <span className="post-time">
-                        {formatDate(post.createdAt)}
+                <div className="pc-header-copy">
+                    <span className="pc-username">{post.userName}</span>
+                    <span className="pc-time" title={new Date(post.createdAt).toLocaleString()}>
+                        {timeAgo(post.createdAt)}
                     </span>
                 </div>
             </div>
 
-            <div className="post-content">
-                <div className="post-message">
-                    <div
-                        className="problem-title"
-                        onClick={() => {
-                        navigate(
-                            `/post/${post.id}`
-                        );
+            <div className="pc-content">
+                <div
+                    className="pc-title"
+                    onClick={() => {
+                        navigate(`/post/${post.id}`);
                     }}
-                    >
-                        {post.questionTitle}
-                    </div>
+                >
+                    {post.questionTitle}
                 </div>
 
-                <div className="post-image-container">
+                <div className="pc-image-area">
                     <input
                         id={`image-input-${post.id}`}
                         type="file"
@@ -247,23 +259,24 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
                     />
 
                     {post.imageUrl ? (
-                        <div className="post-image-wrapper">
+                        <div className="pc-image-wrap">
                             <img
                                 src={post.imageUrl}
                                 alt={post.questionTitle}
                                 loading="lazy"
-                                className="post-image"
+                                className="pc-image"
                             />
 
                             {canUploadImage && (
                                 <button
-                                    className="image-edit-btn"
+                                    className="pc-image-edit-btn"
                                     disabled={uploadingImage}
                                     onClick={() =>
                                         document
                                             .getElementById(`image-input-${post.id}`)
                                             .click()
                                     }
+                                    aria-label="Change image"
                                 >
                                     <FiCamera />
                                 </button>
@@ -271,30 +284,23 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
                         </div>
                     ) : canUploadImage ? (
                         <div
-                            className="image-upload-placeholder"
+                            className="pc-image-placeholder"
                             onClick={() =>
                                 document
                                     .getElementById(`image-input-${post.id}`)
                                     .click()
                             }
                         >
-                            <FiCamera className="upload-camera-icon" />
-
-                            <span>
-                                {uploadingImage ? "Uploading..." : "Add Image"}
-                            </span>
+                            <FiCamera className="pc-image-placeholder-icon" />
+                            <span>{uploadingImage ? "Uploading..." : "Add image"}</span>
                         </div>
                     ) : null}
 
-                    {uploadMessage && (
-                        <div className="upload-message">
-                            {uploadMessage}
-                        </div>
-                    )}
+                    {uploadMessage && <div className="pc-upload-message">{uploadMessage}</div>}
                 </div>
             </div>
 
-            <div className="post-actions">
+            <div className="pc-actions">
                 <LikeButton
                     postId={post.id}
                     initialCount={post.likesCount}
@@ -306,101 +312,107 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
                         }))
                     }
                 />
- 
 
-                <button className="action-btn" onClick={toggleComments}>
-                    <FaRegComment /> 
+                <button className="pc-action-btn" onClick={toggleComments}>
+                    <FaRegComment />
                 </button>
 
-                <button className="action-btn" onClick={openShareModal}>
-                    <FaShareNodes /> 
+                <button className="pc-action-btn" onClick={openShareModal}>
+                    <FaShareNodes />
                 </button>
             </div>
 
             {showComments && (
-                <div className="commentws-section">
-                    <div className="commentw-input-row">
+                <div className="pc-comments">
+                    <div className="pc-comment-input-row">
                         <input
                             type="text"
                             placeholder="Write a comment..."
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") handleCommentSubmit();
+                            }}
+                            className="pc-comment-input"
                         />
 
-                        <button onClick={handleCommentSubmit}>Post</button>
+                        <button className="pc-comment-send" onClick={handleCommentSubmit} aria-label="Post comment">
+                            <FaPaperPlane />
+                        </button>
                     </div>
 
                     {loadingComments ? (
-                        <div className="loading-comments">
-                            Loading comments...
-                        </div>
+                        <div className="pc-comments-loading">Loading comments...</div>
+                    ) : comments.length === 0 ? (
+                        <div className="pc-comments-empty">No comments yet — be the first.</div>
                     ) : (
-                        comments.map((comment) => (
-                            <CommentCard
-                                key={comment.id}
-                                comment={comment}
-                            />
-                        ))
+                        comments.map((comment) => <CommentCard key={comment.id} comment={comment} />)
                     )}
                 </div>
             )}
+
             {showShareModal && (
                 <div
-                    className="share-overlay"
+                    className="pc-share-overlay"
                     onClick={() => {
                         setShowShareModal(false);
                         setSelectedFriends([]);
                     }}
-                />
-            )}
-            {
-                showShareModal && (
-                    <div className="share-modal">
-
-                        <h3>Share Post</h3>
-
-                        <div className="share-friends-list">
-                            {
-                                friends.map(friend => (
-                                    <label key={friend.id} className="share-friend-item">
-                                        <input
-                                            type="checkbox"
-                                            checked={
-                                                selectedFriends.includes(friend.id)
-                                            }
-                                            onChange={() => {
-
-                                                if (
-                                                    selectedFriends.includes(friend.id)
-                                                ) {
-                                                    setSelectedFriends(
-                                                        selectedFriends.filter(
-                                                            id => id !== friend.id
-                                                        )
-                                                    );
-                                                } else {
-                                                    setSelectedFriends([
-                                                        ...selectedFriends,
-                                                        friend.id
-                                                    ]);
-                                                }
-                                            }}
-                                        />
-
-                                        {friend.userName}
-                                    </label>
-                                ))
-                            }
-                        </div>
-                        <div className="share-actions">
-
-                            <button className="share-send-btn" 
-                                    onClick={handleShare}>
-                                Send
-                            </button>
-
+                >
+                    <div className="pc-share-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="pc-share-header">
+                            <h3 className="pc-share-title">Share post</h3>
                             <button
-                                className="share-cancel-btn"
+                                className="pc-share-close"
+                                onClick={() => {
+                                    setShowShareModal(false);
+                                    setSelectedFriends([]);
+                                }}
+                                aria-label="Close"
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+
+                        <div className="pc-share-friends-list">
+                            {friends.length === 0 ? (
+                                <p className="pc-share-empty">Add some friends to share posts with them.</p>
+                            ) : (
+                                friends.map((friend) => {
+                                    const checked = selectedFriends.includes(friend.id);
+                                    return (
+                                        <label
+                                            key={friend.id}
+                                            className={`pc-share-friend ${checked ? "pc-is-checked" : ""}`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={checked}
+                                                onChange={() => {
+                                                    if (checked) {
+                                                        setSelectedFriends(
+                                                            selectedFriends.filter((id) => id !== friend.id)
+                                                        );
+                                                    } else {
+                                                        setSelectedFriends([...selectedFriends, friend.id]);
+                                                    }
+                                                }}
+                                            />
+                                            <span
+                                                className={`pc-share-avatar pc-avatar--${accentFor(friend.userName)}`}
+                                            >
+                                                {friend.userName?.charAt(0)?.toUpperCase()}
+                                            </span>
+                                            <span className="pc-share-name">{friend.userName}</span>
+                                        </label>
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        <div className="pc-share-actions">
+                            <button
+                                className="pc-share-cancel"
                                 onClick={() => {
                                     setShowShareModal(false);
                                     setSelectedFriends([]);
@@ -408,11 +420,18 @@ const PostCard = ({ post, updatePost, profilePicture, currentUser }) => {
                             >
                                 Cancel
                             </button>
-                        </div>
 
+                            <button
+                                className="pc-share-send"
+                                onClick={handleShare}
+                                disabled={selectedFriends.length === 0}
+                            >
+                                Send{selectedFriends.length > 0 ? ` (${selectedFriends.length})` : ""}
+                            </button>
+                        </div>
                     </div>
-                )
-            }
+                </div>
+            )}
         </div>
     );
     
