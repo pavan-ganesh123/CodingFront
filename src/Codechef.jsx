@@ -33,7 +33,7 @@ function Codechef() {
         }
 
         const response = await fetch(
-          `http://localhost:8080/api/problems/my/problems?${params.toString()}`,
+          `https://codecache-13ic.onrender.com/api/problems/my/problems?${params.toString()}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

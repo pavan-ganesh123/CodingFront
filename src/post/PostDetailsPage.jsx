@@ -50,7 +50,7 @@ const PostDetailsPage = () => {
 
             const response =
                 await axios.get(
-                    `http://localhost:8080/api/posts/${postId}`,
+                    `https://codecache-13ic.onrender.com/api/posts/${postId}`,
                     {
                         headers: {
                             Authorization:
@@ -74,7 +74,7 @@ const PostDetailsPage = () => {
 
             const response =
                 await axios.get(
-                    `http://localhost:8080/api/posts/${postId}/comments`,
+                    `https://codecache-13ic.onrender.com/api/posts/${postId}/comments`,
                     {
                         headers: {
                             Authorization:
@@ -100,7 +100,7 @@ const PostDetailsPage = () => {
         try {
 
             await axios.post(
-                `http://localhost:8080/api/posts/${postId}/comments`,
+                `https://codecache-13ic.onrender.com/api/posts/${postId}/comments`,
                 {
                     comment: commentText
                 },
@@ -130,7 +130,7 @@ const PostDetailsPage = () => {
         }
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/problems/${postUserId}/${questionId}`,
+                `https://codecache-13ic.onrender.com/api/problems/${postUserId}/${questionId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -146,7 +146,7 @@ const PostDetailsPage = () => {
     const loadCurrentUser = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/users/me`,
+                `https://codecache-13ic.onrender.com/api/users/me`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -205,7 +205,7 @@ const PostDetailsPage = () => {
         setSaveError("");
         try {
             const response = await axios.put(
-                `http://localhost:8080/api/problems/${post.questionId}`,
+                `https://codecache-13ic.onrender.com/api/problems/${post.questionId}`,
                 {
                     intuition: editForm.intuition,
                     timeComplexity: editForm.timeComplexity,

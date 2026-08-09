@@ -102,8 +102,8 @@ function Profile() {
       // Own profile → the existing self-scoped endpoint (has email).
       // Someone else's → the public endpoint (id, userName, picture only).
       const profileUrl = username
-        ? `http://localhost:8080/api/users/u/${username}`
-        : "http://localhost:8080/api/users/profile";
+        ? `https://codecache-13ic.onrender.com/api/users/u/${username}`
+        : "https://codecache-13ic.onrender.com/api/users/profile";
 
       const profileResponse = await fetch(profileUrl, {
         method: "GET",
@@ -122,16 +122,16 @@ function Profile() {
       // server who "me" is). Someone else's → the same data, but
       // addressed by their id instead.
       const countFriendsUrl = viewingSelf
-        ? "http://localhost:8080/api/users/countFriends"
-        : `http://localhost:8080/api/users/${profileData.id}/countFriends`;
+        ? "https://codecache-13ic.onrender.com/api/users/countFriends"
+        : `https://codecache-13ic.onrender.com/api/users/${profileData.id}/countFriends`;
 
       const statsUrl = viewingSelf
-        ? "http://localhost:8080/api/users/my-stats"
-        : `http://localhost:8080/api/users/${profileData.id}/stats`;
+        ? "https://codecache-13ic.onrender.com/api/users/my-stats"
+        : `https://codecache-13ic.onrender.com/api/users/${profileData.id}/stats`;
 
       const submissionsUrl = viewingSelf
-        ? "http://localhost:8080/api/users/my-yearly-submissions"
-        : `http://localhost:8080/api/users/${profileData.id}/yearly-submissions`;
+        ? "https://codecache-13ic.onrender.com/api/users/my-yearly-submissions"
+        : `https://codecache-13ic.onrender.com/api/users/${profileData.id}/yearly-submissions`;
 
       const friendResponse = await fetch(countFriendsUrl, {
         method: "GET",
@@ -200,7 +200,7 @@ function Profile() {
     try {
       setUploading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/api/users/my-profile-picture", {
+      const response = await fetch("https://codecache-13ic.onrender.com/api/users/my-profile-picture", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

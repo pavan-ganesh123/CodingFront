@@ -22,7 +22,7 @@ const MyPostsPage = () => {
             const token = localStorage.getItem("token");
 
             const userRes = await axios.get(
-                "http://localhost:8080/api/users/me",
+                "https://codecache-13ic.onrender.com/api/users/me",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -33,7 +33,7 @@ const MyPostsPage = () => {
             setCurrentUser(userRes.data);
 
             const response = await axios.get(
-                "http://localhost:8080/api/posts/mine",
+                "https://codecache-13ic.onrender.com/api/posts/mine",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
