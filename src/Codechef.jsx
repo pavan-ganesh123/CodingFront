@@ -26,7 +26,7 @@ function Codechef() {
         const token = localStorage.getItem("token");
 
         const params = new URLSearchParams();
-        params.append("platform", "Codechef");
+        params.append("platform", "CODECHEF");
 
         if (difficulty) {
           params.append("difficulty", difficulty);

@@ -26,7 +26,7 @@ function Codeforces() {
         const token = localStorage.getItem("token");
 
         const params = new URLSearchParams();
-        params.append("platform", "Codeforces");
+        params.append("platform", "CODEFORCES");
 
         if (difficulty) {
           params.append("difficulty", difficulty);

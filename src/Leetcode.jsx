@@ -26,7 +26,7 @@ function Leetcode() {
         const token = localStorage.getItem("token");
 
         const params = new URLSearchParams();
-        params.append("platform", "Leetcode");
+        params.append("platform", "LEETCODE");
 
         if (difficulty) {
           params.append("difficulty", difficulty);
