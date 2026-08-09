@@ -86,18 +86,6 @@ function Blocked() {
         targetUserId: targetId,
       });
 
-      const unblockedRelation = blockedUsers.find((relation) => {
-        const blockedPerson =
-          String(relation.user.id) === String(userId) ? relation.friend : relation.user;
-
-        return String(blockedPerson.id) === String(targetId);
-      });
-
-      const unblockedFriend =
-        String(unblockedRelation.user.id) === String(userId)
-          ? unblockedRelation.friend
-          : unblockedRelation.user;
-
       // Remove from blocked page UI
       setBlockedUsers((prev) =>
         prev.filter((relation) => {
@@ -108,16 +96,12 @@ function Blocked() {
         })
       );
 
-      // Add back to friends cache
-      queryClient.setQueryData(["friends", userId], (oldFriends = []) => {
-        const alreadyExists = oldFriends.some((f) => String(f.id) === String(unblockedFriend.id));
-
-        if (alreadyExists) {
-          return oldFriends;
-        }
-
-        return [...oldFriends, unblockedFriend];
-      });
+      // UNBLOCK_USER (and GET_RELATIONS above) don't select profileImage,
+      // so manually splicing a "friend" object back into the cache would
+      // cache one with no picture until the next natural refetch.
+      // Invalidating instead means anything reading ["friends", userId]
+      // (chat sidebar, share-post modal) pulls the real, complete data.
+      queryClient.invalidateQueries({ queryKey: ["friends", userId] });
 
       showToast("User unblocked", "info");
     } catch (err) {

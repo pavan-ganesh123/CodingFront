@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClient } from "../api/graphqlClient";
 import { gql } from "graphql-request";
+import { useQueryClient } from "@tanstack/react-query";
 import { FaCheck, FaSpinner, FaUserFriends } from "react-icons/fa";
 import "./FriendRequests.css";
 import { getUserFromToken } from "../utils/auth";
@@ -17,6 +18,7 @@ function accentFor(name) {
 
 function FriendRequests() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [requests, setRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,6 +80,14 @@ function FriendRequests() {
       await client.request(ACCEPT_REQUEST, {
         requestId: String(requestId),
       });
+
+      // ACCEPT_REQUEST only returns {id, status} — not enough to build
+      // a full friend object (no userName/profileImage), so rather than
+      // splice an incomplete entry into the friends cache, just mark it
+      // stale. Anything currently reading ["friends", userId] (chat
+      // sidebar, share-post modal) refetches the real data right away.
+      queryClient.invalidateQueries({ queryKey: ["friends", userId] });
+
       showToast("Friend Request Accepted", "info");
       fetchRequests(); // refresh list
     } catch (err) {

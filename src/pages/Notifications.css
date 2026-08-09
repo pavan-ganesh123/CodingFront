@@ -1,0 +1,415 @@
+/* =========================================================
+   Notifications — "code-cache" terminal-log theme
+
+   Self-contained: doesn't depend on Home.css, so this still works
+   even if Home's tokens differ. Retint the block below to match
+   your exact palette — everything else derives from these variables.
+   ========================================================= */
+
+:root {
+  --notif-bg: #0a0a10;
+  --notif-panel: #121218;
+  --notif-panel-hover: #17171f;
+  --notif-border: rgba(255, 255, 255, 0.08);
+  --notif-text: #e7e7ec;
+  --notif-text-dim: #8a8a97;
+  --notif-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, monospace;
+
+  /* one accent per event family — mirrors the post-activity /
+     friend-activity Kafka topic grouping from the backend */
+  --notif-like: #ff5c8a;
+  --notif-comment: #4da3ff;
+  --notif-share: #34d399;
+  --notif-friend: #a78bfa;
+  --notif-message: #f5a623;
+  --notif-mention: #38d0d0;
+  --notif-system: #9aa0ac;
+  --notif-danger: #ef4444;
+}
+
+.notif-page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--notif-bg);
+  color: var(--notif-text);
+  overflow: hidden;
+  padding: 56px 24px 80px;
+}
+
+.notif-mesh {
+  position: absolute;
+  inset: -20% -10%;
+  background:
+    radial-gradient(600px circle at 12% 8%, rgba(167, 139, 250, 0.16), transparent 60%),
+    radial-gradient(520px circle at 88% 0%, rgba(77, 163, 255, 0.13), transparent 55%),
+    radial-gradient(680px circle at 50% 105%, rgba(52, 211, 153, 0.10), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.notif-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.notif-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Header */
+.notif-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.notif-kicker {
+  display: block;
+  font-family: var(--notif-mono);
+  font-size: 13px;
+  color: var(--notif-text-dim);
+  margin-bottom: 8px;
+  letter-spacing: 0.01em;
+}
+
+.notif-chevron {
+  color: var(--notif-mention);
+  margin-right: 6px;
+}
+
+.notif-heading {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.notif-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Buttons — self-contained, doesn't depend on Home.css .btn */
+.notif-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--notif-border);
+  background: var(--notif-panel);
+  color: var(--notif-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+}
+
+.notif-btn:hover:not(:disabled) {
+  background: var(--notif-panel-hover);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.notif-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.notif-btn-danger:hover:not(:disabled) {
+  color: var(--notif-danger);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* List panel */
+.notif-list-panel {
+  border: 1px solid var(--notif-border);
+  border-radius: 16px;
+  background: var(--notif-panel);
+  overflow: hidden;
+}
+
+.notif-status {
+  padding: 44px 20px;
+  text-align: center;
+  font-family: var(--notif-mono);
+  font-size: 13px;
+  color: var(--notif-text-dim);
+}
+
+.notif-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  margin-left: 4px;
+  background: var(--notif-mention);
+  vertical-align: -2px;
+  animation: notif-blink 1s step-end infinite;
+}
+
+.notif-status-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--notif-text-dim);
+}
+
+.notif-empty p {
+  margin: 4px 0 0;
+  color: var(--notif-text);
+  font-weight: 600;
+}
+
+.notif-empty span {
+  font-size: 13px;
+  max-width: 34ch;
+}
+
+.notif-empty-icon {
+  font-size: 26px;
+  opacity: 0.5;
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px 14px 15px;
+  border-bottom: 1px solid var(--notif-border);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  animation: notif-row-in 0.28s ease both;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+
+.notif-row:last-child {
+  border-bottom: none;
+}
+
+.notif-row:hover {
+  background: var(--notif-panel-hover);
+}
+
+.notif-row.is-unread {
+  background: rgba(255, 255, 255, 0.025);
+  border-left-color: var(--accent);
+}
+
+.notif-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--notif-panel-hover);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.notif-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notif-avatar-fallback {
+  font-family: var(--notif-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.notif-avatar-icon {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.notif-tag {
+  align-self: flex-start;
+  font-family: var(--notif-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.notif-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.notif-row-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--notif-text-dim);
+  overflow-wrap: anywhere;
+}
+
+.notif-row.is-unread .notif-row-text {
+  color: var(--notif-text);
+  font-weight: 600;
+}
+
+.notif-row-time {
+  flex-shrink: 0;
+  font-family: var(--notif-mono);
+  font-size: 11.5px;
+  color: var(--notif-text-dim);
+}
+
+.notif-row-delete {
+  flex-shrink: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  color: var(--notif-text-dim);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.notif-row:hover .notif-row-delete,
+.notif-row:focus-within .notif-row-delete {
+  opacity: 1;
+}
+
+.notif-row-delete:hover {
+  color: var(--notif-danger);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+@media (hover: none) {
+  .notif-row-delete {
+    opacity: 1;
+  }
+}
+
+/* Pagination */
+.notif-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.notif-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid var(--notif-border);
+  background: var(--notif-panel);
+  color: var(--notif-text);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.notif-page-btn:hover:not(:disabled) {
+  background: var(--notif-panel-hover);
+}
+
+.notif-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.notif-page-label {
+  font-family: var(--notif-mono);
+  font-size: 12.5px;
+  color: var(--notif-text-dim);
+}
+
+/* Navbar bell badge — Home.jsx imports this file just for these two */
+.notif-bell-btn {
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--notif-danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-family: var(--notif-mono);
+}
+
+/* Motion + focus */
+@keyframes notif-row-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes notif-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notif-row { animation: none; }
+  .notif-cursor { animation: none; }
+}
+
+.notif-row:focus-visible,
+.notif-btn:focus-visible,
+.notif-page-btn:focus-visible,
+.notif-row-delete:focus-visible {
+  outline: 2px solid var(--notif-mention);
+  outline-offset: 2px;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .notif-page { padding: 36px 14px 64px; }
+  .notif-heading { font-size: 22px; }
+  .notif-row { padding: 12px 14px 12px 12px; gap: 9px; }
+  .notif-avatar { width: 30px; height: 30px; }
+  .notif-row-time { display: none; }
+}

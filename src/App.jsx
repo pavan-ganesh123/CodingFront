@@ -22,6 +22,7 @@ import FriendRequests from "./pages/FriendRequests";
 import FindFriends from "./pages/FindFriends";
 import ChatPage from "./pages/ChatPage";
 import Blocked from "./pages/Blocked";
+import Notifications from "./pages/Notifications";
 
 import { ToastProvider } from "./notifications/ToastContext";
 
@@ -204,6 +205,15 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <ChatPage />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/notifications"
+                            element={
+                                <ProtectedRoute>
+                                    <Notifications />
                                 </ProtectedRoute>
                             }
                         />

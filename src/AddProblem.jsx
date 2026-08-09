@@ -12,6 +12,10 @@ import {
   FaCheckCircle,
   FaExclamationCircle,
   FaSpinner,
+  FaSeedling,
+  FaBolt,
+  FaFire,
+  FaCode,
 } from "react-icons/fa";
 import "./AddProblem.css";
 
@@ -19,6 +23,16 @@ const VISIBILITY_OPTIONS = [
   { value: "PUBLIC", label: "Public", hint: "Anyone on code-cache", icon: FaGlobeAmericas },
   { value: "FRIENDS", label: "Friends", hint: "Only people you follow", icon: FaUserFriends },
   { value: "PRIVATE", label: "Only me", hint: "Private log entry", icon: FaLock },
+];
+
+// Reuses the same ap-visibility-* classes as VISIBILITY_OPTIONS below —
+// same button-group look, no new CSS needed. Names are visibility-
+// flavored purely because that's the CSS that already exists; rename
+// the classes later if you want that to read cleaner in the stylesheet.
+const DIFFICULTY_OPTIONS = [
+  { value: "EASY", label: "Easy", hint: "Warm-up", icon: FaSeedling },
+  { value: "MEDIUM", label: "Medium", hint: "Took some thought", icon: FaBolt },
+  { value: "HARD", label: "Hard", hint: "Real grind", icon: FaFire },
 ];
 
 // A continuously scrolling "activity feed" — purely illustrative demo
@@ -42,6 +56,8 @@ function AddProblem() {
   const navigate = useNavigate();
 
   const [link, setLink] = useState("");
+  const [difficulty, setDifficulty] = useState("MEDIUM");
+  const [code, setCode] = useState("");
   const [intuition, setIntuition] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
@@ -52,6 +68,11 @@ function AddProblem() {
   const handleSubmit = async () => {
     if (!link.trim()) {
       setMessage("error:Please enter a problem link");
+      return;
+    }
+
+    if (!code.trim()) {
+      setMessage("error:Please paste your solution code");
       return;
     }
 
@@ -71,6 +92,8 @@ function AddProblem() {
           },
           body: JSON.stringify({
             link,
+            difficulty,
+            code,
             intuition,
             timeComplexity,
             spaceComplexity,
@@ -89,6 +112,8 @@ function AddProblem() {
       setMessage("success:Problem added to your log");
 
       setLink("");
+      setDifficulty("MEDIUM");
+      setCode("");
       setIntuition("");
       setTimeComplexity("");
       setSpaceComplexity("");
@@ -142,7 +167,7 @@ function AddProblem() {
             <span className="ap-kicker ap-kicker--card">$ add --problem</span>
             <h1 className="ap-title">Log a problem</h1>
             <p className="ap-subtitle">
-              Capture it while it's fresh — the link, your approach, and how it ran.
+              Capture it while it's fresh — the link, your code, and how you got there.
             </p>
 
             <div className="ap-form">
@@ -157,6 +182,47 @@ function AddProblem() {
                 placeholder="https://leetcode.com/problems/..."
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
+              />
+            </div>
+
+            <div className="ap-field">
+              <span className="ap-field-label">Difficulty</span>
+              <div className="ap-visibility-group" role="radiogroup" aria-label="Problem difficulty">
+                {DIFFICULTY_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+                  const active = difficulty === option.value;
+                  return (
+                    <button
+                      type="button"
+                      key={option.value}
+                      role="radio"
+                      aria-checked={active}
+                      className={`ap-visibility-option ${active ? "ap-is-active" : ""}`}
+                      onClick={() => setDifficulty(option.value)}
+                    >
+                      <Icon className="ap-visibility-icon" />
+                      <span className="ap-visibility-copy">
+                        <span className="ap-visibility-name">{option.label}</span>
+                        <span className="ap-visibility-hint">{option.hint}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="ap-field">
+              <label className="ap-field-label" htmlFor="solution-code">
+                <FaCode className="ap-field-icon" />
+                Your solution
+              </label>
+              <textarea
+                id="solution-code"
+                className="ap-field-input ap-field-textarea ap-field-mono"
+                placeholder="Paste the code you submitted..."
+                rows="10"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
               />
             </div>
 

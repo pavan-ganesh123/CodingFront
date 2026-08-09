@@ -1,9 +1,11 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaUserCircle, FaUserFriends, FaPlus, FaComments, FaSearch, FaArrowRight } from "react-icons/fa";
+import { FaUserCircle, FaUserFriends, FaPlus, FaComments, FaSearch, FaArrowRight, FaBell } from "react-icons/fa";
 import { FaTimeline } from "react-icons/fa6";
 import "./Home.css";
+import "./Notifications.css";
 import Logout from "./Logout";
+import { fetchUnreadCount } from "./notificationApi";
 
 function Home() {
   const navigate = useNavigate();
@@ -11,6 +13,31 @@ function Home() {
 
   const containerRef = useRef(null);
   const cardRefs = useRef([]);
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadUnread = () => {
+      fetchUnreadCount()
+        .then((count) => {
+          if (!cancelled) setUnreadCount(count ?? 0);
+        })
+        .catch((err) => {
+          console.error("Failed to load unread count:", err);
+          // badge just keeps its last known value if this fails
+        });
+    };
+
+    loadUnread();
+    const interval = setInterval(loadUnread, 30000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   // imageLight is optional per platform — falls back to the dark-theme
   // image below until you supply a real light-variant asset for that logo.
@@ -62,6 +89,17 @@ function Home() {
             title="Chat"
           >
             <FaComments className="nav-icon" />
+          </button>
+          <button
+            className={`nav-icon-btn notif-bell-btn ${location.pathname.includes("/notifications") ? "is-active" : ""}`}
+            onClick={() => navigate("/notifications")}
+            aria-label="Notifications"
+            title="Notifications"
+          >
+            <FaBell className="nav-icon" />
+            {unreadCount > 0 && (
+              <span className="notif-badge">{unreadCount > 9 ? "9+" : unreadCount}</span>
+            )}
           </button>
           <button className="nav-icon-btn" onClick={() => navigate("/profile")} aria-label="Profile" title="Profile">
             <FaUserCircle className="nav-icon" />
