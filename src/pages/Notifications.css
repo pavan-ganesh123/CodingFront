@@ -2,29 +2,60 @@
    Notifications — "code-cache" terminal-log theme
 
    Self-contained: doesn't depend on Home.css, so this still works
-   even if Home's tokens differ. Retint the block below to match
-   your exact palette — everything else derives from these variables.
+   even if Home's tokens differ. Light values are the default below;
+   the @media (prefers-color-scheme: dark) block underneath swaps in
+   the original dark terminal palette when the system prefers dark —
+   same pattern Leetcode.css uses. Retint either block to match your
+   exact palette — everything else derives from these variables.
    ========================================================= */
 
 :root {
-  --notif-bg: #0a0a10;
-  --notif-panel: #121218;
-  --notif-panel-hover: #17171f;
-  --notif-border: rgba(255, 255, 255, 0.08);
-  --notif-text: #e7e7ec;
-  --notif-text-dim: #8a8a97;
+  --notif-bg: #f7f7f9;
+  --notif-panel: #ffffff;
+  --notif-panel-hover: #eeeef2;
+  --notif-border: rgba(10, 10, 16, 0.09);
+  --notif-border-strong: rgba(10, 10, 16, 0.18);
+  --notif-highlight: rgba(10, 10, 16, 0.035);
+  --notif-text: #121218;
+  --notif-text-dim: #65636f;
   --notif-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, monospace;
 
   /* one accent per event family — mirrors the post-activity /
      friend-activity Kafka topic grouping from the backend */
-  --notif-like: #ff5c8a;
-  --notif-comment: #4da3ff;
-  --notif-share: #34d399;
-  --notif-friend: #a78bfa;
-  --notif-message: #f5a623;
-  --notif-mention: #38d0d0;
-  --notif-system: #9aa0ac;
-  --notif-danger: #ef4444;
+  --notif-like: #d63d72;
+  --notif-comment: #3178d6;
+  --notif-share: #1a9c6c;
+  --notif-friend: #7c5cfc;
+  --notif-message: #b8770f;
+  --notif-mention: #0f9c8c;
+  --notif-system: #5f6470;
+  --notif-danger: #e5484d;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --notif-bg: #0a0a10;
+    --notif-panel: #121218;
+    --notif-panel-hover: #17171f;
+    --notif-border: rgba(255, 255, 255, 0.08);
+    --notif-border-strong: rgba(255, 255, 255, 0.18);
+    --notif-highlight: rgba(255, 255, 255, 0.025);
+    --notif-text: #e7e7ec;
+    --notif-text-dim: #8a8a97;
+
+    --notif-like: #ff5c8a;
+    --notif-comment: #4da3ff;
+    --notif-share: #34d399;
+    --notif-friend: #a78bfa;
+    --notif-message: #f5a623;
+    --notif-mention: #38d0d0;
+    --notif-system: #9aa0ac;
+    --notif-danger: #ef4444;
+
+    color-scheme: dark;
+  }
 }
 
 .notif-page {
@@ -118,7 +149,7 @@
 
 .notif-btn:hover:not(:disabled) {
   background: var(--notif-panel-hover);
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: var(--notif-border-strong);
 }
 
 .notif-btn:disabled {
@@ -128,7 +159,7 @@
 
 .notif-btn-danger:hover:not(:disabled) {
   color: var(--notif-danger);
-  border-color: rgba(239, 68, 68, 0.4);
+  border-color: color-mix(in srgb, var(--notif-danger) 40%, transparent);
 }
 
 /* List panel */
@@ -218,7 +249,7 @@
 }
 
 .notif-row.is-unread {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--notif-highlight);
   border-left-color: var(--accent);
 }
 
@@ -312,7 +343,7 @@
 
 .notif-row-delete:hover {
   color: var(--notif-danger);
-  background: rgba(239, 68, 68, 0.12);
+  background: color-mix(in srgb, var(--notif-danger) 12%, transparent);
 }
 
 @media (hover: none) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaExternalLinkAlt, FaChevronDown, FaCopy, FaCheck } from "react-icons/fa";
+import TopicFilter from "./TopicFilter";
 import "./CSES.css";
 
 const DIFFICULTIES = [
@@ -13,6 +14,7 @@ function CSES() {
   const [problems, setProblems] = useState([]);
   const [expanded, setExpanded] = useState(null);
   const [difficulty, setDifficulty] = useState("");
+  const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
@@ -31,6 +33,8 @@ function CSES() {
         if (difficulty) {
           params.append("difficulty", difficulty);
         }
+
+        topics.forEach((t) => params.append("topics", t));
 
         const response = await fetch(
           `https://codecache-13ic.onrender.com/api/problems/my/problems?${params.toString()}`,
@@ -56,7 +60,7 @@ function CSES() {
     };
 
     fetchProblems();
-  }, [difficulty]);
+  }, [difficulty, topics]);
 
   const toggleExpand = (index) => {
     setExpanded((current) => (current === index ? null : index));
@@ -79,7 +83,7 @@ function CSES() {
       <div className="page-grain" aria-hidden="true" />
 
       <header className="platform-header">
-        <div>
+        <div className="platform-title">
           <p className="platform-eyebrow">Platform</p>
           <h1 className="platform-heading">CSES</h1>
           <p className="platform-subtitle">
@@ -91,20 +95,24 @@ function CSES() {
           </p>
         </div>
 
-        <div className="difficulty-filter" role="tablist" aria-label="Filter by difficulty">
-          {DIFFICULTIES.map((d) => (
-            <button
-              key={d.value || "all"}
-              role="tab"
-              aria-selected={difficulty === d.value}
-              className={`difficulty-filter-btn ${difficulty === d.value ? "is-active" : ""} ${
-                d.value ? d.value.toLowerCase() : ""
-              }`}
-              onClick={() => setDifficulty(d.value)}
-            >
-              {d.label}
-            </button>
-          ))}
+        <div className="platform-filters">
+          <div className="difficulty-filter" role="tablist" aria-label="Filter by difficulty">
+            {DIFFICULTIES.map((d) => (
+              <button
+                key={d.value || "all"}
+                role="tab"
+                aria-selected={difficulty === d.value}
+                className={`difficulty-filter-btn ${difficulty === d.value ? "is-active" : ""} ${
+                  d.value ? d.value.toLowerCase() : ""
+                }`}
+                onClick={() => setDifficulty(d.value)}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
+          <TopicFilter platform="CSES" selected={topics} onChange={setTopics} />
         </div>
       </header>
 
@@ -202,6 +210,14 @@ function CSES() {
                           {p.spaceComplexity}
                         </div>
                       </div>
+
+                      {p.topics?.length > 0 && (
+                        <div className="problem-topics">
+                          {p.topics.map((t) => (
+                            <span className="problem-topic-tag" key={t}>{t}</span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </article>

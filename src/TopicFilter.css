@@ -1,0 +1,204 @@
+/* display:contents dissolves this element's own box — its children
+   (the anchor below, and the chips row when present) become direct
+   flex items of .platform-filters instead of being bundled into one
+   shrink-wrapped column. That's what stops the chips row's width from
+   ballooning this container and shifting the toggle button/difficulty
+   pills around whenever the number of selected topics changes. */
+.topic-filter {
+  display: contents;
+}
+
+/* wraps just the toggle + dropdown panel, so it keeps a small, compact
+   footprint next to the difficulty pills, and so the panel
+   (position:absolute) still has a positioning context to anchor to
+   now that .topic-filter itself no longer generates a box. */
+.topic-filter-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.topic-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--textColor-muted);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+
+.topic-filter-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--textColor);
+}
+
+.topic-filter-toggle.is-active {
+  border-color: var(--primary);
+  color: var(--primary-fg);
+  background: var(--primary-soft);
+}
+
+.topic-filter-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.topic-filter-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  animation: topic-panel-in var(--dur-fast) var(--ease-out);
+}
+
+@keyframes topic-panel-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.topic-filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px var(--space-2);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--textColor);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--dur-fast) ease;
+}
+
+.topic-filter-option:hover {
+  background: var(--surface-hover);
+}
+
+.topic-filter-option input {
+  accent-color: var(--primary);
+}
+
+/* flex-basis:100% forces this onto its own full-width line inside
+   .platform-filters (which is flex-wrap:wrap), independent of how
+   wide its own contents are — so no matter how many topics are
+   selected, it can never push or resize the toggle button/difficulty
+   pills sitting above it. */
+.topic-filter-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex-basis: 100%;
+  width: 100%;
+  animation: chips-in var(--dur-fast) var(--ease-out);
+}
+
+@keyframes chips-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.topic-filter-chips-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--textColor-faint);
+  white-space: nowrap;
+}
+
+.topic-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 11px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--primary-fg);
+  background: var(--primary-soft);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.topic-filter-chip button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  font-size: 9px;
+  color: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+
+.topic-filter-chip button:hover {
+  color: var(--on-primary);
+  background: var(--danger);
+}
+
+/* Clear all — a bordered pill matching the rest of the app's button
+   language (copy-btn, view-btn), instead of bare underlined text.
+   Hover shifts to danger tones since it's a destructive/reset action. */
+.topic-filter-clear-all {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--textColor-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+
+.topic-filter-clear-all:hover {
+  background: var(--danger-soft);
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+  color: var(--danger);
+}
+
+.topic-filter-clear-all:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topic-filter-panel,
+  .topic-filter-chips {
+    animation: none !important;
+  }
+
+  .topic-filter-toggle,
+  .topic-filter-option,
+  .topic-filter-chip button,
+  .topic-filter-clear-all {
+    transition: none;
+  }
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaLink,
@@ -16,6 +16,8 @@ import {
   FaBolt,
   FaFire,
   FaCode,
+  FaTags,
+  FaTimes,
 } from "react-icons/fa";
 import "./AddProblem.css";
 
@@ -52,6 +54,11 @@ const FEED_ENTRIES = [
   { name: "number-of-islands", meta: "O(m·n)", accent: "primary" },
 ];
 
+// Strips case and separator differences ("two-pointers" / "two_pointers" /
+// "Two Pointers") down to one comparable form, so suggestion matching
+// isn't fooled by which delimiter someone happened to type.
+const normalizeTopic = (value) => value.trim().toLowerCase().replace(/[\s_-]+/g, "");
+
 function AddProblem() {
   const navigate = useNavigate();
 
@@ -61,9 +68,114 @@ function AddProblem() {
   const [intuition, setIntuition] = useState("");
   const [timeComplexity, setTimeComplexity] = useState("");
   const [spaceComplexity, setSpaceComplexity] = useState("");
+  const [topics, setTopics] = useState([]);
+  const [topicInput, setTopicInput] = useState("");
+  const [knownTopics, setKnownTopics] = useState([]);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [visibility, setVisibility] = useState("FRIENDS");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Every topic the user has ever tagged, across all platforms — not
+  // filtered to one platform, since "two-pointers" is the same concept
+  // whether the problem was solved on LeetCode or Codeforces, and the
+  // whole point is reusing it regardless of where it was first typed.
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetch("https://codecache-13ic.onrender.com/api/problems/my/topics", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Failed to load topics"))))
+      .then(setKnownTopics)
+      .catch((error) => {
+        console.error("Error fetching known topics:", error);
+        setKnownTopics([]);
+      });
+  }, []);
+
+  // Prefix matches (on the normalized form) rank first, substring matches
+  // fill in after, already-added topics are excluded, capped at 6 so the
+  // dropdown stays short.
+  const topicSuggestions = (() => {
+    const query = normalizeTopic(topicInput);
+    if (!query) return [];
+
+    const already = new Set(topics.map((t) => t.toLowerCase()));
+    const prefixMatches = [];
+    const containsMatches = [];
+
+    for (const known of knownTopics) {
+      if (already.has(known.toLowerCase())) continue;
+      const normalized = normalizeTopic(known);
+      if (normalized.startsWith(query)) prefixMatches.push(known);
+      else if (normalized.includes(query)) containsMatches.push(known);
+    }
+
+    return [...prefixMatches, ...containsMatches].slice(0, 6);
+  })();
+
+  const addTopic = () => {
+    const value = topicInput.trim();
+    if (!value) return;
+
+    setTopics((prev) =>
+      prev.some((t) => t.toLowerCase() === value.toLowerCase()) ? prev : [...prev, value]
+    );
+    setTopicInput("");
+    setHighlightedIndex(-1);
+  };
+
+  // Adds a topic by its existing, already-registered spelling — used
+  // when the user picks a suggestion instead of typing their own text,
+  // so the stored value stays the canonical one rather than forking.
+  const selectSuggestion = (topic) => {
+    setTopics((prev) =>
+      prev.some((t) => t.toLowerCase() === topic.toLowerCase()) ? prev : [...prev, topic]
+    );
+    setTopicInput("");
+    setHighlightedIndex(-1);
+  };
+
+  const removeTopic = (value) => {
+    setTopics((prev) => prev.filter((t) => t !== value));
+  };
+
+  const handleTopicKeyDown = (e) => {
+    if (e.key === "ArrowDown" && topicSuggestions.length > 0) {
+      e.preventDefault();
+      setHighlightedIndex((i) => Math.min(i + 1, topicSuggestions.length - 1));
+      return;
+    }
+
+    if (e.key === "ArrowUp" && topicSuggestions.length > 0) {
+      e.preventDefault();
+      setHighlightedIndex((i) => Math.max(i - 1, -1));
+      return;
+    }
+
+    if (e.key === "Escape" && highlightedIndex >= 0) {
+      setHighlightedIndex(-1);
+      return;
+    }
+
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      // Only hijacks Enter when a suggestion has actually been navigated
+      // to — otherwise Enter still adds whatever was typed, unchanged,
+      // so a genuinely new topic that happens to share a prefix with an
+      // existing one doesn't get silently swapped out.
+      if (e.key === "Enter" && highlightedIndex >= 0 && topicSuggestions[highlightedIndex]) {
+        selectSuggestion(topicSuggestions[highlightedIndex]);
+      } else {
+        addTopic();
+      }
+      return;
+    }
+
+    if (e.key === "Backspace" && !topicInput && topics.length > 0) {
+      setTopics((prev) => prev.slice(0, -1));
+    }
+  };
 
   const handleSubmit = async () => {
     if (!link.trim()) {
@@ -97,6 +209,7 @@ function AddProblem() {
             intuition,
             timeComplexity,
             spaceComplexity,
+            topics,
             visibility,
             timeTaken: null,
           }),
@@ -117,6 +230,8 @@ function AddProblem() {
       setIntuition("");
       setTimeComplexity("");
       setSpaceComplexity("");
+      setTopics([]);
+      setTopicInput("");
       setVisibility("FRIENDS");
     } catch (error) {
       console.error(error);
@@ -209,6 +324,69 @@ function AddProblem() {
                   );
                 })}
               </div>
+            </div>
+
+            <div className="ap-field">
+              <label className="ap-field-label" htmlFor="topic-input">
+                <FaTags className="ap-field-icon" />
+                Topics
+              </label>
+              <div className="ap-tag-field">
+                {topics.map((topic) => (
+                  <span className="ap-tag-chip" key={topic}>
+                    {topic}
+                    <button
+                      type="button"
+                      className="ap-tag-chip-remove"
+                      onClick={() => removeTopic(topic)}
+                      aria-label={`Remove ${topic}`}
+                    >
+                      <FaTimes />
+                    </button>
+                  </span>
+                ))}
+                <input
+                  id="topic-input"
+                  className="ap-tag-input"
+                  placeholder={topics.length ? "Add another…" : "e.g. Array, Two Pointers…"}
+                  value={topicInput}
+                  onChange={(e) => {
+                    setTopicInput(e.target.value);
+                    setHighlightedIndex(-1);
+                  }}
+                  onKeyDown={handleTopicKeyDown}
+                  onBlur={addTopic}
+                  role="combobox"
+                  aria-expanded={topicSuggestions.length > 0}
+                  aria-autocomplete="list"
+                  aria-controls="topic-suggestions"
+                  autoComplete="off"
+                />
+
+                {topicSuggestions.length > 0 && (
+                  <div className="ap-tag-suggestions" id="topic-suggestions" role="listbox">
+                    {topicSuggestions.map((topic, i) => (
+                      <button
+                        type="button"
+                        key={topic}
+                        role="option"
+                        aria-selected={i === highlightedIndex}
+                        className={`ap-tag-suggestion ${i === highlightedIndex ? "ap-is-highlighted" : ""}`}
+                        // preventDefault on mousedown stops the input from
+                        // blurring before this click registers — without
+                        // it, onBlur's addTopic() would fire first and add
+                        // the raw partial text instead of this suggestion.
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => selectSuggestion(topic)}
+                        onMouseEnter={() => setHighlightedIndex(i)}
+                      >
+                        {topic}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span className="ap-visibility-hint">Press Enter or comma to add · optional</span>
             </div>
 
             <div className="ap-field">
