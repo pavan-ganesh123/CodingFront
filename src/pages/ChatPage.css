@@ -29,6 +29,7 @@
   --teal: #0f9c8c;
   --rose: #d63d72;
   --amber: #b8770f;
+  --gold: #FFD700;
   --danger: #e5484d;
 
   --shadow-color: 220 30% 12%;
@@ -462,7 +463,7 @@
 }
 
 .cp-star-filled {
-  color: var(--amber);
+  color: var(--gold);
 }
 
 /* ------------------------------------------------------------------ */

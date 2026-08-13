@@ -127,6 +127,11 @@
   overflow-x: hidden;
   isolation: isolate;
   font-family: var(--font-body);
+  /* explicit, in case direction:rtl leaks in from a global style —
+     flex-start/justify-content:flex-start below are direction-relative,
+     so an inherited rtl would anchor the header and filters to the
+     right instead of the left. */
+  direction: ltr;
 }
 
 .page-mesh {
@@ -157,17 +162,37 @@
 }
 
 /* ======================================================================
-   HEADER
+   HEADER — title on the left, filter bar on the right (a classic
+   page-header split). align-items:flex-start, not center/end, means
+   each side grows independently downward — the filter bar can get
+   taller when topic chips appear without touching the title at all.
+   That's the same problem the old column-stack version was solving,
+   just solved here by top-alignment instead of stacking.
+
+   Below the breakpoint (see the media query at the end of this file)
+   this collapses back to that column stack, since there usually isn't
+   room to keep both sides comfortable side-by-side once the filter
+   bar's own content starts wrapping.
    ====================================================================== */
 .platform-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-5);
+  width: 100%;
+  gap: var(--space-4);
   max-width: 1160px;
   margin: 0 auto;
   padding: clamp(32px, 5vw, 56px) clamp(20px, 4vw, 48px) var(--space-6);
+  text-align: left;
+}
+
+/* keeps the title from getting squeezed by the filter bar as the row
+   nears the responsive breakpoint — it should hold its natural width
+   and let the filter bar (already flex-wrap:wrap internally) be the
+   side that gives if things get tight. */
+.platform-title {
+  flex-shrink: 0;
 }
 
 .platform-eyebrow {
@@ -638,9 +663,6 @@
    RESPONSIVE
    ====================================================================== */
 @media (max-width: 640px) {
-  .platform-header {
-    align-items: flex-start;
-  }
   .card-top {
     flex-direction: column;
   }
@@ -672,5 +694,67 @@
   .difficulty-filter-btn,
   .copy-btn {
     transition: none;
+  }
+}
+
+/* filters block — justify-content:flex-start packs the difficulty
+   pills and topic toggle from the left of whatever width this block
+   ends up with. The block itself sits on the right edge of the header
+   because its parent (.platform-header) uses justify-content:space-
+   between, so it doesn't need its own width:100% here — that's only
+   added back in the media query below, once the header stacks into a
+   column and this needs to fill that full-width row instead of
+   shrink-wrapping to its content. */
+.platform-filters {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* right-aligns the chip pills within their own line so they read
+   flush with the toggle button above them, matching this block's
+   position on the right side of the header. Scoped to this page —
+   TopicFilter.css itself defaults .topic-filter-chips to flex-start,
+   so pages that keep a left-aligned filter bar aren't affected. */
+.platform-filters .topic-filter-chips {
+  justify-content: flex-end;
+}
+
+.problem-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-2);
+}
+
+.problem-topic-tag {
+  padding: 4px 10px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary-fg);
+  background: var(--primary-soft);
+  border-radius: var(--radius-full);
+}
+
+/* below this, title-left/filters-right doesn't have room to breathe —
+   collapse back to the original stacked column, left-aligned, full
+   width. Placed last in the file (rather than in the RESPONSIVE
+   section above) so it comes after .platform-header/.platform-filters
+   in source order and reliably overrides them. */
+@media (max-width: 900px) {
+  .platform-header {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .platform-filters {
+    width: 100%;
+  }
+
+  .platform-filters .topic-filter-chips {
+    justify-content: flex-start;
   }
 }
